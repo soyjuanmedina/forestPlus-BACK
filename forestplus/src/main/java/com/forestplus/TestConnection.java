@@ -1,4 +1,4 @@
-package com.forestplustech.forestplus;
+package com.forestplus;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

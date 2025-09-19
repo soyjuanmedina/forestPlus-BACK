@@ -1,7 +1,6 @@
-package com.forestplustech.forestplus.model;
+package com.forestplus.entity;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,23 +12,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "lands")
-public class Land {
+@Table(name = "companies")
+public class CompanyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "company_id", nullable = false)
-    private Company company;
-
     @Column(nullable = false)
     private String name;
 
-    private String location;
+    private String address;
 
-    private BigDecimal area;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -38,5 +35,4 @@ public class Land {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
-
 }
