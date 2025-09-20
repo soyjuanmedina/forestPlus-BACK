@@ -46,6 +46,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Sin sesión
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll() // registro y login abiertos
+                .requestMatchers("/ping").permitAll()   
                 .anyRequest().authenticated() // resto requiere JWT
             );
         
