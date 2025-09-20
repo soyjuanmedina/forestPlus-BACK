@@ -13,7 +13,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.forestplustech</groupId>
+    <groupId>com.forestplus</groupId>
     <artifactId>forestplus</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>forestplus</name>
