@@ -7,11 +7,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "companies")
 public class CompanyEntity {
@@ -19,29 +14,33 @@ public class CompanyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String name;
-
     private String address;
 
-    // Usuario administrador de la compañía
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id", nullable = false)
     private UserEntity admin;
 
-    // Relación con los usuarios que pertenecen a la compañía
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference // evita ciclo en JSON
     private List<UserEntity> users;
 
     @Column(name = "created_at", updatable = false, insertable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    protected void onCreate() {
-        if (this.createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
-    }
+    // Getters
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public String getAddress() { return address; }
+    public UserEntity getAdmin() { return admin; }
+    public List<UserEntity> getUsers() { return users; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+
+    // Setters
+    public void setId(Long id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setAddress(String address) { this.address = address; }
+    public void setAdmin(UserEntity admin) { this.admin = admin; }
+    public void setUsers(List<UserEntity> users) { this.users = users; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }
+

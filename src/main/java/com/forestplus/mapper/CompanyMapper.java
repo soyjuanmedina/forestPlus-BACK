@@ -13,9 +13,9 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface CompanyMapper {
 
-    @Mapping(source = "admin", target = "admin")
-    @Mapping(source = "users", target = "users")
-    CompanyResponse toResponse(CompanyEntity company);
+	@Mapping(source = "admin", target = "admin")
+	@Mapping(source = "users", target = "users")
+	CompanyResponse toResponse(CompanyEntity company);
 
     List<CompanyResponse> toResponseList(List<CompanyEntity> companies);
 
