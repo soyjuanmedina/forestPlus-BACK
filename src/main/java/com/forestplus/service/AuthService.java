@@ -3,6 +3,8 @@ package com.forestplus.service;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.exception.EmailAlreadyExistsException;
 import com.forestplus.repository.UserRepository;
+import com.forestplus.request.UserRequest;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,17 +27,19 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
-    public UserEntity register(String name, String email, String password, String role) {
-        if (userRepository.findByEmail(email).isPresent()) {
-        	throw new EmailAlreadyExistsException(email);
+    public UserEntity register(UserRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        	throw new EmailAlreadyExistsException(request.getEmail());
         }
-        String encodedPassword = passwordEncoder.encode(password);
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         UserEntity user = UserEntity.builder()
-                .name(name)
-                .email(email)
+                .name(request.getName())
+                .surname(request.getSurname())
+                .secondSurname(request.getSecondSurname())
+                .email(request.getEmail())
                 .passwordHash(encodedPassword)
-                .role(role)
+                .role(request.getRole())
                 .build();
 
         return userRepository.save(user);

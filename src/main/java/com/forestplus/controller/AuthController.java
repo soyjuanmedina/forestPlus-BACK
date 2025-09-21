@@ -19,12 +19,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@RequestBody UserRequest request) {
-        UserEntity user = authService.register(
-                request.getUsername(),
-                request.getEmail(),
-                request.getPassword(),
-                request.getRole()
-        );
+        UserEntity user = authService.register(request);
         return ResponseEntity.ok(userMapper.toDto(user));
     }
 
