@@ -1,14 +1,14 @@
 package com.forestplus.service;
 
-import com.forestplus.entity.CompanyEntity;
+import com.forestplus.request.CompanyRequest;
+import com.forestplus.response.CompanyResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CompanyService {
-    List<CompanyEntity> getAllCompanies();
-    Optional<CompanyEntity> getCompanyById(Long id);
-    CompanyEntity createCompany(CompanyEntity company);
-    CompanyEntity updateCompany(Long id, CompanyEntity company);
+    List<CompanyResponse> getAllCompanies();
+    CompanyResponse getCompanyById(Long id);
+    CompanyResponse createCompany(CompanyRequest request);
+    CompanyResponse updateCompany(Long id, CompanyRequest request);
     void deleteCompany(Long id);
 }

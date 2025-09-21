@@ -3,7 +3,7 @@ package com.forestplus.request;
 import lombok.Data;
 
 @Data
-public class UserRequest {
+public class RegisterUserRequest {
     private String name;
     private String surname;
     private String secondSurname;

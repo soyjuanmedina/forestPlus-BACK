@@ -1,6 +1,7 @@
 package com.forestplus.controller;
 
-import com.forestplus.request.UserRequest;
+import com.forestplus.request.RegisterUserRequest;
+import com.forestplus.response.AuthResponse;
 import com.forestplus.response.UserResponse;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.mapper.UserMapper;
@@ -18,14 +19,14 @@ public class AuthController {
     private final UserMapper userMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody UserRequest request) {
+    public ResponseEntity<UserResponse> register(@RequestBody RegisterUserRequest request) {
         UserEntity user = authService.register(request);
-        return ResponseEntity.ok(userMapper.toDto(user));
+        return ResponseEntity.ok(userMapper.toResponse(user));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody RegisterUserRequest request) {
         String jwt = authService.login(request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(jwt);
+        return ResponseEntity.ok(new AuthResponse(jwt));
     }
 }
