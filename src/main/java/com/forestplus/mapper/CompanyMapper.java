@@ -4,7 +4,6 @@ import com.forestplus.entity.CompanyEntity;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.request.CompanyRequest;
 import com.forestplus.response.CompanyResponse;
-import com.forestplus.response.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -24,7 +23,7 @@ public interface CompanyMapper {
     // Request -> Entity
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "admin", source = "adminId", qualifiedByName = "mapAdminIdToUserEntity")
-    @Mapping(target = "users", ignore = true) // Se gestionan en servicio
+    @Mapping(target = "users", ignore = true) // se gestionan en el servicio
     @Mapping(target = "createdAt", ignore = true)
     CompanyEntity toEntity(CompanyRequest request);
 
