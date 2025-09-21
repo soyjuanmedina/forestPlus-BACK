@@ -37,7 +37,7 @@ public class CompanyServiceImpl implements CompanyService {
                 .map(existing -> {
                     existing.setName(company.getName());
                     existing.setAddress(company.getAddress());
-                    existing.setUser(company.getUser());
+                    existing.setAdmin(company.getAdmin());
                     return companyRepository.save(existing);
                 })
                 .orElseThrow(() -> new RuntimeException("Company not found with id " + id));

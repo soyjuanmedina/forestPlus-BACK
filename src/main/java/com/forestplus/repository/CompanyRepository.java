@@ -10,5 +10,5 @@ import com.forestplus.entity.CompanyEntity;
 @Repository
 public interface CompanyRepository extends JpaRepository<CompanyEntity, Long> {
     // Métodos adicionales si quieres filtrar por user_id, por ejemplo:
-    List<CompanyEntity> findByUserId(Long userId);
+    List<CompanyEntity> findByAdminId(Long adminId);
 }

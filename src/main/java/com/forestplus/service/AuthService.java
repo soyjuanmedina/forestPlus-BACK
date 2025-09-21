@@ -25,14 +25,14 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
-    public UserEntity register(String username, String email, String password, String role) {
+    public UserEntity register(String name, String email, String password, String role) {
         if (userRepository.findByEmail(email).isPresent()) {
         	throw new EmailAlreadyExistsException(email);
         }
         String encodedPassword = passwordEncoder.encode(password);
 
         UserEntity user = UserEntity.builder()
-                .username(username)
+                .name(name)
                 .email(email)
                 .passwordHash(encodedPassword)
                 .role(role)

@@ -35,7 +35,9 @@ public class UserServiceImpl implements UserService {
     public UserEntity updateUser(Long id, UserEntity user) {
         return userRepository.findById(id)
                 .map(existing -> {
-                    existing.setUsername(user.getUsername());
+                    existing.setName(user.getName());
+                    existing.setSurname(user.getSurname());
+                    existing.setSecondSurname(user.getSecondSurname());
                     existing.setEmail(user.getEmail());
                     existing.setPasswordHash(user.getPasswordHash());
                     existing.setRole(user.getRole());
