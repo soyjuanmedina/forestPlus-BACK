@@ -6,7 +6,6 @@ import com.forestplus.request.RegisterUserRequest;
 import com.forestplus.response.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -14,12 +13,13 @@ public interface UserMapper {
     // De entidad a response
     UserResponse toResponse(UserEntity user);
 
-    @Mapping(target = "passwordHash", expression = "java(passwordEncoder.encode(request.getPassword()))")
-    UserEntity toEntity(RegisterUserRequest request, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder);
-    
- // Para Admin: asigna la contraseña generada
-    @Mapping(target = "passwordHash", expression = "java(passwordEncoder.encode(randomPassword))")
-    UserEntity toEntityWithPassword(RegisterUserByAdminRequest request, String randomPassword, PasswordEncoder passwordEncoder);
+    // Mapea de RegisterUserRequest a UserEntity (sin contraseña, se setea en el servicio)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "passwordHash", ignore = true) // CORRECTO: se maneja en el servicio
+    UserEntity toEntity(RegisterUserRequest request);
 
-
+    // Para Admin: igual, el password se setea en el servicio
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "passwordHash", ignore = true) 
+    UserEntity toEntity(RegisterUserByAdminRequest request);
 }

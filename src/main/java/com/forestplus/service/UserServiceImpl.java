@@ -44,22 +44,20 @@ public class UserServiceImpl implements UserService {
     // Registro realizado por un ADMIN, con contraseña generada
     public UserResponse registerUserByAdmin(RegisterUserByAdminRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-        	throw new EmailAlreadyExistsException(request.getEmail());
+            throw new EmailAlreadyExistsException(request.getEmail());
         }
         String randomPassword = generateRandomPassword(8);
-        UserEntity user = userMapper.toEntityWithPassword(request, randomPassword, passwordEncoder);
+        UserEntity user = userMapper.toEntity(request);
+        user.setPasswordHash(passwordEncoder.encode(randomPassword)); // aquí seteas
         UserEntity saved = userRepository.save(user);
-        // Enviar email con la contraseña
+
+        // Enviar email con la contraseña generada
         String subject = "Tu nueva cuenta en ForestPlus";
         String text = "Hola " + saved.getName() + ",\n\n"
                     + "Se ha creado tu cuenta con email: " + saved.getEmail() + "\n"
                     + "Tu contraseña temporal es: " + randomPassword + "\n\n"
                     + "Por favor, cámbiala después de iniciar sesión.";
-        try {
-            emailService.sendEmail(saved.getEmail(), subject, text);
-        } catch (Exception e) {
-            throw new EmailSendException(saved.getEmail());
-        }
+        emailService.sendEmail(saved.getEmail(), subject, text);
 
         return userMapper.toResponse(saved);
     }
