@@ -13,21 +13,18 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface CompanyMapper {
 
-    // Entity -> Response
     @Mapping(source = "admin", target = "admin")
     @Mapping(source = "users", target = "users")
     CompanyResponse toResponse(CompanyEntity company);
 
     List<CompanyResponse> toResponseList(List<CompanyEntity> companies);
 
-    // Request -> Entity
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "admin", source = "adminId", qualifiedByName = "mapAdminIdToUserEntity")
-    @Mapping(target = "users", ignore = true) // se gestionan en el servicio
+    @Mapping(target = "users", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     CompanyEntity toEntity(CompanyRequest request);
 
-    // Método auxiliar para convertir adminId -> UserEntity
     @Named("mapAdminIdToUserEntity")
     default UserEntity mapAdminIdToUserEntity(Long adminId) {
         if (adminId == null) return null;
