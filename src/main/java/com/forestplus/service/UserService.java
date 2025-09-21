@@ -11,7 +11,6 @@ import java.util.Optional;
 public interface UserService {
     List<UserResponse> getAllUsers();
     UserResponse getUserById(Long id);
-    UserResponse registerUser(RegisterUserRequest user);
     UserResponse registerUserByAdmin(RegisterUserByAdminRequest request);
     UserResponse updateUser(Long id, RegisterUserRequest user);
     UserResponse updateUserByAdmin(Long id, RegisterUserByAdminRequest user);

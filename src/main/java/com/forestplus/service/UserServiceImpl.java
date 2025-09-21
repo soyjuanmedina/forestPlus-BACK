@@ -1,6 +1,8 @@
 package com.forestplus.service;
 
 import com.forestplus.entity.UserEntity;
+import com.forestplus.exception.EmailAlreadyExistsException;
+import com.forestplus.exception.EmailSendException;
 import com.forestplus.mapper.UserMapper;
 import com.forestplus.repository.UserRepository;
 import com.forestplus.request.RegisterUserByAdminRequest;
@@ -20,6 +22,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final EmailService emailService;
 
     // Obtener todos los usuarios
     @Override
@@ -38,20 +41,26 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
     }
 
-    // Registro estándar (usuario se registra por sí mismo)
-    @Override
-    public UserResponse registerUser(RegisterUserRequest request) {
-        UserEntity user = userMapper.toEntity(request, passwordEncoder);
-        UserEntity saved = userRepository.save(user);
-        return userMapper.toResponse(saved);
-    }
-
     // Registro realizado por un ADMIN, con contraseña generada
     public UserResponse registerUserByAdmin(RegisterUserByAdminRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        	throw new EmailAlreadyExistsException(request.getEmail());
+        }
         String randomPassword = generateRandomPassword(8);
         UserEntity user = userMapper.toEntityWithPassword(request, randomPassword, passwordEncoder);
         UserEntity saved = userRepository.save(user);
-        // Aquí podrías enviar el email con la contraseña "randomPassword"
+        // Enviar email con la contraseña
+        String subject = "Tu nueva cuenta en ForestPlus";
+        String text = "Hola " + saved.getName() + ",\n\n"
+                    + "Se ha creado tu cuenta con email: " + saved.getEmail() + "\n"
+                    + "Tu contraseña temporal es: " + randomPassword + "\n\n"
+                    + "Por favor, cámbiala después de iniciar sesión.";
+        try {
+            emailService.sendEmail(saved.getEmail(), subject, text);
+        } catch (Exception e) {
+            throw new EmailSendException(saved.getEmail());
+        }
+
         return userMapper.toResponse(saved);
     }
 

@@ -34,3 +34,4 @@ build/
 
 .env
 forestPlus-temp/
+/src/main/resources/application-local.properties
