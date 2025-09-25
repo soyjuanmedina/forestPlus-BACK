@@ -6,6 +6,8 @@ import com.forestplus.response.UserResponse;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.mapper.UserMapper;
 import com.forestplus.service.AuthService;
+import com.forestplus.service.UserService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
     private final UserMapper userMapper;
 
     @PostMapping("/register")
@@ -28,6 +31,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody RegisterUserRequest request) {
         String jwt = authService.login(request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(new AuthResponse(jwt));
+        UserResponse user = userService.getUserByEmail(request.getEmail());
+        return ResponseEntity.ok(new AuthResponse(jwt, user));
     }
 }

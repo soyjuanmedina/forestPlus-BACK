@@ -40,6 +40,13 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::toResponse)
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
     }
+    
+    @Override
+    public UserResponse getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(userMapper::toResponse)
+                .orElseThrow(() -> new RuntimeException("User not found with email " + email));
+    }
 
     // Registro realizado por un ADMIN, con contraseña generada
     public UserResponse registerUserByAdmin(RegisterUserByAdminRequest request) {
