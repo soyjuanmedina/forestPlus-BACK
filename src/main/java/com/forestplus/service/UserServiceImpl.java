@@ -55,7 +55,10 @@ public class UserServiceImpl implements UserService {
         }
         String randomPassword = generateRandomPassword(8);
         UserEntity user = userMapper.toEntity(request);
-        user.setPasswordHash(passwordEncoder.encode(randomPassword)); // aquí seteas
+        user.setPasswordHash(passwordEncoder.encode(randomPassword));
+        user.setForcePasswordChange(true); 
+        user.setEmailVerified(true); 
+        user.setUuid(null);
         UserEntity saved = userRepository.save(user);
 
         // Enviar email con la contraseña generada

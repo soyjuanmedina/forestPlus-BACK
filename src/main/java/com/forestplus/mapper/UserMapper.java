@@ -14,9 +14,15 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "passwordHash", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "emailVerified", ignore = true) 
+    @Mapping(target = "forcePasswordChange", ignore = true)
     UserEntity toEntity(RegisterUserRequest request);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "passwordHash", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "emailVerified", ignore = true)
+    @Mapping(target = "forcePasswordChange", ignore = true)
     UserEntity toEntity(RegisterUserByAdminRequest request);
 }

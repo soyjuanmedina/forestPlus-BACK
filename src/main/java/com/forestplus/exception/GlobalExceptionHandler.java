@@ -1,15 +1,17 @@
 package com.forestplus.exception;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<String> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    @ExceptionHandler(ForestPlusException.class)
+    public ResponseEntity<ErrorResponse> handleForestPlusException(ForestPlusException ex) {
+        ErrorResponse body = new ErrorResponse(ex.getMessage(), ex.getStatus());
+        return ResponseEntity.status(ex.getStatus()).body(body);
     }
+
+    public static record ErrorResponse(String message, int status) {}
 }

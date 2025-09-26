@@ -1,8 +1,7 @@
 package com.forestplus.exception;
 
-public class EmailAlreadyExistsException extends RuntimeException {
-
+public class EmailAlreadyExistsException extends ForestPlusException {
     public EmailAlreadyExistsException(String email) {
-        super("Email ya registrado: " + email);
+        super("EMAIL_ALREADY_EXISTS", 400);
     }
 }

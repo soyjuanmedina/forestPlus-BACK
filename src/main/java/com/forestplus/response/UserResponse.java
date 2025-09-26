@@ -13,4 +13,6 @@ public class UserResponse {
     private String secondSurname;
     private String email;
     private String role;
+    private boolean emailVerified;
+    private boolean forcePasswordChange;
 }
