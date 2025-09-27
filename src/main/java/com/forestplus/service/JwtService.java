@@ -1,6 +1,8 @@
 package com.forestplus.service;
 
 import com.forestplus.entity.UserEntity;
+
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -36,5 +38,19 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
+    }
+    
+    public String extractEmail(String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey) // ✅ pasamos SecretKey directamente
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject(); // asumimos que el email está en subject
     }
 }

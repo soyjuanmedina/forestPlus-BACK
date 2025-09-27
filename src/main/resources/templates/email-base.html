@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Correo Forest+</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 0; }
+        .container { max-width: 500px; margin: 40px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn { display: inline-block; padding: 10px 20px; background: #22c55e; color: white; text-decoration: none; border-radius: 6px; }
+        .logo { display: block; margin: 0 auto 20px; width: 100px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img src="https://forestplus.com/assets/logo.png" alt="Forest+ Logo" class="logo">
+
+    <!-- Contenido dinámico -->
+    <div th:utext="${content}">
+        <!-- Aquí se inyecta el contenido -->
+    </div>
+
+    <p style="margin-top:20px; text-align:center; font-size: 12px; color: #666;">
+        © 2025 ForestPlus. Todos los derechos reservados.
+    </p>
+</div>
+</body>
+</html>

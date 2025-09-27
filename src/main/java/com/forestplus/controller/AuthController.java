@@ -1,12 +1,15 @@
 package com.forestplus.controller;
 
+import com.forestplus.request.ForgotPasswordRequest;
 import com.forestplus.request.RegisterUserRequest;
 import com.forestplus.request.ResendVerificationEmailRequest;
+import com.forestplus.request.ResetPasswordRequest;
 import com.forestplus.response.AuthResponse;
 import com.forestplus.response.UserResponse;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.mapper.UserMapper;
 import com.forestplus.service.AuthService;
+import com.forestplus.service.JwtService;
 import com.forestplus.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,26 +20,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200") // frontend
+@CrossOrigin(
+	    origins = "${app.frontend.url}",
+	    allowedHeaders = "*",       // permite Authorization
+	    allowCredentials = "true"
+	)
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-    private final UserService userService;
-    private final UserMapper userMapper;
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@RequestBody RegisterUserRequest request) {
-        UserEntity user = authService.register(request);
-        return ResponseEntity.ok(userMapper.toResponse(user));
+        return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody RegisterUserRequest request) {
-        String jwt = authService.login(request.getEmail(), request.getPassword());
-        UserResponse user = userService.getUserByEmail(request.getEmail());
-        return ResponseEntity.ok(new AuthResponse(jwt, user));
+        return ResponseEntity.ok(authService.login(request.getEmail(), request.getPassword()));
     }
     
     @GetMapping("/verify")
@@ -54,5 +57,24 @@ public class AuthController {
     public ResponseEntity<Void> resendVerification(@RequestBody ResendVerificationEmailRequest request) {
         authService.resendVerificationEmail(request.getEmail());
         return ResponseEntity.ok().build();
+    }
+    
+    @PostMapping("/reset-password")
+    public void resetPassword(@RequestBody ResetPasswordRequest request,
+                              @RequestHeader("Authorization") String token) {
+        // Extraer email del token JWT
+        String email = jwtService.extractEmail(token); 
+        authService.resetPassword(email, request);
+    }
+    
+    @PostMapping("/forgot-password")
+    public void forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request.getEmail());
+    }
+    @PostMapping("/forgot-password/reset")
+    public void resetForgotPassword(@RequestParam("uuid") String uuid, 
+                                    @RequestBody ResetPasswordRequest request) {
+        // Buscar usuario por UUID y actualizar la contraseña
+        authService.resetPasswordWithUuid(uuid, request.getNewPassword()); 
     }
 }

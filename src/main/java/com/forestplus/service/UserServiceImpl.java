@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,13 +63,21 @@ public class UserServiceImpl implements UserService {
         user.setUuid(null);
         UserEntity saved = userRepository.save(user);
 
-        // Enviar email con la contraseña generada
         String subject = "Tu nueva cuenta en ForestPlus";
-        String text = "Hola " + saved.getName() + ",\n\n"
-                    + "Se ha creado tu cuenta con email: " + saved.getEmail() + "\n"
-                    + "Tu contraseña temporal es: " + randomPassword + "\n\n"
-                    + "Por favor, cámbiala después de iniciar sesión.";
-        emailService.sendEmail(saved.getEmail(), subject, text);
+
+     // Variables para la plantilla
+     Map<String, Object> vars = new HashMap<>();
+     vars.put("name", saved.getName());
+     vars.put("email", saved.getEmail());
+     vars.put("password", randomPassword);
+
+     // Enviar usando plantilla dinámica
+     emailService.sendEmail(
+         saved.getEmail(),
+         subject,
+         "contents/new-account-content", // 👈 apunta a /templates/contents/new-account-content.html
+         vars
+     );
 
         return userMapper.toResponse(saved);
     }
