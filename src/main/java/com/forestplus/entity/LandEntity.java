@@ -22,10 +22,6 @@ public class LandEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "company_id", nullable = false)
-    private CompanyEntity company;
-
     @Column(nullable = false)
     private String name;
 
@@ -33,8 +29,23 @@ public class LandEntity {
 
     private BigDecimal area;
     
+    private String picture; 
+    
     @OneToMany(mappedBy = "land", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CoordinateEntity> coordinates;
+    
+    // Relación muchos a muchos con compañías
+    @ManyToMany(mappedBy = "lands")
+    private List<CompanyEntity> companies;
+
+    // Relación muchos a muchos con usuarios
+    @ManyToMany
+    @JoinTable(
+        name = "user_lands",
+        joinColumns = @JoinColumn(name = "land_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<UserEntity> users;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

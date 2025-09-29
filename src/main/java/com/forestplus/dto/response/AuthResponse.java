@@ -1,4 +1,4 @@
-package com.forestplus.response;
+package com.forestplus.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

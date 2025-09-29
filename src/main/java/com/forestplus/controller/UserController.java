@@ -1,8 +1,8 @@
 package com.forestplus.controller;
 
-import com.forestplus.request.RegisterUserByAdminRequest;
-import com.forestplus.request.RegisterUserRequest;
-import com.forestplus.response.UserResponse;
+import com.forestplus.dto.request.RegisterUserByAdminRequest;
+import com.forestplus.dto.request.RegisterUserRequest;
+import com.forestplus.dto.response.UserResponse;
 import com.forestplus.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

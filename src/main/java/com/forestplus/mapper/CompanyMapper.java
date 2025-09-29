@@ -1,9 +1,10 @@
 package com.forestplus.mapper;
 
+import com.forestplus.dto.request.CompanyRequest;
+import com.forestplus.dto.response.CompanyResponse;
 import com.forestplus.entity.CompanyEntity;
 import com.forestplus.entity.UserEntity;
-import com.forestplus.request.CompanyRequest;
-import com.forestplus.response.CompanyResponse;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

@@ -1,5 +1,10 @@
 package com.forestplus.service;
 
+import com.forestplus.dto.request.RegisterUserRequest;
+import com.forestplus.dto.request.ResetPasswordRequest;
+import com.forestplus.dto.response.AuthResponse;
+import com.forestplus.dto.response.UserResponse;
+import com.forestplus.entity.CompanyEntity;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.exception.EmailAlreadyExistsException;
 import com.forestplus.exception.EmailAlreadyVerifiedException;
@@ -9,11 +14,8 @@ import com.forestplus.exception.UserNotFoundException;
 import com.forestplus.exception.UuidNotFoundException;
 import com.forestplus.exception.WrongPasswordException;
 import com.forestplus.mapper.UserMapper;
+import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
-import com.forestplus.request.RegisterUserRequest;
-import com.forestplus.request.ResetPasswordRequest;
-import com.forestplus.response.AuthResponse;
-import com.forestplus.response.UserResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final CompanyRepository companyRepository; // <--- nuevo
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -62,6 +65,13 @@ public class AuthService {
                 .uuid(verificationUuid)
                 .build();
 
+        // --- Asignar compañía si se recibe ---
+        if (request.getCompanyId() != null) {
+            CompanyEntity company = companyRepository.findById(request.getCompanyId())
+                    .orElseThrow(() -> new RuntimeException("Company not found with id " + request.getCompanyId()));
+            user.setCompany(company);
+        }
+
         UserEntity saved = userRepository.save(user);
 
         // Enviar email de confirmación
@@ -86,17 +96,14 @@ public class AuthService {
         Boolean forcePasswordChange = user.getForcePasswordChange() ? true : null;
         return new AuthResponse(token, userResponse, forcePasswordChange);
     }
-    
+
     public void verifyEmail(String uuid) {
         UserEntity user = userRepository.findByUuid(uuid)
-                .orElseThrow(() -> new UuidNotFoundException(uuid)); // nueva excepción
-
+                .orElseThrow(() -> new UuidNotFoundException(uuid));
         user.setEmailVerified(true);
-        // opcional: limpiar uuid tras verificación
-        // user.setUuid(null);
         userRepository.save(user);
     }
-    
+
     public void resendVerificationEmail(String email) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("USER_NOT_FOUND"));
@@ -105,74 +112,52 @@ public class AuthService {
             throw new EmailAlreadyVerifiedException("EMAIL_ALREADY_VERIFIED");
         }
 
-        // Generar un nuevo UUID si quieres invalidar el anterior
         String verificationUuid = UUID.randomUUID().toString();
         user.setUuid(verificationUuid);
         userRepository.save(user);
 
-        // Enviar email
         String subject = "Confirma tu correo en ForestPlus";
         String link = frontendUrl + "/verify-email?uuid=" + verificationUuid;
 
-        // Variables que usará verify-email-content.html
         Map<String, Object> vars = new HashMap<>();
         vars.put("name", user.getName());
         vars.put("link", link);
 
-        // Llamada al servicio genérico
-        emailService.sendEmail(
-            user.getEmail(),
-            subject,
-            "contents/verify-email-content", 
-            vars
-        );
+        emailService.sendEmail(user.getEmail(), subject, "contents/verify-email-content", vars);
     }
-    
+
     @Transactional
     public void resetPassword(String email, ResetPasswordRequest request) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
-
-        // Guardar nueva contraseña
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-
-        // Marcar forcePasswordChange como false
         user.setForcePasswordChange(false);
-
         userRepository.save(user);
     }
-    
+
     public void forgotPassword(String email) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
 
-        // Generar uuid temporal
         String uuid = UUID.randomUUID().toString();
         user.setUuid(uuid);
         userRepository.save(user);
 
-        // Link de reset
         String link = frontendUrl + "/reset-password?token=" + uuid;
-
-        // Variables Thymeleaf
-        var vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("name", user.getName());
         vars.put("link", link);
 
-        // Enviar email
-        emailService.sendEmail(
-            user.getEmail(),
-            "Restablece tu contraseña en ForestPlus",
-            "contents/reset-password-content",
-            vars
-        );
+        emailService.sendEmail(user.getEmail(), "Restablece tu contraseña en ForestPlus",
+                "contents/reset-password-content", vars);
     }
-    
+
     public void resetPasswordWithUuid(String uuid, String newPassword) {
         UserEntity user = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new UserNotFoundException("UUID_INVALIDO"));
         user.setPasswordHash(passwordEncoder.encode(newPassword));
-        user.setUuid(null); // invalidar el UUID para que no se reutilice
+        user.setUuid(null);
         userRepository.save(user);
     }
 }
+

@@ -9,5 +9,4 @@ import com.forestplus.entity.LandEntity;
 
 @Repository
 public interface LandRepository extends JpaRepository<LandEntity, Long> {
-    List<LandEntity> findByCompanyId(Long companyId);
 }

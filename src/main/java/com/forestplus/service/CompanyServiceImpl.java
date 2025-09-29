@@ -1,26 +1,25 @@
 package com.forestplus.service;
 
+import com.forestplus.dto.request.CompanyRequest;
+import com.forestplus.dto.response.CompanyResponse;
 import com.forestplus.entity.CompanyEntity;
 import com.forestplus.mapper.CompanyMapper;
 import com.forestplus.repository.CompanyRepository;
-import com.forestplus.request.CompanyRequest;
-import com.forestplus.response.CompanyResponse;
 import com.forestplus.service.CompanyService;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
-
-    public CompanyServiceImpl(CompanyRepository companyRepository, CompanyMapper companyMapper) {
-        this.companyRepository = companyRepository;
-        this.companyMapper = companyMapper;
-    }
 
     @Override
     public List<CompanyResponse> getAllCompanies() {

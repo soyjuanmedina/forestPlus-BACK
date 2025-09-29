@@ -1,4 +1,4 @@
-package com.forestplus.request;
+package com.forestplus.dto.request;
 
 import lombok.Data;
 

@@ -1,7 +1,7 @@
 package com.forestplus.service;
 
-import com.forestplus.request.CompanyRequest;
-import com.forestplus.response.CompanyResponse;
+import com.forestplus.dto.request.CompanyRequest;
+import com.forestplus.dto.response.CompanyResponse;
 
 import java.util.List;
 

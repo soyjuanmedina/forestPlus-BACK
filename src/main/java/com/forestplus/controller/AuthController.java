@@ -1,11 +1,11 @@
 package com.forestplus.controller;
 
-import com.forestplus.request.ForgotPasswordRequest;
-import com.forestplus.request.RegisterUserRequest;
-import com.forestplus.request.ResendVerificationEmailRequest;
-import com.forestplus.request.ResetPasswordRequest;
-import com.forestplus.response.AuthResponse;
-import com.forestplus.response.UserResponse;
+import com.forestplus.dto.request.ForgotPasswordRequest;
+import com.forestplus.dto.request.RegisterUserRequest;
+import com.forestplus.dto.request.ResendVerificationEmailRequest;
+import com.forestplus.dto.request.ResetPasswordRequest;
+import com.forestplus.dto.response.AuthResponse;
+import com.forestplus.dto.response.UserResponse;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.mapper.UserMapper;
 import com.forestplus.service.AuthService;

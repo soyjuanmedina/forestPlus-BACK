@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -58,6 +59,10 @@ public class UserEntity {
 
     @Column(name = "uuid")
     private String uuid;
+    
+    // Relación muchos a muchos con terrenos
+    @ManyToMany(mappedBy = "users")
+    private List<LandEntity> lands;
 
     @PrePersist
     protected void onCreate() {

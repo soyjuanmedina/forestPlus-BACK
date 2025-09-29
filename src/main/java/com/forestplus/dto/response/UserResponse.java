@@ -1,4 +1,4 @@
-package com.forestplus.response;
+package com.forestplus.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,4 +14,7 @@ public class UserResponse {
     private String email;
     private String role;
     private boolean emailVerified;
+    
+    // Información de la compañía como DTO
+    private CompanyResponse company;
 }
