@@ -6,7 +6,6 @@ import com.forestplus.dto.response.UserResponse;
 import com.forestplus.entity.CompanyEntity;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.exception.EmailAlreadyExistsException;
-import com.forestplus.exception.EmailSendException;
 import com.forestplus.mapper.UserMapper;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
