@@ -3,23 +3,25 @@ package com.forestplus.mapper;
 import com.forestplus.dto.request.RegisterUserByAdminRequest;
 import com.forestplus.dto.request.RegisterUserRequest;
 import com.forestplus.dto.response.UserResponse;
+import com.forestplus.dto.response.CompanySummaryResponse;
 import com.forestplus.entity.UserEntity;
+import com.forestplus.entity.CompanyEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {CompanyMapper.class})
+@Mapper(componentModel = "spring")
 public interface UserMapper {
-
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     // --- ENTITY -> RESPONSE ---
     @Mapping(target = "company", source = "company")
     UserResponse toResponse(UserEntity user);
 
     List<UserResponse> toResponseList(List<UserEntity> users);
+
+    // --- CompanyEntity -> CompanySummaryResponse ---
+    CompanySummaryResponse toCompanySummary(CompanyEntity company);
 
     // --- REQUEST -> ENTITY ---
     @Mapping(target = "id", ignore = true)
