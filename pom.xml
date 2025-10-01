@@ -93,6 +93,17 @@
         <version>0.2.0</version>
         <scope>provided</scope>
     </dependency>
+    
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.7.0</version>
+</dependency>
+
+<dependency>
+    <groupId>org.hibernate.validator</groupId>
+    <artifactId>hibernate-validator</artifactId>
+</dependency>
 
         <!-- JWT -->
         <dependency>
@@ -130,13 +141,6 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>
 </dependency>
-
-    <!-- OpenAPI (Swagger) para Spring Boot -->
-    <dependency>
-        <groupId>org.springdoc</groupId>
-        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        <version>2.6.0</version>
-    </dependency>
 
     </dependencies>
 
