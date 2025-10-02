@@ -1,29 +1,38 @@
 logsBucket: gs://cloud-build-logs-forest-plus
 serviceAccount: projects/nomadic-raceway-473907-s9/serviceAccounts/cloudbuild-deploy@nomadic-raceway-473907-s9.iam.gserviceaccount.com
+substitutions:
+  _IMAGE_NAME: mi-app
 
 steps:
   - name: 'gcr.io/cloud-builders/mvn'
     args: ['clean', 'package', '-DskipTests']
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'build', '-t', 'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app', '.'
-    ]
+    args:
+      [
+        'build',
+        '-t',
+        'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/${_IMAGE_NAME}:${SHORT_SHA}',
+        '.'
+      ]
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'push', 'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app'
-    ]
+    args:
+      [
+        'push',
+        'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/${_IMAGE_NAME}:${SHORT_SHA}'
+      ]
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    args: [
-      'run', 'deploy', 'mi-app',
-      '--image', 'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app',
-      '--region', 'europe-southwest1',
-      '--platform', 'managed',
-      '--allow-unauthenticated'
-    ]
+    args:
+      [
+        'run', 'deploy', '${_IMAGE_NAME}',
+        '--image', 'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/${_IMAGE_NAME}:${SHORT_SHA}',
+        '--region', 'europe-southwest1',
+        '--platform', 'managed',
+        '--allow-unauthenticated'
+      ]
 
 images:
-  - 'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app'
+  - 'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/${_IMAGE_NAME}:${SHORT_SHA}'
