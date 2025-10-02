@@ -7,23 +7,23 @@ steps:
 
   - name: 'gcr.io/cloud-builders/docker'
     args: [
-      'build', '-t', 'us-central1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app', '.'
+      'build', '-t', 'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app', '.'
     ]
 
   - name: 'gcr.io/cloud-builders/docker'
     args: [
-      'push', 'us-central1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app'
+      'push', 'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app'
     ]
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args: [
       'run', 'deploy', 'mi-app',
-      '--image', 'us-central1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app',
-      '--region', 'us-central1',
+      '--image', 'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app',
+      '--region', 'europe-southwest1',
       '--platform', 'managed',
       '--allow-unauthenticated'
     ]
 
 images:
-  - 'us-central1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app'
+  - 'europe-southwest1-docker.pkg.dev/nomadic-raceway-473907-s9/springboot-repo/mi-app'
