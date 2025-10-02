@@ -49,11 +49,11 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 // Endpoints públicos
-                .requestMatchers("/api/auth/**", "/ping").permitAll()
-
-                // Swagger/OpenAPI
-                .requestMatchers("/v3/api-docs/**").permitAll()
-                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/api/auth/**", "/ping",  "/v3/api-docs/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/swagger-resources/**",
+                        "/webjars/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 // Recursos estáticos
                 .requestMatchers(org.springframework.boot.autoconfigure.security.servlet.PathRequest.toStaticResources().atCommonLocations()).permitAll()
@@ -68,6 +68,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
 }
