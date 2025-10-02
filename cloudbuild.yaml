@@ -1,0 +1,25 @@
+steps:
+  - name: 'gcr.io/cloud-builders/mvn'
+    args: ['clean', 'package', '-DskipTests']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/springboot-repo/mi-app', '.'
+    ]
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push', 'us-central1-docker.pkg.dev/$PROJECT_ID/springboot-repo/mi-app'
+    ]
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: [
+      'run', 'deploy', 'mi-app',
+      '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/springboot-repo/mi-app',
+      '--region', 'us-central1',
+      '--platform', 'managed',
+      '--allow-unauthenticated'
+    ]
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/springboot-repo/mi-app'
