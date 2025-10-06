@@ -27,7 +27,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
 
-            // Renderiza primero el contenido dinámico
+            // Renderiza primero el contenido dinámico completo
             Context context = new Context();
             context.setVariables(variables);
             String contentHtml = templateEngine.process(contentTemplate, context);
