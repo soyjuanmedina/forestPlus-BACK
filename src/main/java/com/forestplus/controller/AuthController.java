@@ -5,26 +5,28 @@ import com.forestplus.dto.request.RegisterUserRequest;
 import com.forestplus.dto.request.ResendVerificationEmailRequest;
 import com.forestplus.dto.request.ResetPasswordRequest;
 import com.forestplus.dto.response.AuthResponse;
+import com.forestplus.dto.response.MessageResponse;
 import com.forestplus.dto.response.UserResponse;
-import com.forestplus.entity.UserEntity;
-import com.forestplus.mapper.UserMapper;
 import com.forestplus.service.AuthService;
 import com.forestplus.service.JwtService;
-import com.forestplus.service.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.Map;
-
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(
-	    origins = "${app.frontend.url}",
-	    allowedHeaders = "*",       // permite Authorization
-	    allowCredentials = "true"
-	)
+        origins = "${app.frontend.url}",
+        allowedHeaders = "*",
+        allowCredentials = "true"
+)
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
@@ -32,49 +34,189 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
 
-    @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody RegisterUserRequest request) {
+    @Operation(
+        summary = "Registro de usuario",
+        description = "Registra un nuevo usuario en el sistema",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Usuario registrado correctamente",
+                content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = UserResponse.class)
+                )
+            ),
+            @ApiResponse(
+                responseCode = "400",
+                description = "Datos de registro inválidos",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
+            )
+        }
+    )
+    @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> register(
+        @Parameter(description = "Datos del usuario a registrar") 
+        @RequestBody RegisterUserRequest request
+    ) {
         return ResponseEntity.ok(authService.register(request));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody RegisterUserRequest request) {
+    @Operation(
+        summary = "Login de usuario",
+        description = "Autentica al usuario y devuelve token y datos del usuario",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Login exitoso",
+                content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = AuthResponse.class)
+                )
+            ),
+            @ApiResponse(
+                responseCode = "401",
+                description = "Credenciales inválidas",
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
+            )
+        }
+    )
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AuthResponse> login(
+        @Parameter(description = "Email y contraseña del usuario") 
+        @RequestBody RegisterUserRequest request
+    ) {
         return ResponseEntity.ok(authService.login(request.getEmail(), request.getPassword()));
     }
-    
-    @GetMapping("/verify")
-    public ResponseEntity<?> verifyEmail(@RequestParam("uuid") String uuid) {
+
+    @Operation(
+        summary = "Verificación de email",
+        description = "Verifica la cuenta del usuario usando el UUID enviado por email",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Email verificado correctamente",
+                content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = MessageResponse.class)
+                )
+            ),
+            @ApiResponse(
+                responseCode = "400",
+                description = "Link de verificación inválido",
+                content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = MessageResponse.class)
+                )
+            )
+        }
+    )
+    @GetMapping(value = "/verify", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> verifyEmail(
+        @Parameter(description = "UUID enviado al email del usuario")
+        @RequestParam("uuid") String uuid
+    ) {
         try {
             authService.verifyEmail(uuid);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(new MessageResponse("Email verificado correctamente"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                                 .body(Map.of("message", "VERIFY_EMAIL.INVALID_LINK"));
+                                 .body(new MessageResponse("VERIFY_EMAIL.INVALID_LINK"));
         }
     }
-    
-    @PostMapping("/resend-verification")
-    public ResponseEntity<Void> resendVerification(@RequestBody ResendVerificationEmailRequest request) {
+
+    @Operation(
+        summary = "Reenvío de email de verificación",
+        description = "Envía de nuevo el email de verificación",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Email enviado correctamente",
+                content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = MessageResponse.class)
+                )
+            )
+        }
+    )
+    @PostMapping(value = "/resend-verification", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> resendVerification(
+        @Parameter(description = "Email del usuario") 
+        @RequestBody ResendVerificationEmailRequest request
+    ) {
         authService.resendVerificationEmail(request.getEmail());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new MessageResponse("Email enviado correctamente"));
     }
-    
-    @PostMapping("/reset-password")
-    public void resetPassword(@RequestBody ResetPasswordRequest request,
-                              @RequestHeader("Authorization") String token) {
-        // Extraer email del token JWT
+
+    @Operation(
+        summary = "Restablecimiento de contraseña",
+        description = "Cambia la contraseña del usuario autenticado",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Contraseña actualizada correctamente",
+                content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = MessageResponse.class)
+                )
+            )
+        }
+    )
+    @PostMapping(value = "/reset-password", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> resetPassword(
+        @RequestBody ResetPasswordRequest request,
+        @Parameter(description = "Token JWT del usuario") 
+        @RequestHeader("Authorization") String token
+    ) {
         String email = jwtService.extractEmail(token); 
         authService.resetPassword(email, request);
+        return ResponseEntity.ok(new MessageResponse("Contraseña actualizada correctamente"));
     }
-    
-    @PostMapping("/forgot-password")
-    public void forgotPassword(@RequestBody ForgotPasswordRequest request) {
+
+    @Operation(
+        summary = "Recuperar contraseña",
+        description = "Envía un email para recuperar la contraseña",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Email de recuperación enviado",
+                content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = MessageResponse.class)
+                )
+            )
+        }
+    )
+    @PostMapping(value = "/forgot-password", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> forgotPassword(
+        @Parameter(description = "Email del usuario que olvidó la contraseña")
+        @RequestBody ForgotPasswordRequest request
+    ) {
         authService.forgotPassword(request.getEmail());
+        return ResponseEntity.ok(new MessageResponse("Email de recuperación enviado"));
     }
-    @PostMapping("/forgot-password/reset")
-    public void resetForgotPassword(@RequestParam("uuid") String uuid, 
-                                    @RequestBody ResetPasswordRequest request) {
-        // Buscar usuario por UUID y actualizar la contraseña
+
+    @Operation(
+        summary = "Restablecer contraseña olvidada",
+        description = "Actualiza la contraseña usando el UUID enviado por email",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Contraseña restablecida correctamente",
+                content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = MessageResponse.class)
+                )
+            )
+        }
+    )
+    @PostMapping(value = "/forgot-password/reset", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> resetForgotPassword(
+        @Parameter(description = "UUID enviado al email") 
+        @RequestParam("uuid") String uuid,
+        @Parameter(description = "Nueva contraseña") 
+        @RequestBody ResetPasswordRequest request
+    ) {
         authService.resetPasswordWithUuid(uuid, request.getNewPassword()); 
+        return ResponseEntity.ok(new MessageResponse("Contraseña restablecida correctamente"));
     }
 }

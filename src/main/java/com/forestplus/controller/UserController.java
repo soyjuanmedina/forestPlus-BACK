@@ -58,7 +58,7 @@ public class UserController {
 
     // Update del propio usuario
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
             @RequestBody RegisterUserRequest request) {
