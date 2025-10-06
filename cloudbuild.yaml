@@ -1,7 +1,7 @@
 logsBucket: gs://cloud-build-logs-forest-plus
 serviceAccount: projects/nomadic-raceway-473907-s9/serviceAccounts/cloudbuild-deploy@nomadic-raceway-473907-s9.iam.gserviceaccount.com
 substitutions:
-  _IMAGE_NAME: mi-app
+  _IMAGE_NAME: forestplus-back
 
 steps:
   - name: 'gcr.io/cloud-builders/mvn'
