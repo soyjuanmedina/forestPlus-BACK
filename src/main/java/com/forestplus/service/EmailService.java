@@ -40,7 +40,7 @@ public class EmailService {
             helper.setText(html, true);
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setFrom("noreply@forestplus.com");
+            helper.setFrom("noreply@forestplustech.com");
             mailSender.send(message);
 
         } catch (MessagingException e) {
@@ -73,7 +73,7 @@ public class EmailService {
             helper.setText(html, true); // true = HTML
             helper.setTo(to);
             helper.setSubject("Confirma tu correo en ForestPlus");
-            helper.setFrom("noreply@forestplus.com");
+            helper.setFrom("noreply@forestplustech.com");
             mailSender.send(message);
 
         } catch (MessagingException e) {
