@@ -14,10 +14,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableMethodSecurity // Habilita @PreAuthorize
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
@@ -45,28 +50,37 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
         http
-        	.cors(cors -> {}) 
-        	.csrf(csrf -> csrf.disable())
+            .cors(cors -> {})  // 👈 ahora sí usará la config que definimos abajo
+            .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Endpoints públicos
-                .requestMatchers("/api/auth/**", "/ping",  "/v3/api-docs/**",
-                        "/swagger-ui.html",
-                        "/swagger-ui/**",
-                        "/swagger-resources/**",
+                .requestMatchers("/api/auth/**", "/ping",
+                        "/v3/api-docs/**", "/swagger-ui.html",
+                        "/swagger-ui/**", "/swagger-resources/**",
                         "/webjars/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-// Recursos estáticos
-                .requestMatchers(org.springframework.boot.autoconfigure.security.servlet.PathRequest.toStaticResources().atCommonLocations()).permitAll()
-
-                // Endpoints protegidos
+                .requestMatchers(org.springframework.boot.autoconfigure.security.servlet.PathRequest
+                        .toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers("/api/companies/**").hasRole("ADMIN")
-
-                // Cualquier otra petición requiere autenticación
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "https://app.forestplustech.com"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
