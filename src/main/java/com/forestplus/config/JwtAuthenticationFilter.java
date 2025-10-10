@@ -40,6 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
     	
         String path = request.getRequestURI();
+        System.out.println("📡 path: " + path);
+        System.out.println("📡 Petición recibida: " + request.getMethod() + " " + request.getRequestURI());
+        System.out.println("    Origin: " + request.getHeader("Origin"));
+        System.out.println("    Authorization: " + request.getHeader("Authorization"));
 
         // Saltar Swagger y OpenAPI
         if (path.startsWith("/v3/api-docs") ||
