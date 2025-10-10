@@ -16,6 +16,8 @@ public class WebConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:4200", "https://app.forestplustech.com" )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*") 
+                        .exposedHeaders("*")
                         .allowCredentials(true);
             }
         };
