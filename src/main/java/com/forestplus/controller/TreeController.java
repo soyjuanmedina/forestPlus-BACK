@@ -1,21 +1,22 @@
 package com.forestplus.controller;
 
 import com.forestplus.entity.TreeEntity;
+import com.forestplus.service.LandService;
 import com.forestplus.service.TreeService;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/trees")
+@RequestMapping(value = "/api/trees", produces = "application/json")
+@RequiredArgsConstructor
 public class TreeController {
 
     private final TreeService treeService;
-
-    public TreeController(TreeService treeService) {
-        this.treeService = treeService;
-    }
 
     @GetMapping
     public List<TreeEntity> getAllTrees() {

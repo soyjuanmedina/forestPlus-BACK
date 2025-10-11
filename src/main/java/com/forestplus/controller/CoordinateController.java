@@ -2,20 +2,20 @@ package com.forestplus.controller;
 
 import com.forestplus.entity.CoordinateEntity;
 import com.forestplus.service.CoordinateService;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/coordinates")
+@RequestMapping(value = "/api/coordinates", produces = "application/json")
+@RequiredArgsConstructor
 public class CoordinateController {
 
     private final CoordinateService coordinateService;
-
-    public CoordinateController(CoordinateService coordinateService) {
-        this.coordinateService = coordinateService;
-    }
 
     @GetMapping
     public List<CoordinateEntity> getAllCoordinates() {

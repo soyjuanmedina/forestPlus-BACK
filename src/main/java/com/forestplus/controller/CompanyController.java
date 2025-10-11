@@ -13,21 +13,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/companies")
+@RequestMapping(value = "/api/companies", produces = "application/json")
 @RequiredArgsConstructor
 public class CompanyController {
 
     private final CompanyService companyService;
 
-
-    // Obtener todas las compañías
     @GetMapping
     public ResponseEntity<List<CompanyResponse>> getAllCompanies() {
         List<CompanyResponse> companies = companyService.getAllCompanies();
         return ResponseEntity.ok(companies);
     }
 
-    // Obtener compañía por ID
     @GetMapping("/{id}")
     public ResponseEntity<CompanyResponse> getCompanyById(@PathVariable Long id) {
         try {
@@ -38,7 +35,6 @@ public class CompanyController {
         }
     }
 
-    // Crear compañía
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CompanyResponse> createCompany(@RequestBody CompanyRequest request) {
@@ -46,7 +42,6 @@ public class CompanyController {
         return ResponseEntity.ok(created);
     }
 
-    // Actualizar compañía
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CompanyResponse> updateCompany(@PathVariable Long id, @RequestBody CompanyRequest request) {
@@ -58,7 +53,6 @@ public class CompanyController {
         }
     }
 
-    // Eliminar compañía
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteCompany(@PathVariable Long id) {
@@ -70,3 +64,4 @@ public class CompanyController {
         }
     }
 }
+

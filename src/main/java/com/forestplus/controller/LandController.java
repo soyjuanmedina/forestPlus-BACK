@@ -2,21 +2,22 @@ package com.forestplus.controller;
 
 import com.forestplus.dto.request.LandRequest;
 import com.forestplus.dto.response.LandResponse;
+import com.forestplus.service.CoordinateService;
 import com.forestplus.service.LandService;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/lands")
+@RequestMapping(value = "/api/lands", produces = "application/json")
+@RequiredArgsConstructor
 public class LandController {
 
     private final LandService landService;
-
-    public LandController(LandService landService) {
-        this.landService = landService;
-    }
 
     // Obtener todas las tierras
     @GetMapping

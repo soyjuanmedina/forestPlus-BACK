@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
         allowedHeaders = "*",
         allowCredentials = "true"
 )
-@RequestMapping("/api/auth")
+@RequestMapping(value = "/api/auth", produces = "application/json")
 @RequiredArgsConstructor
 public class AuthController {
 
