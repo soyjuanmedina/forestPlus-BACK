@@ -14,6 +14,7 @@ public class UserResponse {
     private String email;
     private String role;
     private boolean emailVerified;
+    private Boolean forcePasswordChange;
     
     // Información de la compañía como DTO
     private CompanyResponse company;
