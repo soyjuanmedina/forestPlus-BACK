@@ -14,7 +14,7 @@ public class CompanyResponse {
     private Long id;
     private String name;
     private String address;
-    private UserResponse admin;
+    private UserSummaryResponse admin;
     private List<UserSummaryResponse> users;
     private LocalDateTime createdAt;
 }
