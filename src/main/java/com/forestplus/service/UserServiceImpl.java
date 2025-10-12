@@ -11,6 +11,9 @@ import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -139,6 +142,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+    
+    @Override
+    public Page<UserResponse> getUsers(Pageable pageable) {
+        // simplemente delegamos al método más completo sin filtros
+        return getUsers(pageable, null, null);
+    }
+    
+    @Override
+    public Page<UserResponse> getUsers(Pageable pageable, String role, Long companyId) {
+        Page<UserEntity> page;
+        if (role != null && companyId != null) {
+            page = userRepository.findByRoleAndCompanyId(role, companyId, pageable);
+        } else if (role != null) {
+            page = userRepository.findByRole(role, pageable);
+        } else if (companyId != null) {
+            page = userRepository.findByCompanyId(companyId, pageable);
+        } else {
+            page = userRepository.findAll(pageable);
+        }
+
+        return page.map(user -> userMapper.toResponse(user));
     }
 
     private String generateRandomPassword(int length) {

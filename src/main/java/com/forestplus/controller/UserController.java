@@ -1,20 +1,31 @@
 package com.forestplus.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.forestplus.dto.request.RegisterUserByAdminRequest;
 import com.forestplus.dto.request.RegisterUserRequest;
 import com.forestplus.dto.response.UserResponse;
 import com.forestplus.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.util.List;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(value = "/api/users", produces = "application/json")
@@ -23,22 +34,26 @@ public class UserController {
 
     private final UserService userService;
 
-    // =====================================
-    // Obtener todos los usuarios
-    // =====================================
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Obtener todos los usuarios")
-    @ApiResponse(
-        responseCode = "200",
-        description = "Lista de usuarios",
-        content = @Content(
-            mediaType = "application/json",
-            array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))
-        )
-    )
-    public List<UserResponse> getAllUsers() {
-        return userService.getAllUsers();
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+    @Operation(summary = "Obtener usuarios con filtros, paginación y orden")
+    public ResponseEntity<Page<UserResponse>> getUsers(
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) Long companyId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String sort // un solo string "campo,direccion"
+    ) {
+        String[] parts = sort.split(",");
+        String property = parts[0];
+        Sort.Direction direction = parts.length > 1
+                ? Sort.Direction.fromString(parts[1])
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(direction, property)));
+
+        Page<UserResponse> users = userService.getUsers(pageable, role, companyId);
+        return ResponseEntity.ok(users);
     }
 
     // =====================================
