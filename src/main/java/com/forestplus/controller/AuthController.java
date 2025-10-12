@@ -7,6 +7,10 @@ import com.forestplus.dto.request.ResetPasswordRequest;
 import com.forestplus.dto.response.AuthResponse;
 import com.forestplus.dto.response.MessageResponse;
 import com.forestplus.dto.response.UserResponse;
+import com.forestplus.entity.UserEntity;
+import com.forestplus.exception.UserNotFoundException;
+import com.forestplus.mapper.UserMapper;
+import com.forestplus.repository.UserRepository;
 import com.forestplus.service.AuthService;
 import com.forestplus.service.JwtService;
 
@@ -17,6 +21,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +41,8 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtService jwtService;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Operation(
         summary = "Registro de usuario",
@@ -218,5 +228,25 @@ public class AuthController {
     ) {
         authService.resetPasswordWithUuid(uuid, request.getNewPassword()); 
         return ResponseEntity.ok(new MessageResponse("Contraseña restablecida correctamente"));
+    }
+    
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshToken(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+        if (!jwtService.validateRefreshToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String email = jwtService.extractAllClaims(refreshToken, true).getSubject();
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
+
+        String newAccessToken = jwtService.generateAccessToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user);
+
+        UserResponse userResponse = userMapper.toResponse(user);
+        Boolean forcePasswordChange = user.getForcePasswordChange() ? true : null;
+
+        return ResponseEntity.ok(new AuthResponse(newAccessToken, newRefreshToken, userResponse, forcePasswordChange));
     }
 }

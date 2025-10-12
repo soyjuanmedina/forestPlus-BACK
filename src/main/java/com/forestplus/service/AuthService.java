@@ -91,10 +91,11 @@ public class AuthService {
         if (!Boolean.TRUE.equals(user.getEmailVerified())) {
             throw new EmailNotVerifiedException(email);
         }
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
         UserResponse userResponse = userMapper.toResponse(user);
         Boolean forcePasswordChange = user.getForcePasswordChange() ? true : null;
-        return new AuthResponse(token, userResponse, forcePasswordChange);
+        return new AuthResponse(token, refreshToken,userResponse, forcePasswordChange);
     }
 
     public void verifyEmail(String uuid) {

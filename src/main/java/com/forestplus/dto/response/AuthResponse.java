@@ -11,8 +11,11 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Respuesta de autenticación con token y datos del usuario")
 public class AuthResponse {
 
-    @Schema(description = "Token JWT del usuario")
+    @Schema(description = "Access Token JWT del usuario")
     private String token;
+
+    @Schema(description = "Refresh Token para renovación del access token")
+    private String refreshToken;
 
     @Schema(description = "Información del usuario logueado")
     private UserResponse user;
