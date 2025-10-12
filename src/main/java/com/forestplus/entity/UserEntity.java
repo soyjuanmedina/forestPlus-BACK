@@ -1,6 +1,8 @@
 package com.forestplus.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.forestplus.model.RolesEnum;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,8 +45,9 @@ public class UserEntity {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RolesEnum role;
 
     @Column(name = "created_at", updatable = false, insertable = false)
     private LocalDateTime createdAt;

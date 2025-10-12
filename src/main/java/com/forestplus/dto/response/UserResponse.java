@@ -1,4 +1,6 @@
 package com.forestplus.dto.response;
+import com.forestplus.model.RolesEnum;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +14,7 @@ public class UserResponse {
     private String surname;
     private String secondSurname;
     private String email;
-    private String role;
+    private RolesEnum role;
     private boolean emailVerified;
     private Boolean forcePasswordChange;
     

@@ -1,5 +1,7 @@
 package com.forestplus.dto.request;
 
+import com.forestplus.model.RolesEnum;
+
 import lombok.Data;
 
 @Data
@@ -9,6 +11,6 @@ public class RegisterUserRequest {
     private String secondSurname;
     private String email;
     private String password;
-    private String role;
+    private RolesEnum role;
     private Long companyId;
 }
