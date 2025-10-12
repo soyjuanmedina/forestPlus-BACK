@@ -60,7 +60,7 @@ public class UserController {
     // Obtener un usuario por id
     // =====================================
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     @Operation(summary = "Obtener un usuario por su ID")
     @ApiResponse(
         responseCode = "200",
@@ -83,7 +83,7 @@ public class UserController {
     // Registrar usuario por admin
     // =====================================
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     @Operation(summary = "Registrar un usuario por un administrador")
     @ApiResponse(
         responseCode = "200",
@@ -102,7 +102,7 @@ public class UserController {
     // Actualizar usuario por admin
     // =====================================
     @PutMapping("/admin/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     @Operation(summary = "Actualizar un usuario por un administrador")
     @ApiResponse(
         responseCode = "200",
@@ -154,7 +154,7 @@ public class UserController {
     // Eliminar usuario
     // =====================================
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     @Operation(summary = "Eliminar un usuario")
     @ApiResponse(responseCode = "204", description = "Usuario eliminado")
     @ApiResponse(responseCode = "404", description = "Usuario no encontrado")

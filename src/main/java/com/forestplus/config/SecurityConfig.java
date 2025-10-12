@@ -61,7 +61,6 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(org.springframework.boot.autoconfigure.security.servlet.PathRequest
                         .toStaticResources().atCommonLocations()).permitAll()
-                .requestMatchers("/api/companies/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);

@@ -88,14 +88,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
+                String authority = "ROLE_" + role;
+                System.out.println("📌 Usuario autenticado: " + email);
+                System.out.println("📌 Rol desde JWT: " + role);
+                System.out.println("📌 GrantedAuthority que se asignará: " + authority);
+
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
-                                List.of(() -> "ROLE_" + role) // asigna la autoridad correctamente
+                                List.of(() -> authority)
                         );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                // Debug adicional para ver qué tiene Spring Security
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                        .forEach(a -> System.out.println("📌 Authority en SecurityContext: " + a.getAuthority()));
             }
 
         } catch (ExpiredJwtException e) {
