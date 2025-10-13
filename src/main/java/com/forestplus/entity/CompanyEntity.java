@@ -30,6 +30,8 @@ public class CompanyEntity {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserEntity> users;
     
+    private String picture; 
+    
     // Relación muchos a muchos con terrenos
     @ManyToMany
     @JoinTable(

@@ -14,6 +14,7 @@ public class UserResponse {
     private String surname;
     private String secondSurname;
     private String email;
+    private String picture; 
     private RolesEnum role;
     private boolean emailVerified;
     private Boolean forcePasswordChange;

@@ -12,4 +12,5 @@ public class RegisterUserByAdminRequest {
     private String email;
     private RolesEnum role;
     private Long companyId;
+    private String picture; 
 }

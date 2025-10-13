@@ -32,6 +32,8 @@ public class UserEntity {
 
     @Column(name = "second_surname")
     private String secondSurname;
+    
+    private String picture; 
 
     // Relación con compañía
     @ManyToOne(fetch = FetchType.LAZY)
