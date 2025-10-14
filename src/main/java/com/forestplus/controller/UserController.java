@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.forestplus.dto.request.RegisterUserByAdminRequest;
 import com.forestplus.dto.request.RegisterUserRequest;
@@ -162,4 +165,41 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+    
+	 // =====================================
+	 // Actualizar imagen de perfil del usuario
+	 // =====================================
+	 @PutMapping("/{id}/picture")
+	 @PreAuthorize("isAuthenticated()")
+	 @Operation(
+	     summary = "Actualizar la imagen de perfil del usuario",
+	     requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+	         description = "Archivo de imagen a subir",
+	         required = true,
+	         content = @Content(
+	             mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+	             schema = @Schema(type = "string", format = "binary")
+	         )
+	     )
+	 )
+	 @ApiResponse(
+	     responseCode = "200",
+	     description = "Imagen actualizada",
+	     content = @Content(
+	         mediaType = "application/json",
+	         schema = @Schema(implementation = UserResponse.class)
+	     )
+	 )
+	 public ResponseEntity<UserResponse> updateUserPicture(
+	         @PathVariable Long id,
+	         @RequestPart("file") MultipartFile file // <-- Cambiado de @RequestParam a @RequestPart
+	 ) {
+	     try {
+	         UserResponse response = userService.updateUserPicture(id, file);
+	         return ResponseEntity.ok(response);
+	     } catch (RuntimeException e) {
+	         return ResponseEntity.notFound().build();
+	     }
+	 }
+
 }

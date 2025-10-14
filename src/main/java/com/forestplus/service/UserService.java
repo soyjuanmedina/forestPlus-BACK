@@ -5,6 +5,7 @@ import com.forestplus.dto.request.RegisterUserRequest;
 import com.forestplus.dto.response.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -36,4 +37,7 @@ public interface UserService {
 
     // Eliminar un usuario
     void deleteUser(Long id);
+    
+    // Carga la imagen del usuario
+    UserResponse updateUserPicture(Long id, MultipartFile file);
 }

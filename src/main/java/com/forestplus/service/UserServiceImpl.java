@@ -16,10 +16,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final EmailService emailService;
+    private final FileStorageService fileStorageService;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -174,6 +178,28 @@ public class UserServiceImpl implements UserService {
             sb.append(chars.charAt(idx));
         }
         return sb.toString();
+    }
+    
+    @Override
+    @Transactional
+    public UserResponse updateUserPicture(Long id, MultipartFile file) {
+        // 1️⃣ Buscar el usuario
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // 2️⃣ Guardar la imagen con UUID para evitar colisiones
+        UUID userUuid = UUID.fromString(user.getUuid());
+        String imageUrl = fileStorageService.storeFile(file, "users", userUuid);
+        // Ejemplo de storeFile: /uploads/users/{uuid}-{originalFilename}
+
+        // 3️⃣ Actualizar entidad con la nueva ruta
+        user.setPicture(imageUrl);
+
+        // 4️⃣ Guardar cambios en DB
+        userRepository.save(user);
+
+        // 5️⃣ Devolver DTO
+        return userMapper.toResponse(user);
     }
 }
 
