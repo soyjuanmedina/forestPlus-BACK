@@ -11,9 +11,10 @@ public interface FileStorageService {
      *
      * @param file archivo a guardar
      * @param folder subcarpeta donde se almacenará (por ejemplo "users" o "companies")
+     * @param id id con el que se guardará el archivo
      * @return ruta o URL de acceso al archivo
      */
-    String storeFile(MultipartFile file, String subdirectory, UUID userUuid);
+    String storeFile(MultipartFile file, String subdirectory, Long id);
 
     /**
      * Elimina un archivo si es necesario.

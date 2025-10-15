@@ -187,9 +187,8 @@ public class UserServiceImpl implements UserService {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // 2️⃣ Guardar la imagen con UUID para evitar colisiones
-        UUID userUuid = UUID.fromString(user.getUuid());
-        String imageUrl = fileStorageService.storeFile(file, "users", userUuid);
+        // 2️⃣ Guardar la imagen con id para evitar colisiones
+        String imageUrl = fileStorageService.storeFile(file, "users", user.getId());
         // Ejemplo de storeFile: /uploads/users/{uuid}-{originalFilename}
 
         // 3️⃣ Actualizar entidad con la nueva ruta
