@@ -22,7 +22,7 @@ public class FileStorageServiceImpl implements FileStorageService {
      * @param userUuid UUID del usuario
      * @return nombre del archivo guardado
      */
-    public String storeFile(MultipartFile file, String subdirectory, UUID userUuid) {
+    public String storeFile(MultipartFile file, String subdirectory,  Long id) {
         try {
             Path uploadPath = Paths.get(baseUploadDir, subdirectory);
             if (!Files.exists(uploadPath)) {
@@ -36,7 +36,7 @@ public class FileStorageServiceImpl implements FileStorageService {
                 extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             }
 
-            String filename = userUuid + extension;
+            String filename = id + extension;
             Path filePath = uploadPath.resolve(filename);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
