@@ -2,12 +2,18 @@ package com.forestplus.service;
 
 import com.forestplus.dto.request.CompanyRequest;
 import com.forestplus.dto.request.CompanyUpdateRequest;
+import com.forestplus.dto.response.CompanyCompensationResponse;
+import com.forestplus.dto.response.CompanyEmissionResponse;
 import com.forestplus.dto.response.CompanyResponse;
 import com.forestplus.entity.CompanyEntity;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.exception.CompanyNotFoundException;
+import com.forestplus.mapper.CompanyCompensationMapper;
+import com.forestplus.mapper.CompanyEmissionMapper;
 import com.forestplus.mapper.CompanyMapper;
 import com.forestplus.model.RolesEnum;
+import com.forestplus.repository.CompanyCompensationRepository;
+import com.forestplus.repository.CompanyEmissionRepository;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,15 +29,19 @@ import java.util.stream.Collectors;
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
-    private final UserRepository userRepository; // Para asociar admin si corresponde
+    private final UserRepository userRepository;
     private final CompanyMapper companyMapper;
+    private final CompanyEmissionRepository emissionRepository;
+    private final CompanyEmissionMapper emissionMapper;
+    private final CompanyCompensationRepository compensationRepository;
+    private final CompanyCompensationMapper compensationMapper;
     private final FileStorageService fileStorageService;
 
     @Override
     public List<CompanyResponse> getAllCompanies() {
         return companyRepository.findAll()
                 .stream()
-                .map(companyMapper::toResponse)
+                .map(this::mapCompanyWithEmissionsAndCompensations)
                 .collect(Collectors.toList());
     }
 
@@ -39,15 +49,13 @@ public class CompanyServiceImpl implements CompanyService {
     public CompanyResponse getCompanyById(Long id) {
         CompanyEntity entity = companyRepository.findById(id)
                 .orElseThrow(() -> new CompanyNotFoundException(id));
-        return companyMapper.toResponse(entity);
+        return mapCompanyWithEmissionsAndCompensations(entity);
     }
 
-    @Override
     @Transactional
     public CompanyResponse createCompany(CompanyRequest request) {
         CompanyEntity entity = companyMapper.toEntity(request);
 
-        // Si viene un adminId, lo buscamos y lo asociamos
         if (request.getAdminId() != null) {
             UserEntity admin = userRepository.findById(request.getAdminId())
                     .orElseThrow(() -> new RuntimeException("Admin user not found with id " + request.getAdminId()));
@@ -55,7 +63,7 @@ public class CompanyServiceImpl implements CompanyService {
         }
 
         CompanyEntity saved = companyRepository.save(entity);
-        return companyMapper.toResponse(saved);
+        return mapCompanyWithEmissionsAndCompensations(saved);
     }
 
     @Transactional
@@ -63,7 +71,6 @@ public class CompanyServiceImpl implements CompanyService {
         CompanyEntity updated = companyRepository.findById(id)
             .map(company -> {
 
-                // Validación de permisos
                 if (loggedUser.getRole() == RolesEnum.COMPANY_ADMIN 
                         && !company.getId().equals(loggedUser.getCompany().getId())) {
                     throw new RuntimeException("No tiene permiso para editar esta compañía");
@@ -72,15 +79,13 @@ public class CompanyServiceImpl implements CompanyService {
                 company.setName(request.getName());
                 company.setAddress(request.getAddress());
 
-                // Solo ADMIN puede cambiar adminId, no lo hacemos aquí
                 return companyRepository.save(company);
             })
             .orElseThrow(() -> new CompanyNotFoundException(id));
 
-        return companyMapper.toResponse(updated);
+        return mapCompanyWithEmissionsAndCompensations(updated);
     }
 
-    @Override
     @Transactional
     public void deleteCompany(Long id) {
         if (!companyRepository.existsById(id)) {
@@ -88,25 +93,37 @@ public class CompanyServiceImpl implements CompanyService {
         }
         companyRepository.deleteById(id);
     }
-    
-    @Override
+
     @Transactional
     public CompanyResponse updateCompanyPicture(Long id, MultipartFile file) {
-        // 1️⃣ Buscar la compañía
         CompanyEntity company = companyRepository.findById(id)
                 .orElseThrow(() -> new CompanyNotFoundException(id));
 
-        // 2️⃣ Guardar la imagen en el almacenamiento
         String imageUrl = fileStorageService.storeFile(file, "companies", company.getId());
-        // Ejemplo: /uploads/companies/{id}-{filename}
-
-        // 3️⃣ Actualizar la entidad con la nueva URL
         company.setPicture(imageUrl);
-
-        // 4️⃣ Guardar cambios
         companyRepository.save(company);
 
-        // 5️⃣ Devolver DTO actualizado
-        return companyMapper.toResponse(company);
+        return mapCompanyWithEmissionsAndCompensations(company);
+    }
+
+    /**
+     * Método auxiliar para mapear una compañía incluyendo sus emisiones y compensaciones.
+     */
+    private CompanyResponse mapCompanyWithEmissionsAndCompensations(CompanyEntity company) {
+        CompanyResponse response = companyMapper.toResponse(company);
+
+        List<CompanyEmissionResponse> emissions = emissionRepository.findByCompanyId(company.getId())
+                .stream()
+                .map(emissionMapper::toResponse)
+                .collect(Collectors.toList());
+        response.setEmissions(emissions);
+
+        List<CompanyCompensationResponse> compensations = compensationRepository.findByCompanyId(company.getId())
+                .stream()
+                .map(compensationMapper::toResponse)
+                .collect(Collectors.toList());
+        response.setCompensations(compensations);
+
+        return response;
     }
 }

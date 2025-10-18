@@ -66,25 +66,31 @@ public class CompanyController {
         return ResponseEntity.ok(created);
     }
 
-    // ============================
-    // Actualizar compañía
-    // ============================
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
-    public ResponseEntity<CompanyResponse> updateCompany(
-            @PathVariable Long id,
-            @RequestBody CompanyUpdateRequest request,
-            @RequestHeader("Authorization") String authHeader // JWT
-    ) {
-        // Extraemos el email desde el token
-        String email = jwtService.extractEmail(authHeader);
+ // ============================
+ // Actualizar compañía
+ // ============================
+ @PutMapping("/{id}")
+ @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+ public ResponseEntity<CompanyResponse> updateCompany(
+         @PathVariable Long id,
+         @RequestBody CompanyUpdateRequest request,
+         @RequestHeader(name = "Authorization", required = false) String authHeader // JWT opcional
+ ) {
+     // Extraemos email solo si viene el header (puede que interceptor lo agregue)
+     UserEntity loggedUser;
+     if (authHeader != null) {
+         String email = jwtService.extractEmail(authHeader);
+         loggedUser = userRepository.findByEmail(email)
+                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+     } else {
+         // Opcional: si no hay header, asumimos usuario por sesión o otra lógica
+         throw new RuntimeException("No se pudo identificar el usuario");
+     }
 
-        UserEntity loggedUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+     CompanyResponse updated = companyService.updateCompany(id, request, loggedUser);
+     return ResponseEntity.ok(updated);
+ }
 
-        CompanyResponse updated = companyService.updateCompany(id, request, loggedUser);
-        return ResponseEntity.ok(updated);
-    }
 
     // ============================
     // Eliminar compañía
