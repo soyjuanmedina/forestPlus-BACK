@@ -1,11 +1,13 @@
 package com.forestplus.service;
 
 import com.forestplus.dto.request.CompanyRequest;
+import com.forestplus.dto.request.CompanyUpdateRequest;
 import com.forestplus.dto.response.CompanyResponse;
 import com.forestplus.entity.CompanyEntity;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.exception.CompanyNotFoundException;
 import com.forestplus.mapper.CompanyMapper;
+import com.forestplus.model.RolesEnum;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -56,25 +58,24 @@ public class CompanyServiceImpl implements CompanyService {
         return companyMapper.toResponse(saved);
     }
 
-    @Override
     @Transactional
-    public CompanyResponse updateCompany(Long id, CompanyRequest request) {
+    public CompanyResponse updateCompany(Long id, CompanyUpdateRequest request, UserEntity loggedUser) {
         CompanyEntity updated = companyRepository.findById(id)
-                .map(company -> {
-                    company.setName(request.getName());
-                    company.setAddress(request.getAddress());
+            .map(company -> {
 
-                    if (request.getAdminId() != null) {
-                        UserEntity admin = userRepository.findById(request.getAdminId())
-                                .orElseThrow(() -> new RuntimeException("Admin user not found with id " + request.getAdminId()));
-                        company.setAdmin(admin);
-                    } else {
-                        company.setAdmin(null);
-                    }
+                // Validación de permisos
+                if (loggedUser.getRole() == RolesEnum.COMPANY_ADMIN 
+                        && !company.getId().equals(loggedUser.getCompany().getId())) {
+                    throw new RuntimeException("No tiene permiso para editar esta compañía");
+                }
 
-                    return companyRepository.save(company);
-                })
-                .orElseThrow(() -> new CompanyNotFoundException(id));
+                company.setName(request.getName());
+                company.setAddress(request.getAddress());
+
+                // Solo ADMIN puede cambiar adminId, no lo hacemos aquí
+                return companyRepository.save(company);
+            })
+            .orElseThrow(() -> new CompanyNotFoundException(id));
 
         return companyMapper.toResponse(updated);
     }

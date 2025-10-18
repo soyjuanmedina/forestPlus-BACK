@@ -1,8 +1,12 @@
 package com.forestplus.controller;
 
 import com.forestplus.dto.request.CompanyRequest;
+import com.forestplus.dto.request.CompanyUpdateRequest;
 import com.forestplus.dto.response.CompanyResponse;
+import com.forestplus.entity.UserEntity;
+import com.forestplus.repository.UserRepository;
 import com.forestplus.service.CompanyService;
+import com.forestplus.service.JwtService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +29,8 @@ import java.util.List;
 public class CompanyController {
 
     private final CompanyService companyService;
+    private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     // ============================
     // Obtener todas las compañías
@@ -64,13 +71,19 @@ public class CompanyController {
     // ============================
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
-    public ResponseEntity<CompanyResponse> updateCompany(@PathVariable Long id, @RequestBody CompanyRequest request) {
-        try {
-            CompanyResponse updated = companyService.updateCompany(id, request);
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<CompanyResponse> updateCompany(
+            @PathVariable Long id,
+            @RequestBody CompanyUpdateRequest request,
+            @RequestHeader("Authorization") String authHeader // JWT
+    ) {
+        // Extraemos el email desde el token
+        String email = jwtService.extractEmail(authHeader);
+
+        UserEntity loggedUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        CompanyResponse updated = companyService.updateCompany(id, request, loggedUser);
+        return ResponseEntity.ok(updated);
     }
 
     // ============================
