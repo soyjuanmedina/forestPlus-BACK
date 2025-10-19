@@ -1,28 +1,26 @@
 package com.forestplus.service;
 
-import com.forestplus.dto.request.CompanyRequest;
-import com.forestplus.dto.request.CompanyUpdateRequest;
-import com.forestplus.dto.response.CompanyCompensationResponse;
-import com.forestplus.dto.response.CompanyEmissionResponse;
-import com.forestplus.dto.response.CompanyResponse;
-import com.forestplus.entity.CompanyEntity;
-import com.forestplus.entity.UserEntity;
-import com.forestplus.exception.CompanyNotFoundException;
-import com.forestplus.mapper.CompanyCompensationMapper;
-import com.forestplus.mapper.CompanyEmissionMapper;
-import com.forestplus.mapper.CompanyMapper;
-import com.forestplus.model.RolesEnum;
-import com.forestplus.repository.CompanyCompensationRepository;
-import com.forestplus.repository.CompanyEmissionRepository;
-import com.forestplus.repository.CompanyRepository;
-import com.forestplus.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.forestplus.dto.request.CompanyRequest;
+import com.forestplus.dto.request.CompanyUpdateRequest;
+import com.forestplus.dto.response.CompanyCO2YearlyResponse;
+import com.forestplus.dto.response.CompanyResponse;
+import com.forestplus.entity.CompanyCO2YearlyEntity;
+import com.forestplus.entity.CompanyEntity;
+import com.forestplus.entity.UserEntity;
+import com.forestplus.exception.CompanyNotFoundException;
+import com.forestplus.mapper.CompanyMapper;
+import com.forestplus.model.RolesEnum;
+import com.forestplus.repository.CompanyRepository;
+import com.forestplus.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +29,6 @@ public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
     private final CompanyMapper companyMapper;
-    private final CompanyEmissionRepository emissionRepository;
-    private final CompanyEmissionMapper emissionMapper;
-    private final CompanyCompensationRepository compensationRepository;
-    private final CompanyCompensationMapper compensationMapper;
     private final FileStorageService fileStorageService;
 
     @Override
@@ -112,18 +106,23 @@ public class CompanyServiceImpl implements CompanyService {
     private CompanyResponse mapCompanyWithEmissionsAndCompensations(CompanyEntity company) {
         CompanyResponse response = companyMapper.toResponse(company);
 
-        List<CompanyEmissionResponse> emissions = emissionRepository.findByCompanyId(company.getId())
-                .stream()
-                .map(emissionMapper::toResponse)
-                .collect(Collectors.toList());
-        response.setEmissions(emissions);
-
-        List<CompanyCompensationResponse> compensations = compensationRepository.findByCompanyId(company.getId())
-                .stream()
-                .map(compensationMapper::toResponse)
-                .collect(Collectors.toList());
-        response.setCompensations(compensations);
+        // 👉 Nuevo: convertir entidades CO2Yearly a DTO
+        if (company.getCo2Yearly() != null) {
+            List<CompanyCO2YearlyResponse> co2List = company.getCo2Yearly().stream()
+                    .map(this::mapToCO2DTO)
+                    .collect(Collectors.toList());
+            response.setCo2(co2List);
+        }
 
         return response;
+    }
+
+    private CompanyCO2YearlyResponse mapToCO2DTO(CompanyCO2YearlyEntity entity) {
+        return new CompanyCO2YearlyResponse(
+                entity.getId(),
+                entity.getYear(),
+                entity.getTotalEmissions(),
+                entity.getTotalCompensations()
+        );
     }
 }

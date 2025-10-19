@@ -21,11 +21,8 @@ public class CompanyResponse {
     private UserSummaryResponse admin;
     private List<UserSummaryResponse> users;
     private LocalDateTime createdAt;
-    
-    @ArraySchema(schema = @Schema(implementation = CompanyEmissionResponse.class))
-    private List<CompanyEmissionResponse> emissions;
-    
-    @ArraySchema(schema = @Schema(implementation = CompanyCompensationResponse.class))
-    private List<CompanyCompensationResponse> compensations;
+   
+    @ArraySchema(schema = @Schema(implementation = CompanyCO2YearlyResponse.class))
+    private List<CompanyCO2YearlyResponse> co2;
 }
 

@@ -28,4 +28,5 @@ public interface CompanyService {
 
     // 📸 Actualizar imagen de perfil de la compañía
     CompanyResponse updateCompanyPicture(Long id, MultipartFile file);
+
 }
