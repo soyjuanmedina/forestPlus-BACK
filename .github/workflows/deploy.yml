@@ -3,35 +3,35 @@ name: Build and Deploy Spring Boot WAR to Tomcat via FTP
 on:
   push:
     branches:
-      - master  # se ejecuta al hacer push a master
+      - master  # Se ejecuta al hacer push a la rama 'master'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
+      # 1️⃣ Checkout del código
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Set up Java 21
+      # 2️⃣ Configuración de Java 21
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 21
 
-      # 3️⃣ Build WAR with Maven
+      # 3️⃣ Construcción del WAR con Maven
       - name: Build Spring Boot WAR
         run: mvn clean package -DskipTests
 
-      # 4️⃣ Verify WAR exists (opcional)
+      # 4️⃣ Verificación de la existencia del WAR (opcional)
       - name: List target folder
         run: ls -la target/
 
-      # 5️⃣ Upload ROOT.war via FTP
+      # 5️⃣ Subida de ROOT.war vía FTP
       - name: Deploy ROOT.war via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server: ftp.forestplustech.com
           username: ${{ secrets.FTP_USER }}
