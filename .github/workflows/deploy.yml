@@ -3,8 +3,7 @@ name: Deploy Spring Boot to Tomcat
 on:
   push:
     branches:
-      - main  # o la rama que quieras usar para deploy
-
+      - master
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
