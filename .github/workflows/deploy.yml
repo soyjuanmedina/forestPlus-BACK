@@ -25,25 +25,30 @@ jobs:
       - name: Build WAR with Maven
         run: mvn clean package -DskipTests
 
-      # 4️⃣ Renombrar WAR a ROOT.war
-      - name: Rename WAR file
+      # 4️⃣ Renombrar WAR a ROOT.war solo si no lo es
+      - name: Rename WAR file to ROOT.war
         run: |
           WAR_FILE=$(ls target/*.war | head -n 1)
-          mv "$WAR_FILE" target/ROOT.war
+          BASENAME=$(basename "$WAR_FILE")
+          if [ "$BASENAME" != "ROOT.war" ]; then
+            mv "$WAR_FILE" target/ROOT.war
+          else
+            echo "WAR already named ROOT.war, skipping rename"
+          fi
 
       # 5️⃣ Verificar contenido
       - name: List target folder
         run: ls -la target/
 
-      # 6️⃣ Subir WAR por FTP
-      - name: Upload WAR via FTP
+      # 6️⃣ Subir WAR por FTPS
+      - name: Upload WAR via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server: 148.251.14.115
           username: forestplustechcm
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
-          protocol: ftp
+          protocol: ftps
           local-dir: target/
           server-dir: appservers/apache-tomcat-11x/webapps/
           log-level: standard
