@@ -40,7 +40,7 @@ jobs:
       - name: List target folder
         run: ls -la target/
 
-      # 6️⃣ Subir solo ROOT.war por FTPS en modo pasivo
+      # 6️⃣ Subir solo ROOT.war por FTPS
       - name: Upload ROOT.war via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
@@ -49,8 +49,10 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           protocol: ftps
-          passive: true
-          local-dir: target/ROOT.war
+          local-dir: target/
           server-dir: appservers/apache-tomcat-11x/webapps/
           log-level: standard
           timeout: 10m
+          exclude: |
+            *
+            !ROOT.war
