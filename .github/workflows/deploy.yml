@@ -1,4 +1,4 @@
-name: Build and Deploy Spring Boot WAR to Tomcat (FTP)
+name: Build and Deploy Spring Boot WAR to Tomcat (FTPS)
 
 on:
   push:
@@ -40,8 +40,8 @@ jobs:
       - name: List target folder
         run: ls -la target/
 
-      # 6️⃣ Subir WAR por FTPS
-      - name: Upload WAR via FTPS
+      # 6️⃣ Subir solo ROOT.war por FTPS en modo pasivo
+      - name: Upload ROOT.war via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server: 148.251.14.115
@@ -49,6 +49,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           protocol: ftps
-          local-dir: target/
+          passive: true
+          local-dir: target/ROOT.war
           server-dir: appservers/apache-tomcat-11x/webapps/
           log-level: standard
+          timeout: 10m
