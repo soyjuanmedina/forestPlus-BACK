@@ -1,0 +1,50 @@
+name: Deploy Spring Boot to Tomcat
+
+on:
+  push:
+    branches:
+      - main  # o la rama que quieras usar para deploy
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ Set up Java
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # 3️⃣ Build Spring Boot
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+
+      # 4️⃣ Deploy to Tomcat via SSH
+      - name: Deploy .war to Tomcat
+        uses: appleboy/scp-action@v0.1.6
+        with:
+          host: ${{ secrets.TOMCAT_HOST }}
+          username: ${{ secrets.TOMCAT_USER }}
+          password: ${{ secrets.TOMCAT_PASSWORD }}
+          port: 22
+          source: target/*.war
+          target: /opt/tomcat/webapps/
+          rm: true  # elimina el .war viejo y la carpeta si existiera
+
+      # 5️⃣ Reiniciar Tomcat (opcional)
+      - name: Restart Tomcat
+        if: always()
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.TOMCAT_HOST }}
+          username: ${{ secrets.TOMCAT_USER }}
+          password: ${{ secrets.TOMCAT_PASSWORD }}
+          port: 22
+          script: |
+            sudo systemctl restart tomcat
