@@ -1,31 +1,34 @@
-name: Build and Deploy to Tomcat
+name: Build and Deploy via FTP
 
 on:
   push:
     branches:
-      - main  # Se despliega al hacer push a main
+      - main  # se desplegará al hacer push a main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       - name: Build WAR
         run: mvn clean package
 
-      - name: Deploy to Tomcat
-        uses: appleboy/tomcat-action@v0.2.2
+      - name: Upload ROOT.war via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-          tomcat_url: ${{ secrets.TOMCAT_URL }}     # Ej: http://tu-servidor:8080/manager/text
-          tomcat_username: ${{ secrets.TOMCAT_USER }}
-          tomcat_password: ${{ secrets.TOMCAT_PASSWORD }}
-          war_file: target/ROOT.war
+          server: ftp.forestplustech.com
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: target
+          server-dir: /appservers/apache-tomcat-11x/webapps/
+          include: ROOT.war
+          log-level: info
