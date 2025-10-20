@@ -13,7 +13,7 @@ import com.forestplus.dto.request.CompanyCO2YearlyRequest;
 import com.forestplus.dto.response.CompanyCO2YearlyResponse;
 import com.forestplus.service.CompanyCO2YearlyService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import lombok.RequiredArgsConstructor;
 
 @RestController
