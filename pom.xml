@@ -143,7 +143,16 @@
     </dependencies>
 
     <build>
+    
+        <finalName>ROOT</finalName>
         <plugins>
+                <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.3.2</version>
+            <configuration>
+                <failOnMissingWebXml>false</failOnMissingWebXml>
+            </configuration>
+        </plugin>
             <!-- Spring Boot plugin -->
 <plugin>
     <groupId>org.springframework.boot</groupId>

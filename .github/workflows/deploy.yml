@@ -1,53 +1,31 @@
-name: Build and Deploy Spring Boot WAR to Tomcat
+name: Build and Deploy to Tomcat
 
 on:
   push:
     branches:
-      - master
+      - main  # Se despliega al hacer push a main
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout code
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️⃣ Set up Java 21
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 21
+          java-version: '17'
 
-      # 3️⃣ Build WAR with Maven
-      - name: Build Spring Boot WAR
-        run: mvn clean package -DskipTests
+      - name: Build WAR
+        run: mvn clean package
 
-      # 4️⃣ Verify WAR exists (opcional, útil para debug)
-      - name: List target folder
-        run: ls -la target/
-
-      # 5️⃣ Deploy WAR to Tomcat via SCP
-      - name: Deploy .war to Tomcat
-        uses: appleboy/scp-action@v0.1.6
+      - name: Deploy to Tomcat
+        uses: appleboy/tomcat-action@v0.2.2
         with:
-          host: ${{ secrets.TOMCAT_HOST }}
-          username: ${{ secrets.TOMCAT_USER }}
-          password: ${{ secrets.TOMCAT_PASSWORD }}
-          port: 22
-          source: target/*.war
-          target: /opt/tomcat/webapps/
-          rm: true  # elimina el WAR y la carpeta anterior si existiera
-
-      # 6️⃣ Restart Tomcat via SSH
-      - name: Restart Tomcat
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.TOMCAT_HOST }}
-          username: ${{ secrets.TOMCAT_USER }}
-          password: ${{ secrets.TOMCAT_PASSWORD }}
-          port: 22
-          script: |
-            sudo systemctl restart tomcat
+          tomcat_url: ${{ secrets.TOMCAT_URL }}     # Ej: http://tu-servidor:8080/manager/text
+          tomcat_username: ${{ secrets.TOMCAT_USER }}
+          tomcat_password: ${{ secrets.TOMCAT_PASSWORD }}
+          war_file: target/ROOT.war
