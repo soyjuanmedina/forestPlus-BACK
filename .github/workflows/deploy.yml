@@ -39,4 +39,4 @@ jobs:
           local-dir: target
           server-dir: /appservers/apache-tomcat-11x/webapps/
           include: ROOT.war
-          log-level: info
+          log-level: standard
