@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-public class CompanyCO2YearlyResponseDTO {
+public class CompanyCO2YearlyRequest {
 
 	private Long id; 
 	private Integer year; 
