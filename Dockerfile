@@ -1,4 +1,3 @@
 FROM eclipse-temurin:17-jdk-alpine
-ARG WAR_FILE=target/*.war
-COPY ${WAR_FILE} app.war
+COPY target/forestplus-0.0.1-SNAPSHOT.war app.war
 ENTRYPOINT ["java", "-jar", "/app.war"]
