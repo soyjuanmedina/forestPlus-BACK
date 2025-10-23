@@ -57,3 +57,4 @@ jobs:
           exclude: |
             *
             !ROOT.war
+          passive: true
