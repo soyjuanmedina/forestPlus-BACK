@@ -3,29 +3,30 @@ name: Build and Deploy Spring Boot WAR to Tomcat (FTPS)
 on:
   push:
     branches:
-      - master
+      - master  # O "main" si tu rama principal se llama así
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Descargar el repo
+      # 1️⃣ Descargar el código del repositorio
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2️⃣ Instalar Java 21
+      # 2️⃣ Instalar Java 21 (Temurin es el más estable y recomendado)
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
+          cache: maven
 
-      # 3️⃣ Compilar el WAR
+      # 3️⃣ Compilar y empaquetar el WAR
       - name: Build WAR with Maven
         run: mvn clean package -DskipTests
 
-      # 4️⃣ Renombrar WAR a ROOT.war solo si no lo es
+      # 4️⃣ Renombrar el WAR a ROOT.war (si tu hosting despliega automáticamente ese nombre)
       - name: Rename WAR file to ROOT.war
         run: |
           WAR_FILE=$(ls target/*.war | head -n 1)
@@ -36,22 +37,22 @@ jobs:
             echo "WAR already named ROOT.war, skipping rename"
           fi
 
-      # 5️⃣ Verificar contenido
+      # 5️⃣ Verificar que el archivo esté listo
       - name: List target folder
         run: ls -la target/
 
-      # 6️⃣ Subir solo ROOT.war por FTPS
+      # 6️⃣ Subir solo ROOT.war a tu servidor por FTPS
       - name: Upload ROOT.war via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
-          server: 148.251.14.115
-          username: forestplustechcm
+          server: ${{ secrets.FTP_SERVER }}        # 👈 cámbialo o usa secreto
+          username: ${{ secrets.FTP_USERNAME }}    # 👈 cámbialo o usa secreto
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
+          port: 21                                 # o 990 si tu FTPS usa ese
           protocol: ftps
           local-dir: target/
-          server-dir: appservers/apache-tomcat-11x/webapps/
-          log-level: standard
+          server-dir: appservers/apache-tomcat-10x/webapps/  # 👈 ajusta a tu ruta real
+          log-level: verbose
           timeout: 10m
           exclude: |
             *
