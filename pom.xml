@@ -61,11 +61,17 @@
         </dependency>
 
         <!-- DB -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+<dependency>
+    <groupId>org.mariadb.jdbc</groupId>
+    <artifactId>mariadb-java-client</artifactId>
+    <version>3.2.0</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-tomcat</artifactId>
+    <scope>provided</scope>
+</dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -157,16 +163,10 @@
 <plugin>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-maven-plugin</artifactId>
+    <version>3.5.6</version>
     <configuration>
-        <finalName>forestplus</finalName>
+        <skip>true</skip> <!-- <- Esto evita el repackage -->
     </configuration>
-    <executions>
-        <execution>
-            <goals>
-                <goal>repackage</goal>
-            </goals>
-        </execution>
-    </executions>
 </plugin>
 
             <!-- Compiler plugin for MapStruct + Lombok -->

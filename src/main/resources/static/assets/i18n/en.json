@@ -1,0 +1,118 @@
+{
+  "MENU": {
+    "MENU": "Menu",
+    "HOME": "Home",
+    "PROFILE": "Profile",
+    "MY_COMPANY": "My Company",
+    "MY_LANDS": "My Lands",
+    "MY_TREES": "My Trees",
+    "ADMIN": {
+      "ADMIN": "Administration",
+      "USERS": "Users",
+      "COMPANIES": "Companies",
+      "TREE_TYPES": "Tree Types",
+      "TREES": "Trees",
+      "AVAILABLE_LANDS": "Available Lands",
+      "LANDS": "Lands"
+    },
+    "LOGIN": "Log In",
+    "REGISTER": "Register"
+  },
+  "DASHBOARD": {
+    "DASHBOARD": "Dashboard",
+    "LOGOUT": "Logout"
+  },
+  "LOGIN": {
+    "TITLE": "Login",
+    "EMAIL": "Email",
+    "EMAIL_PLACEHOLDER": "example@email.com",
+    "EMAIL_REQUIRED": "Email is required",
+    "EMAIL_INVALID": "Invalid email format",
+    "PASSWORD": "Password",
+    "PASSWORD_PLACEHOLDER": "Enter your password",
+    "PASSWORD_REQUIRED": "Password is required",
+    "PASSWORD_MINLENGTH": "Password must be at least {{length}} characters",
+    "BUTTON": "Login",
+    "NO_ACCOUNT": "Don't have an account?",
+    "REGISTER": "Register",
+    "EMAIL_NOT_VERIFIED": "Email has not been verified",
+    "RESEND_EMAIL": "Resend verification email",
+    "VERIFICATION_EMAIL_SENT": "A new verification email has been sent",
+    "VERIFICATION_EMAIL_FAILED": "Failed to send the verification email",
+    "FORGOT_PASSWORD_TITLE": "Reset Password",
+    "FORGOT_PASSWORD_SUCCESS": "A password reset email has been sent. Please check your inbox.",
+    "GO_TO_LOGIN": "Back to Login",
+    "FORGOT_PASSWORD": "Forgot your password?",
+    "SEND_NEW_PASSWORD": "Send New Password"
+  },
+  "HOME": {
+    "TITLE": "Welcome to Forest+",
+    "LINES": [
+      "The platform that combines technology and innovation to care for our planet.",
+      "Using satellite imagery and Artificial Intelligence, we make digital reforestation possible with traceability and measurable results.",
+      "We regenerate ecosystems and help organizations achieve their climate goals efficiently.",
+      "Together, we build a greener future."
+    ]
+  },
+  "PROFILE": {
+    "ROLE": "Role"
+  },
+  "REGISTER": {
+    "TITLE": "Create Account",
+    "NAME": "First Name",
+    "NAME_PLACEHOLDER": "Enter your first name",
+    "NAME_REQUIRED": "First name is required",
+    "SURNAME": "Last Name",
+    "SURNAME_PLACEHOLDER": "Enter your last name",
+    "SURNAME_REQUIRED": "Last name is required",
+    "SECOND_SURNAME": "Second Last Name",
+    "SECOND_SURNAME_PLACEHOLDER": "Enter your second last name (optional)",
+    "EMAIL": "Email",
+    "EMAIL_PLACEHOLDER": "Enter your email",
+    "EMAIL_REQUIRED": "Email is required",
+    "EMAIL_INVALID": "Invalid email address",
+    "PASSWORD": "Password",
+    "PASSWORD_PLACEHOLDER": "Enter your password",
+    "PASSWORD_REQUIRED": "Password is required",
+    "PASSWORD_MINLENGTH": "Password must be at least {{length}} characters",
+    "ROLE": "Role",
+    "ROLE_REQUIRED": "Role is required",
+    "BUTTON": "Register",
+    "HAVE_ACCOUNT": "Already have an account?",
+    "LOGIN": "Login",
+    "SUCCESS": "Thank you for registering at Forest+. Please confirm your email before logging in.",
+    "ALREADY_ACCOUNT": "¿Already account?"
+  },
+  "VERIFY_EMAIL": {
+    "TITLE": "Email Verification",
+    "PROCESSING": "We are verifying your email, please wait...",
+    "SUCCESS": "Your email has been successfully verified! 🎉",
+    "ERROR": "An error occurred while verifying your email.",
+    "INVALID_LINK": "The verification link is invalid.",
+    "GO_TO_LOGIN": "Go to Login"
+  },
+  "USER": {
+    "NEW_TITLE": "New User",
+    "EDIT_TITLE": "Edit User",
+    "NAME_LABEL": "First Name",
+    "NAME_PLACEHOLDER": "First Name",
+    "SURNAME_LABEL": "Last Name",
+    "SURNAME_PLACEHOLDER": "Last Name",
+    "SECOND_SURNAME_LABEL": "Second Last Name",
+    "SECOND_SURNAME_PLACEHOLDER": "Second Last Name",
+    "EMAIL_LABEL": "Email",
+    "EMAIL_PLACEHOLDER": "Email",
+    "PASSWORD_LABEL": "Password",
+    "PASSWORD_PLACEHOLDER": "Password",
+    "ROLE_LABEL": "Role",
+    "SELECT_ROLE": "Select role",
+    "COMPANY_LABEL": "Company",
+    "SELECT_COMPANY": "Select company",
+    "CREATE_BUTTON": "Create User",
+    "EDIT_BUTTON": "Edit User",
+    "FIELD_REQUIRED": "Required field",
+    "INVALID_EMAIL": "Invalid email",
+    "MIN_LENGTH": "Minimum 6 characters",
+    "SUCCESS_MSG": "User created successfully"
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "MENU": {
+    "MENU": "Menú",
+    "HOME": "Inicio",
+    "PROFILE": "Perfil",
+    "MY_COMPANY": "Mi compañía",
+    "MY_LANDS": "Mis terrenos",
+    "MY_TREES": "Mis árboles",
+    "ADMIN": {
+      "ADMIN": "Administración",
+      "USERS": "Usuarios",
+      "COMPANIES": "Compañías",
+      "TREE_TYPES": "Tipos de árboles",
+      "TREES": "Árboles",
+      "AVAILABLE_LANDS": "Terrenos disponibles",
+      "LANDS": "Terrenos"
+    },
+    "LOGIN": "Iniciar sesión",
+    "REGISTER": "Registrarse"
+  },
+  "DASHBOARD": {
+    "DASHBOARD": "Dashboard",
+    "LOGOUT": "Cerrar sesion"
+  },
+  "LOGIN": {
+    "TITLE": "Inicio de Sesión",
+    "EMAIL": "Correo electrónico",
+    "EMAIL_PLACEHOLDER": "ejemplo@correo.com",
+    "EMAIL_REQUIRED": "El email es obligatorio",
+    "EMAIL_INVALID": "Formato de email inválido",
+    "PASSWORD": "Contraseña",
+    "PASSWORD_PLACEHOLDER": "Introduce tu contraseña",
+    "PASSWORD_REQUIRED": "La contraseña es obligatoria",
+    "PASSWORD_MINLENGTH": "La contraseña debe tener al menos {{length}} caracteres",
+    "BUTTON": "Iniciar Sesión",
+    "NO_ACCOUNT": "¿No tienes cuenta?",
+    "REGISTER": "Regístrate",
+    "EMAIL_NOT_VERIFIED": "El email no ha sido verificado",
+    "RESEND_EMAIL": "Enviar nuevo correo de verificación",
+    "VERIFICATION_EMAIL_SENT": "Se ha enviado un nuevo correo de verificación",
+    "VERIFICATION_EMAIL_FAILED": "Ha fallado el envio del correo de verificación",
+    "FORGOT_PASSWORD_TITLE": "Restablecer contraseña",
+    "FORGOT_PASSWORD_SUCCESS": "Se ha enviado un correo para restablecer tu contraseña. Revisa tu bandeja de entrada.",
+    "GO_TO_LOGIN": "Volver al inicio de sesión",
+    "FORGOT_PASSWORD": "¿Olvidaste tu contraseña?",
+    "SEND_NEW_PASSWORD": "Enviar nueva contraseña"
+  },
+  "HOME": {
+    "TITLE": "Bienvenido a Forest+",
+    "LINES": [
+      "La plataforma que combina tecnología e innovación para cuidar nuestro planeta.",
+      "Con imágenes satelitales e Inteligencia Artificial, hacemos posible la reforestación digital con trazabilidad y resultados medibles.",
+      "Regeneramos ecosistemas y ayudamos a organizaciones a cumplir sus metas climáticas de manera eficiente.",
+      "Juntos, construimos un futuro más verde."
+    ]
+  },
+  "PROFILE": {
+    "ROLE": "Rol"
+  },
+  "REGISTER": {
+    "TITLE": "Crear cuenta",
+    "NAME": "Nombre",
+    "NAME_PLACEHOLDER": "Introduce tu nombre",
+    "NAME_REQUIRED": "El nombre es obligatorio",
+    "SURNAME": "Primer apellido",
+    "SURNAME_PLACEHOLDER": "Introduce tu primer apellido",
+    "SURNAME_REQUIRED": "El primer apellido es obligatorio",
+    "SECOND_SURNAME": "Segundo apellido",
+    "SECOND_SURNAME_PLACEHOLDER": "Introduce tu segundo apellido (opcional)",
+    "EMAIL": "Correo electrónico",
+    "EMAIL_PLACEHOLDER": "Introduce tu correo electrónico",
+    "EMAIL_REQUIRED": "El correo electrónico es obligatorio",
+    "EMAIL_INVALID": "El correo electrónico no es válido",
+    "PASSWORD": "Contraseña",
+    "PASSWORD_PLACEHOLDER": "Introduce tu contraseña",
+    "PASSWORD_REQUIRED": "La contraseña es obligatoria",
+    "PASSWORD_MINLENGTH": "La contraseña debe tener al menos {{length}} caracteres",
+    "ROLE": "Rol",
+    "ROLE_REQUIRED": "El rol es obligatorio",
+    "BUTTON": "Registrarse",
+    "HAVE_ACCOUNT": "¿Ya tienes una cuenta?",
+    "LOGIN": "Iniciar sesión",
+    "SUCCESS": "Gracias por registrarte en Forest+. Por favor, confirma tu correo electrónico antes de hacer login",
+    "ALREADY_ACCOUNT": "¿Ya tienes cuenta?"
+  },
+  "VERIFY_EMAIL": {
+    "TITLE": "Verificación de correo",
+    "PROCESSING": "Estamos verificando tu correo, por favor espera...",
+    "SUCCESS": "¡Tu correo ha sido verificado correctamente! 🎉",
+    "ERROR": "Ha ocurrido un error al verificar tu correo.",
+    "INVALID_LINK": "El enlace de verificación no es válido.",
+    "GO_TO_LOGIN": "Ir a Iniciar Sesión"
+  },
+  "USER": {
+    "NEW_TITLE": "Nuevo Usuario",
+    "EDIT_TITLE": "Edición de Usuario",
+    "NAME_LABEL": "Nombre",
+    "NAME_PLACEHOLDER": "Nombre",
+    "SURNAME_LABEL": "Apellido",
+    "SURNAME_PLACEHOLDER": "Apellido",
+    "SECOND_SURNAME_LABEL": "Segundo Apellido",
+    "SECOND_SURNAME_PLACEHOLDER": "Segundo Apellido",
+    "EMAIL_LABEL": "Email",
+    "EMAIL_PLACEHOLDER": "Correo electrónico",
+    "PASSWORD_LABEL": "Contraseña",
+    "PASSWORD_PLACEHOLDER": "Contraseña",
+    "ROLE_LABEL": "Rol",
+    "SELECT_ROLE": "Seleccione rol",
+    "COMPANY_LABEL": "Compañía",
+    "SELECT_COMPANY": "Seleccione compañía",
+    "CREATE_BUTTON": "Crear Usuario",
+    "EDIT_BUTTON": "Editar Usuario",
+    "FIELD_REQUIRED": "Campo requerido",
+    "INVALID_EMAIL": "Email inválido",
+    "MIN_LENGTH": "Mínimo 6 caracteres",
+    "SUCCESS_MSG": "Usuario creado correctamente"
+  }
+}
