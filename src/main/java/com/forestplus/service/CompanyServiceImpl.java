@@ -95,6 +95,7 @@ public class CompanyServiceImpl implements CompanyService {
 
         String imageUrl = fileStorageService.storeFile(file, "companies", company.getId());
         company.setPicture(imageUrl);
+        System.out.println("[#updateCompanyPicture] Imagen guardada en: " + imageUrl);
         companyRepository.save(company);
 
         return mapCompanyWithEmissionsAndCompensations(company);
