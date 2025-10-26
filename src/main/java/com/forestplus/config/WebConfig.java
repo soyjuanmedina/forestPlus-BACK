@@ -19,10 +19,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 
-    // Recursos estáticos genéricos
+    // 📁 Recursos estáticos (uploads)
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/uploads/**")          // URL pública
-                .addResourceLocations("file:/forestplus/home/"); // Carpeta raíz
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:/appservers/forestplus-files/uploads/") // 👈 ruta real
+                .setCachePeriod(3600); // (opcional) cache de 1h
     }
 }

@@ -22,14 +22,14 @@ public class FileStorageServiceImpl implements FileStorageService {
      * @param userUuid UUID del usuario
      * @return nombre del archivo guardado
      */
-    public String storeFile(MultipartFile file, String subdirectory,  Long id) {
+    public String storeFile(MultipartFile file, String subdirectory, Long id) {
+        System.out.println("[FileStorageServiceImpl#storeFile] Ruta base de uploads: " + baseUploadDir);
         try {
             Path uploadPath = Paths.get(baseUploadDir, subdirectory);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            // Anteponer UUID al nombre del archivo original
             String originalFilename = file.getOriginalFilename();
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
@@ -40,7 +40,8 @@ public class FileStorageServiceImpl implements FileStorageService {
             Path filePath = uploadPath.resolve(filename);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            return filename;
+            // Devolver la ruta relativa que el front usará
+            return Paths.get("api/uploads", subdirectory, filename).toString().replace("\\", "/");
         } catch (IOException e) {
             throw new RuntimeException("Error al guardar el archivo", e);
         }

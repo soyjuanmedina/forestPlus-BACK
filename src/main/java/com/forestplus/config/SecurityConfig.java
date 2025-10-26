@@ -57,7 +57,7 @@ public class SecurityConfig {
                 .requestMatchers("/", "/index.html" , "/*.js", "/*.css", "assets/**", "/api/auth/**", "/ping",
                         "/v3/api-docs/**", "/swagger-ui.html",
                         "/swagger-ui/**", "/swagger-resources/**",
-                        "/webjars/**").permitAll()
+                        "/webjars/**", "/api/uploads/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(org.springframework.boot.autoconfigure.security.servlet.PathRequest
                         .toStaticResources().atCommonLocations()).permitAll()

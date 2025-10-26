@@ -186,10 +186,16 @@ public class UserServiceImpl implements UserService {
         // 1️⃣ Buscar el usuario
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
+        // Imprimir info de debug
+        System.out.println("📁 Guardando imagen para usuario " + id + ", original filename: " 
+                            + file.getOriginalFilename());
 
         // 2️⃣ Guardar la imagen con id para evitar colisiones
         String imageUrl = fileStorageService.storeFile(file, "users", user.getId());
         // Ejemplo de storeFile: /uploads/users/{uuid}-{originalFilename}
+        
+        System.out.println("Imagen guardada en: " + imageUrl);
 
         // 3️⃣ Actualizar entidad con la nueva ruta
         user.setPicture(imageUrl);
