@@ -40,7 +40,7 @@ public class CompanyEntity {
     @Column(name = "created_at", updatable = false, insertable = false)
     private LocalDateTime createdAt;
     
-    @OneToMany(mappedBy = "companyId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<CompanyCO2YearlyEntity> co2Yearly;
 }

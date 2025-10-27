@@ -27,9 +27,6 @@ public class CompanyCO2YearlyEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "company_id", nullable = false)
-    private Long companyId;
-
     @Column(nullable = false)
     private Integer year;
 
@@ -43,6 +40,6 @@ public class CompanyCO2YearlyEntity {
     private LocalDateTime createdAt = LocalDateTime.now();
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "company_id", nullable = false)
     private CompanyEntity company;
 }
