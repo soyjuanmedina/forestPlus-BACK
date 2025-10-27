@@ -1,60 +1,60 @@
-name: Build and Deploy Spring Boot WAR to Tomcat (FTPS)
+name: Build & Deploy Spring Boot App
 
 on:
   push:
     branches:
-      - master  # O "main" si tu rama principal se llama así
+      - main  # o la rama que uses para producción
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Descargar el código del repositorio
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Instalar Java 21 (Temurin es el más estable y recomendado)
+      # Configurar JDK para compilar el backend
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: 21
-          cache: maven
 
-      # 3️⃣ Compilar y empaquetar el WAR
-      - name: Build WAR with Maven
+      # Construir el WAR usando Maven o Gradle (ajusta según tu caso)
+      - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      # 4️⃣ Renombrar el WAR a ROOT.war (si tu hosting despliega automáticamente ese nombre)
-      - name: Rename WAR file to ROOT.war
+      # Instalar lftp
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      # Subir el WAR a tu servidor Tomcat
+      - name: Deploy WAR via lftp
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          WAR_FILE=$(ls target/*.war | head -n 1)
-          BASENAME=$(basename "$WAR_FILE")
-          if [ "$BASENAME" != "ROOT.war" ]; then
-            mv "$WAR_FILE" target/ROOT.war
-          else
-            echo "WAR already named ROOT.war, skipping rename"
+          # Ruta donde se genera el WAR (ajusta si tu proyecto lo pone en otro sitio)
+          WAR_FILE=$(find target -name "*.war" | head -n 1)
+          if [ -z "$WAR_FILE" ]; then
+            echo "❌ No se encontró ningún archivo WAR en target/"
+            exit 1
           fi
+          echo "✅ WAR encontrado: $WAR_FILE"
 
-      # 5️⃣ Verificar que el archivo esté listo
-      - name: List target folder
-        run: ls -la target/
+          # Subir el WAR al servidor Tomcat
+          lftp -c "
+            set ftp:ssl-allow true
+            set ftp:ssl-force true
+            set ftp:ssl-protect-data true
+            set ftp:passive-mode true
+            set ssl:verify-certificate no
+            open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_SERVER
 
-      # 6️⃣ Subir solo ROOT.war a tu servidor por FTPS
-      - name: Upload ROOT.war via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
-        with:
-          server: ${{ secrets.FTP_SERVER }}        # 👈 cámbialo o usa secreto
-          username: ${{ secrets.FTP_USERNAME }}    # 👈 cámbialo o usa secreto
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21                                 # o 990 si tu FTPS usa ese
-          protocol: ftps
-          local-dir: target/
-          server-dir: appservers/apache-tomcat-10x/webapps/  # 👈 ajusta a tu ruta real
-          log-level: verbose
-          timeout: 10m
-          exclude: |
-            *
-            !ROOT.war
-          passive: true
+            # Eliminar el WAR anterior
+            rm -f /appservers/apache-tomcat-10x/webapps/ROOT.war || true
+
+            # Subir el nuevo WAR
+            put -O /appservers/apache-tomcat-10x/webapps/ $WAR_FILE
+          "
