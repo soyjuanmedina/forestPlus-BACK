@@ -2,6 +2,7 @@ package com.forestplus.controller;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +30,7 @@ public class CompanyCO2YearlyController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public CompanyCO2YearlyResponse createOrUpdate(
             @PathVariable Long companyId,
             @RequestBody CompanyCO2YearlyRequest request
@@ -37,6 +39,7 @@ public class CompanyCO2YearlyController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public void delete(
         @PathVariable Long companyId, // 👈 esto es lo que faltaba
         @PathVariable Long id
