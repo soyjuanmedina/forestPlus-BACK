@@ -23,10 +23,6 @@ public class CompanyEntity {
     private String name;
     private String address;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id", nullable = false)
-    private UserEntity admin;
-
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserEntity> users;
     

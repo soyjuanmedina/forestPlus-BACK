@@ -76,7 +76,7 @@ public class AuthService {
 
         // Enviar email de confirmación
         String subject = "Confirma tu correo en ForestPlus";
-        String link = frontendUrl + "/verify-email?uuid=" + verificationUuid;
+        String link = frontendUrl + "/#verify-email?uuid=" + verificationUuid;
         emailService.sendVerificationEmail(user.getEmail(), user.getName(), link);
 
         return userMapper.toResponse(saved);
@@ -118,7 +118,7 @@ public class AuthService {
         userRepository.save(user);
 
         String subject = "Confirma tu correo en ForestPlus";
-        String link = frontendUrl + "/verify-email?uuid=" + verificationUuid;
+        String link = frontendUrl + "/#verify-email?uuid=" + verificationUuid;
 
         Map<String, Object> vars = new HashMap<>();
         vars.put("name", user.getName());

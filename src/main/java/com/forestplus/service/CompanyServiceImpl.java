@@ -50,12 +50,6 @@ public class CompanyServiceImpl implements CompanyService {
     public CompanyResponse createCompany(CompanyRequest request) {
         CompanyEntity entity = companyMapper.toEntity(request);
 
-        if (request.getAdminId() != null) {
-            UserEntity admin = userRepository.findById(request.getAdminId())
-                    .orElseThrow(() -> new RuntimeException("Admin user not found with id " + request.getAdminId()));
-            entity.setAdmin(admin);
-        }
-
         CompanyEntity saved = companyRepository.save(entity);
         return mapCompanyWithEmissionsAndCompensations(saved);
     }

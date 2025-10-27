@@ -18,7 +18,6 @@ public class CompanyResponse {
     private String name;
     private String address;
     private String picture; 
-    private UserSummaryResponse admin;
     private List<UserSummaryResponse> users;
     private LocalDateTime createdAt;
    

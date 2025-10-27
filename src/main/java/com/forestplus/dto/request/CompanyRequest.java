@@ -13,6 +13,5 @@ import lombok.NoArgsConstructor;
 public class CompanyRequest {
     private String name;
     private String address;
-    private Long adminId;
     private String picture; 
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,8 @@ public class EmailService {
 
     
     public void sendVerificationEmail(String to, String name, String link) {
+    	
+    	printMailProperties();
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
@@ -78,6 +81,18 @@ public class EmailService {
 
         } catch (MessagingException e) {
             throw new RuntimeException("Error enviando correo", e);
+        }
+    }
+    
+    public void printMailProperties() {
+        if (mailSender instanceof JavaMailSenderImpl sender) {
+            System.out.println("Mail host: " + sender.getHost());
+            System.out.println("Mail port: " + sender.getPort());
+            System.out.println("Mail username: " + sender.getUsername());
+            System.out.println("Mail protocol: " + sender.getProtocol());
+            System.out.println("Mail java properties: " + sender.getJavaMailProperties());
+        } else {
+            System.out.println("mailSender no es JavaMailSenderImpl!");
         }
     }
 }

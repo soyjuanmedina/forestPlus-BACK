@@ -18,7 +18,6 @@ public abstract class CompanyMapper {
     // =======================
     // ENTITY -> DTO
     // =======================
-    @Mapping(target = "admin", source = "admin") // usa UserMapper
     public abstract CompanyResponse toResponse(CompanyEntity company);
 
     public abstract List<CompanyResponse> toResponseList(List<CompanyEntity> companies);
@@ -28,7 +27,6 @@ public abstract class CompanyMapper {
     // =======================
     // DTO -> ENTITY
     // =======================
-    @Mapping(target = "admin", source = "adminId", qualifiedByName = "mapAdminIdToUserEntity")
     @Mapping(target = "users", ignore = true)
     @Mapping(target = "lands", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

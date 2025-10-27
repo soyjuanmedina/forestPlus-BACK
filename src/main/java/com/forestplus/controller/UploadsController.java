@@ -23,16 +23,33 @@ public class UploadsController {
 
     @GetMapping("/users/{filename:.+}")
     public ResponseEntity<Resource> serveUserImage(@PathVariable String filename) throws MalformedURLException {
-        System.out.println("[UploadsController] Petición recibida para: " + filename);
+        System.out.println("[UploadsController#serveUserImage] Petición recibida para: " + filename);
 
         Path file = Paths.get(baseUploadDir, "users", filename);
         Resource resource = new UrlResource(file.toUri());
         if(!resource.exists() || !resource.isReadable()) {
-            System.out.println("[UploadsController] Archivo no encontrado o no legible: " + file.toAbsolutePath());
+            System.out.println("[UploadsController#serveUserImage] Archivo no encontrado o no legible: " + file.toAbsolutePath());
             return ResponseEntity.notFound().build();
         }
 
-        System.out.println("[UploadsController] Sirviendo archivo: " + file.toAbsolutePath());
+        System.out.println("[UploadsController#serveUserImage] Sirviendo archivo: " + file.toAbsolutePath());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "image/png")
+                .body(resource);
+    }
+    
+    @GetMapping("/companies/{filename:.+}")
+    public ResponseEntity<Resource> serveCompanyImage(@PathVariable String filename) throws MalformedURLException {
+        System.out.println("[UploadsController#serveCompanyImage] Petición recibida para: " + filename);
+
+        Path file = Paths.get(baseUploadDir, "companies", filename);
+        Resource resource = new UrlResource(file.toUri());
+        if(!resource.exists() || !resource.isReadable()) {
+            System.out.println("[UploadsController#serveCompanyImage] Archivo no encontrado o no legible: " + file.toAbsolutePath());
+            return ResponseEntity.notFound().build();
+        }
+
+        System.out.println("[UploadsController#serveCompanyImage] Sirviendo archivo: " + file.toAbsolutePath());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "image/png")
                 .body(resource);
