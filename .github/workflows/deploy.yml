@@ -3,7 +3,7 @@ name: Build & Deploy Spring Boot App
 on:
   push:
     branches:
-      - main  # o la rama que uses para producción
+      - master  # o la rama que uses para producción
 
 jobs:
   build-and-deploy:
