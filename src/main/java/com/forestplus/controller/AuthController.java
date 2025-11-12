@@ -9,6 +9,7 @@ import com.forestplus.dto.response.MessageResponse;
 import com.forestplus.dto.response.UserResponse;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.exception.UserNotFoundException;
+import com.forestplus.exception.UuidNotFoundException;
 import com.forestplus.mapper.UserMapper;
 import com.forestplus.repository.UserRepository;
 import com.forestplus.service.AuthService;
@@ -128,10 +129,10 @@ public class AuthController {
         try {
             authService.verifyEmail(uuid);
             return ResponseEntity.ok(new MessageResponse("Email verificado correctamente"));
-        } catch (IllegalArgumentException e) {
+        } catch (UuidNotFoundException e) {  // <-- cambiar la excepción
             return ResponseEntity.badRequest()
-                                 .body(new MessageResponse("VERIFY_EMAIL.INVALID_LINK"));
-        }
+                    .body(new MessageResponse("VERIFY_EMAIL.INVALID_LINK"));
+}
     }
 
     @Operation(

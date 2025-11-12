@@ -14,6 +14,7 @@ import com.forestplus.exception.UserNotFoundException;
 import com.forestplus.exception.UuidNotFoundException;
 import com.forestplus.exception.WrongPasswordException;
 import com.forestplus.mapper.UserMapper;
+import com.forestplus.model.RolesEnum;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
 
@@ -59,7 +60,7 @@ public class AuthService {
                 .secondSurname(request.getSecondSurname())
                 .email(request.getEmail())
                 .passwordHash(encodedPassword)
-                .role(request.getRole())
+                .role(request.getRole() != null ? request.getRole() : RolesEnum.USER)
                 .emailVerified(false)
                 .forcePasswordChange(false)
                 .uuid(verificationUuid)
