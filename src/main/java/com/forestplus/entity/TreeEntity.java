@@ -17,27 +17,40 @@ import lombok.NoArgsConstructor;
 @Table(name = "trees")
 public class TreeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	 @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "land_id", nullable = false)
-    private LandEntity land;
+	    @Column(name = "co2_absorption", nullable = false)
+	    private BigDecimal co2Absorption;
 
-    private String species;
+	    @Column(name = "planted_at")
+	    private LocalDate plantedAt;
 
-    @Column(name = "planted_at")
-    private LocalDate plantedAt;
+	    @Column(name = "species")
+	    private String species;
 
-    @Column(name = "co2_absorption", nullable = false)
-    private BigDecimal co2Absorption;
+	    @ManyToOne
+	    @JoinColumn(name = "tree_type_id", nullable = false)
+	    private TreeTypeEntity treeType;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+	    @ManyToOne
+	    @JoinColumn(name = "land_id", nullable = false)
+	    private LandEntity land;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+	    @ManyToOne
+	    @JoinColumn(name = "owner_user_id")
+	    private UserEntity ownerUser;
+
+	    @ManyToOne
+	    @JoinColumn(name = "owner_company_id")
+	    private CompanyEntity ownerCompany;
+
+	    @Column(name = "created_at", updatable = false)
+	    private LocalDateTime createdAt;
+
+	    @PrePersist
+	    public void prePersist() {
+	        createdAt = LocalDateTime.now();
+	    }
 }

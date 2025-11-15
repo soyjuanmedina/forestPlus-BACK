@@ -9,5 +9,7 @@ import com.forestplus.entity.TreeEntity;
 
 @Repository
 public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
+    List<TreeEntity> findByOwnerUserId(Long userId);
+    List<TreeEntity> findByOwnerCompanyId(Long companyId);
     List<TreeEntity> findByLandId(Long landId);
 }

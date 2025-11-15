@@ -1,14 +1,21 @@
 package com.forestplus.service;
 
+import com.forestplus.dto.request.TreeRequest;
+import com.forestplus.dto.request.TreeUpdateRequest;
+import com.forestplus.dto.response.TreeResponse;
 import com.forestplus.entity.TreeEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface TreeService {
-    List<TreeEntity> getAllTrees();
-    Optional<TreeEntity> getTreeById(Long id);
-    TreeEntity createTree(TreeEntity tree);
-    TreeEntity updateTree(Long id, TreeEntity tree);
+
+    List<TreeResponse> getAllTrees();
+
+    TreeResponse getTreeById(Long id);
+
+    TreeResponse createTree(TreeRequest request);
+
+    TreeResponse updateTree(Long id, TreeUpdateRequest request);
+
     void deleteTree(Long id);
 }

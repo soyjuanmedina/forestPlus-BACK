@@ -1,50 +1,53 @@
 package com.forestplus.controller;
 
-import com.forestplus.entity.TreeEntity;
-import com.forestplus.service.LandService;
+import com.forestplus.dto.request.TreeRequest;
+import com.forestplus.dto.request.TreeUpdateRequest;
+import com.forestplus.dto.response.TreeResponse;
 import com.forestplus.service.TreeService;
 
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/trees", produces = "application/json")
+@RequestMapping("/api/trees")
 @RequiredArgsConstructor
 public class TreeController {
 
     private final TreeService treeService;
 
     @GetMapping
-    public List<TreeEntity> getAllTrees() {
-        return treeService.getAllTrees();
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<TreeResponse>> getAllTrees() {
+        return ResponseEntity.ok(treeService.getAllTrees());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TreeEntity> getTreeById(@PathVariable Long id) {
-        return treeService.getTreeById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TreeResponse> getTreeById(@PathVariable Long id) {
+        return ResponseEntity.ok(treeService.getTreeById(id));
     }
 
     @PostMapping
-    public TreeEntity createTree(@RequestBody TreeEntity tree) {
-        return treeService.createTree(tree);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TreeResponse> createTree(@RequestBody TreeRequest request) {
+        return ResponseEntity.ok(treeService.createTree(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TreeEntity> updateTree(@PathVariable Long id, @RequestBody TreeEntity tree) {
-        try {
-            return ResponseEntity.ok(treeService.updateTree(id, tree));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TreeResponse> updateTree(
+            @PathVariable Long id,
+            @RequestBody TreeUpdateRequest request
+    ) {
+        return ResponseEntity.ok(treeService.updateTree(id, request));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteTree(@PathVariable Long id) {
         treeService.deleteTree(id);
         return ResponseEntity.noContent().build();
