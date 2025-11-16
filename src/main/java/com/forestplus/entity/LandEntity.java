@@ -28,12 +28,12 @@ public class LandEntity {
     private String location;
 
     private BigDecimal area;
-    
-    private String picture; 
-    
+
+    private String picture;
+
     @OneToMany(mappedBy = "land", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CoordinateEntity> coordinates;
-    
+
     // Relación muchos a muchos con compañías
     @ManyToMany(mappedBy = "lands")
     private List<CompanyEntity> companies;
@@ -50,9 +50,16 @@ public class LandEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    // 🔥 NUEVO: Máximo de árboles permitidos en este terreno
+    @Column(name = "max_trees")
+    private Integer maxTrees;
+
+    // 🔥 NUEVO: Indicador de si el terreno está lleno
+    @Column(name = "is_full")
+    private Boolean isFull;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
-
 }

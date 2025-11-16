@@ -7,6 +7,7 @@ import com.forestplus.entity.TreeEntity;
 import com.forestplus.entity.TreeTypeEntity;
 import com.forestplus.entity.LandEntity;
 import com.forestplus.entity.UserEntity;
+import com.forestplus.mapper.TreeMapper;
 import com.forestplus.entity.CompanyEntity;
 import com.forestplus.repository.TreeRepository;
 import com.forestplus.repository.TreeTypeRepository;
@@ -29,114 +30,78 @@ public class TreeServiceImpl implements TreeService {
     private final LandRepository landRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+    private final TreeMapper treeMapper;
 
     @Override
     public List<TreeResponse> getAllTrees() {
-        return treeRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        return treeMapper.toResponseList(treeRepository.findAll());
     }
 
     @Override
     public TreeResponse getTreeById(Long id) {
         return treeRepository.findById(id)
-                .map(this::mapToResponse)
+                .map(treeMapper::toResponse)
                 .orElseThrow(() -> new RuntimeException("Tree not found with id " + id));
     }
 
     @Override
     public TreeResponse createTree(TreeRequest request) {
-        TreeEntity tree = new TreeEntity();
-        tree.setSpecies(request.getSpecies());
-        tree.setPlantedAt(request.getPlantedAt());
-        tree.setCo2Absorption(request.getCo2Absorption());
+        TreeEntity tree = treeMapper.toEntity(request);
 
-        LandEntity land = landRepository.findById(request.getLandId())
-                .orElseThrow(() -> new RuntimeException("Land not found"));
-        tree.setLand(land);
+        tree.setLand(landRepository.findById(request.getLandId())
+                .orElseThrow(() -> new RuntimeException("Land not found")));
 
-        TreeTypeEntity type = treeTypeRepository.findById(request.getTreeTypeId())
-                .orElseThrow(() -> new RuntimeException("TreeType not found"));
-        tree.setTreeType(type);
+        tree.setTreeType(treeTypeRepository.findById(request.getTreeTypeId())
+                .orElseThrow(() -> new RuntimeException("TreeType not found")));
 
         if (request.getOwnerUserId() != null) {
-            UserEntity user = userRepository.findById(request.getOwnerUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-            tree.setOwnerUser(user);
+            tree.setOwnerUser(userRepository.findById(request.getOwnerUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found")));
         }
 
         if (request.getOwnerCompanyId() != null) {
-            CompanyEntity company = companyRepository.findById(request.getOwnerCompanyId())
-                    .orElseThrow(() -> new RuntimeException("Company not found"));
-            tree.setOwnerCompany(company);
+            tree.setOwnerCompany(companyRepository.findById(request.getOwnerCompanyId())
+                    .orElseThrow(() -> new RuntimeException("Company not found")));
         }
 
-        TreeEntity saved = treeRepository.save(tree);
-        return mapToResponse(saved);
+        return treeMapper.toResponse(treeRepository.save(tree));
     }
 
     @Override
     public TreeResponse updateTree(Long id, TreeUpdateRequest request) {
-        TreeEntity updated = treeRepository.findById(id)
-                .map(tree -> {
-                    tree.setSpecies(request.getSpecies());
-                    tree.setPlantedAt(request.getPlantedAt());
-                    tree.setCo2Absorption(request.getCo2Absorption());
-
-                    if (request.getLandId() != null) {
-                        LandEntity land = landRepository.findById(request.getLandId())
-                                .orElseThrow(() -> new RuntimeException("Land not found"));
-                        tree.setLand(land);
-                    }
-
-                    if (request.getTreeTypeId() != null) {
-                        TreeTypeEntity type = treeTypeRepository.findById(request.getTreeTypeId())
-                                .orElseThrow(() -> new RuntimeException("TreeType not found"));
-                        tree.setTreeType(type);
-                    }
-
-                    if (request.getOwnerUserId() != null) {
-                        UserEntity user = userRepository.findById(request.getOwnerUserId())
-                                .orElseThrow(() -> new RuntimeException("User not found"));
-                        tree.setOwnerUser(user);
-                    }
-
-                    if (request.getOwnerCompanyId() != null) {
-                        CompanyEntity company = companyRepository.findById(request.getOwnerCompanyId())
-                                .orElseThrow(() -> new RuntimeException("Company not found"));
-                        tree.setOwnerCompany(company);
-                    }
-
-                    return treeRepository.save(tree);
-                })
+        TreeEntity tree = treeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tree not found with id " + id));
 
-        return mapToResponse(updated);
+        tree.setSpecies(request.getSpecies());
+        tree.setPlantedAt(request.getPlantedAt());
+        tree.setCo2Absorption(request.getCo2Absorption());
+
+        if (request.getLandId() != null) {
+            tree.setLand(landRepository.findById(request.getLandId())
+                    .orElseThrow(() -> new RuntimeException("Land not found")));
+        }
+
+        if (request.getTreeTypeId() != null) {
+            tree.setTreeType(treeTypeRepository.findById(request.getTreeTypeId())
+                    .orElseThrow(() -> new RuntimeException("TreeType not found")));
+        }
+
+        if (request.getOwnerUserId() != null) {
+            tree.setOwnerUser(userRepository.findById(request.getOwnerUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found")));
+        }
+
+        if (request.getOwnerCompanyId() != null) {
+            tree.setOwnerCompany(companyRepository.findById(request.getOwnerCompanyId())
+                    .orElseThrow(() -> new RuntimeException("Company not found")));
+        }
+
+        return treeMapper.toResponse(treeRepository.save(tree));
     }
 
     @Override
     public void deleteTree(Long id) {
         treeRepository.deleteById(id);
     }
-
-    // ====================================
-    // Mapper a DTO
-    // ====================================
-    private TreeResponse mapToResponse(TreeEntity tree) {
-        return TreeResponse.builder()
-                .id(tree.getId())
-                .species(tree.getSpecies())
-                .co2Absorption(tree.getCo2Absorption())
-                .plantedAt(tree.getPlantedAt())
-                .treeTypeId(tree.getTreeType() != null ? tree.getTreeType().getId() : null)
-                .treeTypeName(tree.getTreeType() != null ? tree.getTreeType().getName() : null)
-                .landId(tree.getLand() != null ? tree.getLand().getId() : null)
-                .landName(tree.getLand() != null ? tree.getLand().getName() : null)
-                .ownerUserId(tree.getOwnerUser() != null ? tree.getOwnerUser().getId() : null)
-                .ownerUserName(tree.getOwnerUser() != null ? tree.getOwnerUser().getName() : null)
-                .ownerCompanyId(tree.getOwnerCompany() != null ? tree.getOwnerCompany().getId() : null)
-                .ownerCompanyName(tree.getOwnerCompany() != null ? tree.getOwnerCompany().getName() : null)
-                .build();
-    }
 }
+

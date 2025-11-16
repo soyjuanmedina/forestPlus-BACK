@@ -11,10 +11,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LandRequest {
+
     private String name;
     private String location;
-    private BigDecimal  area; // se convertirá a BigDecimal en el service
+    private BigDecimal area;
     private List<Long> userIds;
     private List<Long> companyIds;
     private String picture;
+
+    // Nuevo: máximo de árboles permitidos
+    private Integer maxTrees;
 }
