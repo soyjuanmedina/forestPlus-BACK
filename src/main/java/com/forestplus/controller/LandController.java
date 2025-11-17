@@ -9,9 +9,6 @@ import com.forestplus.service.LandService;
 import com.forestplus.service.JwtService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,16 +31,23 @@ public class LandController {
     // ============================
     // Obtener todas las parcelas
     // ============================
+    @Operation(
+        operationId = "getAllLands",
+        summary = "Obtener todas las parcelas"
+    )
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<List<LandResponse>> getAllLands() {
-        List<LandResponse> lands = landService.getAllLands();
-        return ResponseEntity.ok(lands);
+        return ResponseEntity.ok(landService.getAllLands());
     }
 
     // ============================
     // Obtener parcela por ID
     // ============================
+    @Operation(
+        operationId = "getLandById",
+        summary = "Obtener una parcela por su ID"
+    )
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<LandResponse> getLandById(@PathVariable Long id) {
@@ -58,6 +62,10 @@ public class LandController {
     // ============================
     // Crear nueva parcela
     // ============================
+    @Operation(
+        operationId = "createLand",
+        summary = "Crear una nueva parcela"
+    )
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<LandResponse> createLand(@RequestBody LandRequest request) {
@@ -68,6 +76,10 @@ public class LandController {
     // ============================
     // Actualizar parcela
     // ============================
+    @Operation(
+        operationId = "updateLand",
+        summary = "Actualizar una parcela existente"
+    )
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<LandResponse> updateLand(
@@ -75,11 +87,10 @@ public class LandController {
             @RequestBody LandUpdateRequest request,
             @RequestHeader(name = "Authorization", required = false) String authHeader
     ) {
-        // Extraer usuario si viene JWT
-        UserEntity loggedUser;
+        // Extraer usuario si viene un JWT
         if (authHeader != null) {
             String email = jwtService.extractEmail(authHeader);
-            loggedUser = userRepository.findByEmail(email)
+            userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         } else {
             throw new RuntimeException("No se pudo identificar el usuario");
@@ -92,6 +103,10 @@ public class LandController {
     // ============================
     // Eliminar parcela
     // ============================
+    @Operation(
+        operationId = "deleteLand",
+        summary = "Eliminar una parcela por su ID"
+    )
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<Void> deleteLand(@PathVariable Long id) {
