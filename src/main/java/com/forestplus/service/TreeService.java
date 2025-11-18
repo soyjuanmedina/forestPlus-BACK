@@ -1,7 +1,10 @@
 package com.forestplus.service;
 
+import com.forestplus.dto.request.TreeBatchPlantRequest;
 import com.forestplus.dto.request.TreeRequest;
 import com.forestplus.dto.request.TreeUpdateRequest;
+import com.forestplus.dto.response.LandTreeSummaryResponse;
+import com.forestplus.dto.response.TreeBatchPlantResponse;
 import com.forestplus.dto.response.TreeResponse;
 import com.forestplus.entity.TreeEntity;
 
@@ -18,4 +21,8 @@ public interface TreeService {
     TreeResponse updateTree(Long id, TreeUpdateRequest request);
 
     void deleteTree(Long id);
+    
+	List<LandTreeSummaryResponse> getTreesByLand(Long id);
+
+	TreeBatchPlantResponse plantTreeBatch(TreeBatchPlantRequest request);
 }

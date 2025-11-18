@@ -1,7 +1,9 @@
 package com.forestplus.controller;
 
+import com.forestplus.dto.request.TreeBatchPlantRequest;
 import com.forestplus.dto.request.TreeRequest;
 import com.forestplus.dto.request.TreeUpdateRequest;
+import com.forestplus.dto.response.LandTreeSummaryResponse;
 import com.forestplus.dto.response.TreeResponse;
 import com.forestplus.service.TreeService;
 
@@ -51,5 +53,18 @@ public class TreeController {
     public ResponseEntity<Void> deleteTree(@PathVariable Long id) {
         treeService.deleteTree(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/land/{landId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+    public ResponseEntity<List<LandTreeSummaryResponse>> getTreesByLand(@PathVariable Long landId) {
+        List<LandTreeSummaryResponse> summary = treeService.getTreesByLand(landId);
+        return ResponseEntity.ok(summary);
+    }
+    
+    @PostMapping("/plant-batch")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+    public ResponseEntity<?> plantTreeBatch(@RequestBody TreeBatchPlantRequest request) {
+        return ResponseEntity.ok(treeService.plantTreeBatch(request));
     }
 }
