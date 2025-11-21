@@ -1,14 +1,30 @@
 package com.forestplus.service;
 
-import com.forestplus.entity.CoordinateEntity;
+import com.forestplus.dto.request.CoordinateRequest;
+import com.forestplus.dto.request.CoordinateUpdateRequest;
+import com.forestplus.dto.response.CoordinateResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CoordinateService {
-    List<CoordinateEntity> getAllCoordinates();
-    Optional<CoordinateEntity> getCoordinateById(Long id);
-    CoordinateEntity createCoordinate(CoordinateEntity coordinate);
-    CoordinateEntity updateCoordinate(Long id, CoordinateEntity coordinate);
+
+    // -------------------------------
+    // CRUD básico
+    // -------------------------------
+    List<CoordinateResponse> getAllCoordinates();
+
+    CoordinateResponse getCoordinateById(Long id);
+
+    CoordinateResponse createCoordinate(CoordinateRequest request);
+
+    CoordinateResponse updateCoordinate(Long id, CoordinateUpdateRequest request);
+
     void deleteCoordinate(Long id);
+
+    // -------------------------------
+    // Operaciones por parcela (land)
+    // -------------------------------
+    List<CoordinateResponse> getCoordinatesByLand(Long landId);
+
+    void deleteCoordinatesByLand(Long landId);
 }

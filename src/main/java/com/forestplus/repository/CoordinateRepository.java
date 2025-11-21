@@ -10,4 +10,6 @@ import com.forestplus.entity.CoordinateEntity;
 @Repository
 public interface CoordinateRepository extends JpaRepository<CoordinateEntity, Long> {
     List<CoordinateEntity> findByLandId(Long landId);
+    
+    void deleteByLandId(Long landId);
 }

@@ -8,6 +8,8 @@ import com.forestplus.dto.response.TreeResponse;
 import com.forestplus.service.TreeService;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/trees")
+@RequestMapping(value = "/api/trees", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class TreeController {
 
@@ -54,6 +56,7 @@ public class TreeController {
         treeService.deleteTree(id);
         return ResponseEntity.noContent().build();
     }
+    
     
     @GetMapping("/land/{landId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
