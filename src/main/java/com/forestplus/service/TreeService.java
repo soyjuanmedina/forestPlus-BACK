@@ -23,6 +23,13 @@ public interface TreeService {
     void deleteTree(Long id);
     
 	List<LandTreeSummaryResponse> getTreesByLand(Long id);
+	
+	List<LandTreeSummaryResponse> getTreesByOwner(Long ownerUserId, Long ownerCompanyId);
 
 	TreeBatchPlantResponse plantTreeBatch(TreeBatchPlantRequest request);
+
+	List<TreeResponse> getUnassignedTreesByLand(Long landId);
+
+	TreeResponse assignTreeToUser(Long treeId, Long userId);
+
 }

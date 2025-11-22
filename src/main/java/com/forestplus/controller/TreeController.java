@@ -5,6 +5,8 @@ import com.forestplus.dto.request.TreeRequest;
 import com.forestplus.dto.request.TreeUpdateRequest;
 import com.forestplus.dto.response.LandTreeSummaryResponse;
 import com.forestplus.dto.response.TreeResponse;
+import com.forestplus.security.CurrentUserService;
+import com.forestplus.service.AuthService;
 import com.forestplus.service.TreeService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,8 @@ import java.util.List;
 public class TreeController {
 
     private final TreeService treeService;
+    private final AuthService authService;
+    private final CurrentUserService currentUserService;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -65,9 +69,46 @@ public class TreeController {
         return ResponseEntity.ok(summary);
     }
     
+    @GetMapping("/owner")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<LandTreeSummaryResponse>> getTreesByOwner(
+            @RequestParam(required = false) Long ownerUserId,
+            @RequestParam(required = false) Long ownerCompanyId
+    ) {
+        Long currentUserId = currentUserService.getCurrentUserId();
+        String currentRole = currentUserService.getCurrentUserRole();
+
+        // --- LÓGICA ---
+        if ("ADMIN".equals(currentRole) || "COMPANY_ADMIN".equals(currentRole)) {
+            // Admin: puede pedir cualquiera
+            return ResponseEntity.ok(treeService.getTreesByOwner(ownerUserId, ownerCompanyId));
+        }
+
+        // Usuario normal: solo puede pedir sus propios árboles
+        if (ownerUserId != null && !ownerUserId.equals(currentUserId)) {
+            return ResponseEntity.status(403).build(); // No permitido
+        }
+
+        // Si no envía parámetros → devolver sus árboles
+        return ResponseEntity.ok(treeService.getTreesByOwner(currentUserId, null));
+    }
+
+    
     @PostMapping("/plant-batch")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<?> plantTreeBatch(@RequestBody TreeBatchPlantRequest request) {
         return ResponseEntity.ok(treeService.plantTreeBatch(request));
+    }
+    
+    @GetMapping("/unassigned")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<TreeResponse>> getUnassignedTreesByLand(@RequestParam Long landId) {
+        return ResponseEntity.ok(treeService.getUnassignedTreesByLand(landId));
+    }
+    
+    @PostMapping("/assign")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+    public ResponseEntity<TreeResponse> assignTreeToUser(@RequestParam Long treeId, @RequestParam Long userId) {
+        return ResponseEntity.ok(treeService.assignTreeToUser(treeId, userId));
     }
 }

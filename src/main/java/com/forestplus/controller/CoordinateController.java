@@ -21,7 +21,6 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/coordinates", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
-@Tag(name = "Coordinates", description = "API para gestionar coordenadas de parcelas")
 public class CoordinateController {
 
     private final CoordinateService coordinateService;
