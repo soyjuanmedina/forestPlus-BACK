@@ -32,4 +32,6 @@ public interface TreeService {
 
 	TreeResponse assignTreeToUser(Long treeId, Long userId);
 
+	List<TreeResponse> getTreesByLandAndType(Long landId, Long treeTypeId);
+
 }

@@ -209,5 +209,14 @@ public class TreeServiceImpl implements TreeService {
         return treeMapper.toResponse(tree);
     }
     
+    @Override
+    public List<TreeResponse> getTreesByLandAndType(Long landId, Long treeTypeId) {
+        List<TreeEntity> trees = treeRepository.findByLand_IdAndTreeType_Id(landId, treeTypeId);
+
+        return trees.stream()
+                .map(treeMapper::toResponse)
+                .toList();
+    }
+    
 }
 

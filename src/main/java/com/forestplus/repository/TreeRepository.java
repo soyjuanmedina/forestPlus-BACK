@@ -49,5 +49,7 @@ public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
 			@Param("ownerCompanyId") Long ownerCompanyId);
     
     List<TreeEntity> findByLandIdAndOwnerUserIdIsNullAndOwnerCompanyIdIsNull(Long landId);
+    
+    List<TreeEntity> findByLand_IdAndTreeType_Id(Long landId, Long treeTypeId);
 
 }

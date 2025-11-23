@@ -111,4 +111,13 @@ public class TreeController {
     public ResponseEntity<TreeResponse> assignTreeToUser(@RequestParam Long treeId, @RequestParam Long userId) {
         return ResponseEntity.ok(treeService.assignTreeToUser(treeId, userId));
     }
+    
+    @GetMapping("/land/{landId}/type/{treeTypeId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<TreeResponse>> getTreesByLandAndType(
+            @PathVariable Long landId,
+            @PathVariable Long treeTypeId
+    ) {
+        return ResponseEntity.ok(treeService.getTreesByLandAndType(landId, treeTypeId));
+    }
 }
