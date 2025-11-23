@@ -120,4 +120,13 @@ public class TreeController {
     ) {
         return ResponseEntity.ok(treeService.getTreesByLandAndType(landId, treeTypeId));
     }
+    
+    @PostMapping("/assign-company")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+    public ResponseEntity<TreeResponse> assignTreeToCompany(
+            @RequestParam Long treeId,
+            @RequestParam Long companyId
+    ) {
+        return ResponseEntity.ok(treeService.assignTreeToCompany(treeId, companyId));
+    }
 }

@@ -17,12 +17,16 @@ import com.forestplus.repository.TreeRepository;
 import com.forestplus.repository.TreeTypeRepository;
 import com.forestplus.repository.LandRepository;
 import com.forestplus.repository.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import com.forestplus.repository.CompanyRepository;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -131,18 +135,41 @@ public class TreeServiceImpl implements TreeService {
         TreeTypeEntity type = treeTypeRepository.findById(request.getTreeTypeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Tree type not found"));
 
+        // ==============================
+        // 🔹 LÓGICA DE MAX TREES
+        // ==============================
         long currentTrees = treeRepository.countByLandId(land.getId());
-        long available = land.getMaxTrees() - currentTrees;
 
+        long available;
+
+        if (land.getMaxTrees() == null) {
+            // ✔ No hay límite de árboles
+            available = Long.MAX_VALUE;
+        } else {
+            // ✔ Límite normal
+            available = land.getMaxTrees() - currentTrees;
+
+            if (available <= 0) {
+                return new TreeBatchPlantResponse(
+                        0,
+                        request.getQuantity(),
+                        "Land is full"
+                );
+            }
+        }
+
+        // ==============================
+        // 🔹 Cálculo de cuántos plantar
+        // ==============================
         int toPlant = (int) Math.min(request.getQuantity(), available);
 
         if (toPlant <= 0) {
             return new TreeBatchPlantResponse(0, request.getQuantity(), "Land is full");
         }
 
-        // ======================================================
-        // 🔹 Cargar entidades de usuario y compañía a partir de los IDs
-        // ======================================================
+        // ==============================
+        // 🔹 Propietarios (usuario / compañía)
+        // ==============================
         UserEntity ownerUser = null;
         CompanyEntity ownerCompany = null;
 
@@ -156,9 +183,9 @@ public class TreeServiceImpl implements TreeService {
                     .orElseThrow(() -> new ResourceNotFoundException("Company not found"));
         }
 
-        // ======================================================
+        // ==============================
         // 🔹 Crear los árboles
-        // ======================================================
+        // ==============================
         List<TreeEntity> trees = new ArrayList<>();
 
         for (int i = 0; i < toPlant; i++) {
@@ -168,24 +195,25 @@ public class TreeServiceImpl implements TreeService {
             tree.setPlantedAt(LocalDate.now());
             tree.setCo2Absorption(type.getCo2Absorption());
 
-            tree.setOwnerUser(ownerUser);        // <--- CORRECTO
-            tree.setOwnerCompany(ownerCompany);  // <--- CORRECTO
+            tree.setOwnerUser(ownerUser);
+            tree.setOwnerCompany(ownerCompany);
 
             trees.add(tree);
         }
 
         treeRepository.saveAll(trees);
 
-        // ======================================================
-        // 🔹 Marcar terreno lleno si ya no cabe más
-        // ======================================================
-        if (toPlant == available) {
+        // ==============================
+        // 🔹 Marcar terreno lleno (solo si hay máximo definido)
+        // ==============================
+        if (land.getMaxTrees() != null && toPlant == available) {
             land.setIsFull(true);
             landRepository.save(land);
         }
 
         return new TreeBatchPlantResponse(toPlant, request.getQuantity() - toPlant, "OK");
     }
+
     
     @Override
     public List<TreeResponse> getUnassignedTreesByLand(Long landId) {
@@ -216,6 +244,32 @@ public class TreeServiceImpl implements TreeService {
         return trees.stream()
                 .map(treeMapper::toResponse)
                 .toList();
+    }
+    
+    @Override
+    @Transactional
+    public TreeResponse assignTreeToCompany(Long treeId, Long companyId) {
+        // 1. Buscar el árbol
+        TreeEntity tree = treeRepository.findById(treeId)
+                .orElseThrow(() -> new EntityNotFoundException("Tree not found with id: " + treeId));
+
+        // 2. Validar que no esté ya asignado a otro usuario o compañía si es necesario
+        if (tree.getOwnerUser() != null || tree.getOwnerCompany() != null) {
+            throw new IllegalStateException("Tree is already assigned");
+        }
+
+        // 3. Buscar la compañía
+        CompanyEntity company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new EntityNotFoundException("Company not found with id: " + companyId));
+
+        // 4. Asignar
+        tree.setOwnerCompany(company);
+
+        // 5. Guardar cambios
+        treeRepository.save(tree);
+
+        // 6. Devolver DTO
+        return treeMapper.toResponse(tree);
     }
     
 }
