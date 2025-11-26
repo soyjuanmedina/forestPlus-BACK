@@ -36,7 +36,6 @@ public class LandController {
         summary = "Obtener todas las parcelas"
     )
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<LandResponse>> getAllLands() {
         return ResponseEntity.ok(landService.getAllLands());
     }
@@ -49,7 +48,6 @@ public class LandController {
         summary = "Obtener una parcela por su ID"
     )
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LandResponse> getLandById(@PathVariable Long id) {
         try {
             LandResponse land = landService.getLandById(id);

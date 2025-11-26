@@ -30,7 +30,6 @@ public class TreeTypeController {
     // Obtener todos los tipos de árboles
     // ============================
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TreeTypeResponse>> getAllTreeTypes() {
         List<TreeTypeResponse> treeTypes = treeTypeService.getAllTreeTypes();
         return ResponseEntity.ok(treeTypes);
@@ -40,7 +39,6 @@ public class TreeTypeController {
     // Obtener un tipo de árbol por ID
     // ============================
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TreeTypeResponse> getTreeTypeById(@PathVariable Long id) {
         try {
             TreeTypeResponse treeType = treeTypeService.getTreeTypeById(id);
