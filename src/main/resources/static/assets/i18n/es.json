@@ -6,10 +6,11 @@
     "MY_COMPANY": "Mi compañía",
     "MY_LANDS": "Mis terrenos",
     "MY_TREES": "Mis árboles",
+    "MY_COMPANY_TREES": "Los árboles de la compañia",
     "ADMIN": {
       "ADMIN": "Administración",
       "USERS": "Usuarios",
-      "COMPANIES": "Compañías",
+      "COMPANIES": "Compañias",
       "TREE_TYPES": "Tipos de árboles",
       "TREES": "Árboles",
       "AVAILABLE_LANDS": "Terrenos disponibles",
@@ -17,6 +18,41 @@
     },
     "LOGIN": "Iniciar sesión",
     "REGISTER": "Registrarse"
+  },
+  "ADMIN_PAGE": {
+    "TITLE": "Administración"
+  },
+  "COMPANIES": {
+    "SEARCH_PLACEHOLDER": "Buscar compañía...",
+    "NEW_COMPANY": "Nueva compañía",
+    "PREVIOUS": "Anterior",
+    "NEXT": "Siguiente"
+  },
+  "LANDS": {
+    "SEARCH_PLACEHOLDER": "Buscar terreno...",
+    "NEW_LAND": "Nuevo terreno",
+    "PREVIOUS": "Anterior",
+    "NEXT": "Siguiente",
+    "IMAGE_ALT": "Imagen del terreno",
+    "NO_LOCATION": "Sin localización",
+    "AREA_LABEL": "Área",
+    "MAX_TREES_LABEL": "Máx. árboles",
+    "NO_MAX_TREES": "Sin límite",
+    "EDIT_BUTTON": "Editar terreno",
+    "NO_COORDINATES": "Aún no se han definido coordenadas para este terreno",
+    "PLANTED_TREES": "Árboles plantados en este terreno",
+    "PLANTED_TREES_BY_USER": "Árboles plantados por el usuario",
+    "COORDINATES": "Coordenadas",
+    "NO_PLANTED_TREES_IN_LAND": "Aún no se ha plantado ningún árbol en este terreno",
+    "NO_PLANTED_TREES_BY_USER": "Este usuario aún no ha plantado ningún árbol"
+  },
+  "ASSIGN_TREES": {
+    "TITLE": "Asignar árbol",
+    "LAND": "Seleccionar terreno",
+    "TREES": "Árboles disponibles",
+    "NO_TREES": "No hay árboles disponibles en este terreno",
+    "ASSIGN": "Asignar",
+    "ASSIGN_PLANTED_TREES": "Asignar árboles plantados"
   },
   "DASHBOARD": {
     "DASHBOARD": "Dashboard",
@@ -55,7 +91,10 @@
     ]
   },
   "PROFILE": {
-    "ROLE": "Rol"
+    "ROLE": "Rol",
+    "AVATAR_ALT": "Avatar",
+    "EDIT_BUTTON": "Editar",
+    "COMPANY_LABEL": "Empresa"
   },
   "REGISTER": {
     "TITLE": "Crear cuenta",
@@ -114,6 +153,240 @@
     "INVALID_EMAIL": "Email inválido",
     "MIN_LENGTH": "Mínimo 6 caracteres",
     "SUCCESS_MSG": "Usuario creado correctamente",
-    "CANCEL_BUTTON": "Cancelar"
+    "CANCEL_BUTTON": "Cancelar",
+    "SELECT_IMAGE": "Seleccionar imagen"
+  },
+  "TREE_TYPE": {
+    "EDIT_TITLE": "Editar Tipo de Árbol",
+    "NEW_TITLE": "Nuevo Tipo de Árbol",
+    "IMAGE_ALT": "Imagen del tipo de árbol",
+    "SELECT_IMAGE": "Seleccionar imagen",
+    "NAME": "Nombre",
+    "NAME_PLACEHOLDER": "Nombre del tipo de árbol",
+    "DESCRIPTION": "Descripción",
+    "DESCRIPTION_PLACEHOLDER": "Descripción del tipo de árbol",
+    "CO2": "Absorción de CO₂ (kg/año)",
+    "CO2_PLACEHOLDER": "Ej. 12.5",
+    "HEIGHT": "Altura típica (m)",
+    "HEIGHT_PLACEHOLDER": "Ej. 10.0",
+    "LIFESPAN": "Años de vida",
+    "LIFESPAN_PLACEHOLDER": "Ej. 50",
+    "CREATE": "Crear tipo de árbol",
+    "NO_DESCRIPTION": "Sin descripción",
+    "CO2_LABEL": "Absorción CO₂",
+    "CO2_UNIT": "toneladas / año",
+    "TYPICAL_HEIGHT_LABEL": "Altura típica",
+    "HEIGHT_UNIT": "metros",
+    "LIFESPAN_LABEL": "Esperanza de vida",
+    "YEARS_UNIT": "años",
+    "EDIT_BUTTON": "Editar"
+  },
+  "COMMON": {
+    "CANCEL": "Cancelar",
+    "SAVE_CHANGES": "Guardar cambios",
+    "SAVE": "Guardar",
+    "PREVIOUS": "Anterior",
+    "NEXT": "Siguiente",
+    "CONFIRM_DELETE": "Confirmar eliminación",
+    "CONFIRM_DELETE_MESSAGE": "¿Esta seguro de eliminar este elemento?",
+    "MORE_INFO": "Más información"
+  },
+  "ADMIN_TREE_TYPES": {
+    "CONFIRM_DELETE_TREE_TYPE": {
+      "TITLE": "Eliminar tipo de árbol",
+      "MESSAGE": "¿Estás seguro de que quieres eliminar {{name}}?"
+    },
+    "TREE_TYPE_DELETED": "✅ Tipo de árbol eliminado",
+    "TREE_TYPE_DELETE_ERROR": "❌ Error al eliminar tipo de árbol",
+    "SEARCH_PLACEHOLDER": "Buscar tipo de árbol...",
+    "ADD_BUTTON": "Nuevo tipo",
+    "CO2_LABEL": "CO₂ absorción: {{value}} kg/año",
+    "ACTIONS": {
+      "VIEW": "Ver",
+      "EDIT": "Editar",
+      "DELETE": "Eliminar"
+    },
+    "PAGINATION": {
+      "PREVIOUS": "Anterior",
+      "NEXT": "Siguiente",
+      "PAGE_INFO": "{{current}} / {{total}}"
+    }
+  },
+  "ADMIN_USERS": {
+    "CONFIRM_DELETE_USER": {
+      "TITLE": "Eliminar usuario",
+      "MESSAGE": "¿Estás seguro de que quieres eliminar a {{name}}?"
+    },
+    "USER_DELETED": "✅ Usuario eliminado",
+    "USER_DELETE_ERROR": "❌ Error al eliminar usuario",
+    "SEARCH_PLACEHOLDER": "Buscar usuario...",
+    "ADD_BUTTON": "Nuevo usuario",
+    "ACTIONS": {
+      "VIEW": "Ver",
+      "EDIT": "Editar",
+      "DELETE": "Eliminar"
+    },
+    "PAGINATION": {
+      "PREVIOUS": "Anterior",
+      "NEXT": "Siguiente",
+      "PAGE_INFO": "{{current}} / {{total}}"
+    }
+  },
+  "COMPANY_FORM": {
+    "TITLE_NEW": "Nueva Compañía",
+    "TITLE_EDIT": "Editar Compañía",
+    "SELECT_IMAGE": "Seleccionar imagen",
+    "NAME_LABEL": "Nombre",
+    "NAME_PLACEHOLDER": "Nombre de la compañía",
+    "ADDRESS_LABEL": "Dirección",
+    "ADDRESS_PLACEHOLDER": "Dirección",
+    "CANCEL_BUTTON": "Cancelar",
+    "SUBMIT_NEW": "Crear empresa",
+    "SUBMIT_EDIT": "Guardar cambios",
+    "CO2_SECTION_TITLE": "Emisiones de CO₂ por año",
+    "LAST_YEAR": "Último año registrado: {{year}}",
+    "ISSUED_LABEL": "Emitido",
+    "COMPENSATED_LABEL": "Compensado",
+    "NET_VALUE": "Valor Neto",
+    "TONS_CO2": "Toneladas de CO₂",
+    "COMPENSATED_PERCENTAGE": "(Has compensado el {{percentage}}%)",
+    "EDIT_BUTTON": "Editar",
+    "CANCEL_EDIT_BUTTON": "Cancelar",
+    "DELETE_BUTTON": "Eliminar",
+    "PREVIOUS_YEARS": "Año {{year}}",
+    "PREVIOUS_COMPENSATED_PERCENTAGE": "({{percentage}}% compensado)",
+    "ADD_YEAR_LABEL": "Año",
+    "ADD_YEAR_BUTTON": "Añadir año"
+  },
+  "COMPANY": {
+    "COMPANY_LOGO_ALT": "Logo de la compañía",
+    "EDIT_BUTTON": "Editar",
+    "CO2_SECTION_TITLE": "Emisiones de CO₂ por año",
+    "LAST_YEAR": "Último año registrado",
+    "ISSUED_LABEL": "Emitido",
+    "COMPENSATED_LABEL": "Compensado",
+    "NET_VALUE": "Valor Neto",
+    "TONS_CO2": "Toneladas de CO₂",
+    "COMPENSATED_PERCENTAGE": "(Compensaste el {{percentage}}% de tus emisiones)",
+    "PREVIOUS_YEARS_TITLE": "Años anteriores",
+    "TREES_PLANTED_TITLE": "Árboles plantados por la compañia",
+    "NO_TREES_PLANTED": "La compañia aún no ha plantado ningún árbol"
+  },
+  "RESET_PASSWORD": {
+    "LOGO_ALT": "Forest+ Logo",
+    "TITLE": "Cambiar contraseña",
+    "NEW_PASSWORD_LABEL": "Nueva contraseña",
+    "NEW_PASSWORD_PLACEHOLDER": "Ingresa tu nueva contraseña",
+    "NEW_PASSWORD_REQUIRED": "La nueva contraseña es requerida",
+    "NEW_PASSWORD_MINLENGTH": "La contraseña debe tener al menos 6 caracteres",
+    "CONFIRM_PASSWORD_LABEL": "Confirmar nueva contraseña",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Confirma tu nueva contraseña",
+    "CONFIRM_PASSWORD_REQUIRED": "Confirma la nueva contraseña",
+    "SUBMIT_BUTTON": "Cambiar contraseña",
+    "REMEMBER_PASSWORD": "¿Recordaste tu contraseña?",
+    "LOGIN_LINK": "Inicia sesión"
+  },
+  "CONFIRM_DIALOG": {
+    "CANCEL": "Cancelar",
+    "CONFIRM_DELETE": "Eliminar"
+  },
+  "ADMIN_COMPANIES": {
+    "CONFIRM_DELETE_COMPANY": {
+      "TITLE": "Eliminar compañía",
+      "MESSAGE": "¿Estás seguro de que quieres eliminar {{name}}?"
+    },
+    "COMPANY_DELETED": "✅ Compañía eliminada",
+    "COMPANY_DELETE_ERROR": "❌ Error al eliminar compañía",
+    "SEARCH_PLACEHOLDER": "Buscar compañía...",
+    "ADD_BUTTON": "Nueva compañía",
+    "ACTIONS": {
+      "VIEW": "Ver",
+      "EDIT": "Editar",
+      "DELETE": "Eliminar"
+    },
+    "PAGINATION": {
+      "PREVIOUS": "Anterior",
+      "NEXT": "Siguiente",
+      "PAGE_INFO": "{{current}} / {{total}}"
+    }
+  },
+  "LAND_FORM": {
+    "TITLE_NEW": "Nuevo Terreno",
+    "TITLE_EDIT": "Editar Terreno",
+    "SELECT_IMAGE": "Seleccionar Imagen",
+    "NAME_LABEL": "Nombre",
+    "NAME_PLACEHOLDER": "Ingrese el nombre del terreno",
+    "LOCATION_LABEL": "Ubicación",
+    "LOCATION_PLACEHOLDER": "Ingrese la ubicación",
+    "AREA_LABEL": "Superficie (m²)",
+    "AREA_PLACEHOLDER": "Ingrese la superficie en hectáreas",
+    "MAX_TREES_LABEL": "Máximo de Árboles",
+    "MAX_TREES_PLACEHOLDER": "Ingrese el número máximo de árboles",
+    "CANCEL_BUTTON": "Cancelar",
+    "SUBMIT_NEW": "Crear Terreno",
+    "SUBMIT_EDIT": "Guardar Cambios",
+    "DELETE_BUTTON": "Eliminar Terreno",
+    "ADD_COORDINATE": "Añadir coordenadas",
+    "PLANT_TREES": "Plantar árboles",
+    "EDIT_TREES": "Editar",
+    "DELETE_COORDINATE": "Eliminar Coordenada"
+  },
+  "ADD_COORDINATE": {
+    "TITLE": "Añadir coordenada",
+    "LATITUDE": "Latitud",
+    "LONGITUDE": "Longitud",
+    "LATITUDE_PLACEHOLDER": "Introduce la latitud",
+    "LONGITUDE_PLACEHOLDER": "Introduce la longitud",
+    "SAVE": "Guardar coordenada"
+  },
+  "PLANT_TREES": {
+    "TITLE": "Plantar árboles",
+    "TREE_TYPE": "Tipo de árbol",
+    "QUANTITY": "Cantidad",
+    "QUANTITY_PLACEHOLDER": "Introduce la cantidad",
+    "PLANT": "Plantar"
+  },
+  "EDIT_TREE": {
+    "TITLE": "Editar árbol",
+    "SPECIES": "Especie",
+    "PLANTED_AT": "Plantado el",
+    "TYPE": "Tipo de árbol",
+    "CO2": "Absorción de CO₂ (kg/año)"
+  },
+  "TREE_LIST": {
+    "SEARCH_PLACEHOLDER": "Buscar árboles...",
+    "ADD_TREE": "Añadir árbol",
+    "ID": "ID",
+    "TYPE": "Tipo",
+    "PLANTED_AT": "Plantado",
+    "EDIT": "Editar",
+    "DELETE": "Eliminar",
+    "OWNER": "Propietario"
+  },
+  "MY_TREES": {
+    "SEARCH_PLACEHOLDER": "Buscar por tipo de árbol...",
+    "BUY_NEW_TREE": "Comprar un árbol",
+    "QUANTITY": "Cantidad",
+    "PREVIOUS": "Anterior",
+    "NEXT": "Siguiente",
+    "ERROR_LOADING": "Error al cargar tus árboles.",
+    "NO_TREES": "No tienes árboles aún."
+  },
+  "BUY_TREE": {
+    "TITLE": "Comprar un árbol",
+    "SELECT_LAND": "1. Selecciona un terreno",
+    "SELECT_LAND_PLACEHOLDER": "Terreno disponible",
+    "SELECT_TREE": "2. Selecciona un tipo de árbol",
+    "SELECT_TREE_PLACEHOLDER": "Tipo de árbol",
+    "SELECT_QUANTITY": "3. Selecciona la cantidad",
+    "SUMMARY": "Resumen de la compra",
+    "LAND": "Terreno",
+    "TREE": "Árbol",
+    "QUANTITY": "Cantidad",
+    "TOTAL": "Total",
+    "NEXT": "Siguiente",
+    "BACK": "Atrás",
+    "CONFIRM": "Confirmar compra",
+    "UNIT_PRICE": "Precio por unidad"
   }
 }
