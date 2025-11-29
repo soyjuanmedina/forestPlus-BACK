@@ -1,38 +1,84 @@
 package com.forestplus.service;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import com.forestplus.dto.request.PurchaseRequest;
 import com.forestplus.dto.response.PurchaseResponse;
+import com.forestplus.entity.LandEntity;
+import com.forestplus.entity.UserEntity;
+import com.forestplus.repository.LandRepository;
+import com.forestplus.security.CurrentUserService;
 
 import lombok.RequiredArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
 public class PurchaseServiceImpl implements PurchaseService {
 
+	private final LandRepository landRepository;
+    private final EmailService emailService;
+    private final CurrentUserService currentUserService;
+
     @Override
-    public PurchaseResponse processPurchase(PurchaseRequest req) {
+    public PurchaseResponse processPurchase(PurchaseRequest request) {
 
-        // ejemplo de lógica inicial (luego la cambias)
-        Long generatedPurchaseId = 1L; // simulado
-        BigDecimal totalPrice = req.getPricePerUnit().multiply(BigDecimal.valueOf(req.getQuantity()));
+        // 1️⃣ Obtener terreno
+        LandEntity land = landRepository.findById(request.getLandId())
+                .orElseThrow(() -> new RuntimeException("Terreno no encontrado"));
 
-        return PurchaseResponse.builder()
-                .purchaseId(generatedPurchaseId)
-                .result("OK")
-                .message("Purchase processed successfully")
-                .landId(req.getLandId())
-                .treeTypeId(req.getTreeTypeId())
-                .quantity(req.getQuantity())
-                .totalPrice(totalPrice)
-                .assignedTreeIds(Collections.emptyList()) // por ahora vacío
-                .emailsSent(false) // aún no implementado
-                .createdAt(Instant.now())
-                .build();
+        // 2️⃣ Obtener comprador
+        UserEntity buyer = currentUserService.getCurrentUser();
+        if (buyer == null) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+
+        // 3️⃣ Calcular total
+        BigDecimal totalPrice = request.getPricePerUnit().multiply(BigDecimal.valueOf(request.getQuantity()));
+
+        // 4️⃣ Variables para el template de comprador
+        Map<String, Object> buyerVars = new HashMap<>();
+        buyerVars.put("buyerName", buyer.getName());
+        buyerVars.put("landName", land.getName());
+        buyerVars.put("quantity", request.getQuantity());
+        buyerVars.put("totalPrice", totalPrice);
+        buyerVars.put("treeTypeId", request.getTreeTypeId());
+
+        // 5️⃣ Enviar email al comprador
+        emailService.sendEmail(
+                buyer.getEmail(),
+                "Compra realizada - Forest+",
+                "contents/purchase-buyer-content",
+                buyerVars
+        );
+
+        // 6️⃣ Variables para el vendedor
+        Map<String, Object> sellerVars = new HashMap<>();
+        sellerVars.put("buyerName", buyer.getName());
+        sellerVars.put("landName", land.getName());
+        sellerVars.put("quantity", request.getQuantity());
+        sellerVars.put("totalPrice", totalPrice);
+        sellerVars.put("treeTypeId", request.getTreeTypeId());
+
+        // 7️⃣ Enviar email al vendedor (ya conocido)
+        String sellerEmail = "soyjuanmedina@gmail.com"; // aquí tu mail real
+        emailService.sendEmail(
+                sellerEmail,
+                "Tu terreno ha recibido una compra - Forest+",
+                "contents/purchase-seller-content",
+                sellerVars
+        );
+
+        // 8️⃣ Devolver respuesta
+        PurchaseResponse response = new PurchaseResponse();
+        response.setLandName(land.getName());
+        response.setTreeTypeId(request.getTreeTypeId());
+        response.setQuantity(request.getQuantity());
+        response.setTotalPrice(totalPrice);
+
+        return response;
     }
 }

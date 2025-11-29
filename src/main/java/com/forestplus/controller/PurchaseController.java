@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.forestplus.dto.request.PurchaseRequest;
+import com.forestplus.dto.response.PurchaseResponse;
 import com.forestplus.service.PurchaseService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class PurchaseController {
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> purchaseTrees(@RequestBody PurchaseRequest request) {
+    public ResponseEntity<PurchaseResponse> purchaseTrees(@RequestBody PurchaseRequest request) {
         return ResponseEntity.ok(purchaseService.processPurchase(request));
     }
 }
