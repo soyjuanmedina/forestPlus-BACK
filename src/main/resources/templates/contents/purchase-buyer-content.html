@@ -1,10 +1,15 @@
-<div>
-    <h2>Hola <span th:text="${sellerName}">Vendedor</span>,</h2>
+<!-- /src/main/resources/templates/contents/purchase-buyer-content.html -->
+<h2>Hola <span th:text="${buyerName}">Comprador</span>,</h2>
 
-    <p>Se ha realizado una compra en tu terreno <strong th:text="${landName}">Mi Terreno</strong>.</p>
-    <p>Árbol: <strong th:text="${treeName}">Roble</strong></p>
-    <p>Cantidad: <strong th:text="${quantity}">1</strong></p>
-    <p>Total: <span th:text="${totalPrice}">5.00</span> €</p>
+<p>¡Gracias por tu compra en ForestPlus!</p>
 
-    <p>Por favor, prepara la entrega y confirma al comprador.</p>
-</div>
+<ul>
+    <li><strong>Terreno:</strong> <span th:text="${landName}">Nombre del terreno</span></li>
+    <li><strong>Tipo de árbol:</strong> <span th:text="${treeType}">Tipo de árbol</span></li>
+    <li><strong>Cantidad:</strong> <span th:text="${quantity}">0</span></li>
+    <li><strong>Precio total:</strong> <span th:text="${totalPrice}">0 €</span> €</li>
+</ul>
+
+<p>Tu pedido será procesado y recibirás actualizaciones sobre el estado de tu compra.</p>
+
+<p style="margin-top:20px;">Si tienes alguna pregunta, puedes contactarnos en info@forestplusapp.com y te ayudaremos encantados.</p>

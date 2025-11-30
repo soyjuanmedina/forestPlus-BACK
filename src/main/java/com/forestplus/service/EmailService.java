@@ -41,7 +41,7 @@ public class EmailService {
             helper.setText(html, true);
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setFrom("noreply@forestplustech.com");
+            helper.setFrom("noreply@forestplusapp.com");
             mailSender.send(message);
 
         } catch (MessagingException e) {

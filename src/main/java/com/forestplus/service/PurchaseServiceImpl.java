@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import com.forestplus.dto.request.PurchaseRequest;
 import com.forestplus.dto.response.PurchaseResponse;
 import com.forestplus.entity.LandEntity;
+import com.forestplus.entity.TreeTypeEntity;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.repository.LandRepository;
+import com.forestplus.repository.TreeTypeRepository;
 import com.forestplus.security.CurrentUserService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class PurchaseServiceImpl implements PurchaseService {
 
 	private final LandRepository landRepository;
+	private final TreeTypeRepository treeTypeRepository;
     private final EmailService emailService;
     private final CurrentUserService currentUserService;
 
@@ -29,6 +32,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         // 1️⃣ Obtener terreno
         LandEntity land = landRepository.findById(request.getLandId())
                 .orElseThrow(() -> new RuntimeException("Terreno no encontrado"));
+        
+        // 1️⃣ Obtener terreno
+        TreeTypeEntity treeType = treeTypeRepository.findById(request.getTreeTypeId())
+                .orElseThrow(() -> new RuntimeException("Tipo de árbol no encontrado"));
 
         // 2️⃣ Obtener comprador
         UserEntity buyer = currentUserService.getCurrentUser();
@@ -45,7 +52,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         buyerVars.put("landName", land.getName());
         buyerVars.put("quantity", request.getQuantity());
         buyerVars.put("totalPrice", totalPrice);
-        buyerVars.put("treeTypeId", request.getTreeTypeId());
+        buyerVars.put("treeType", treeType.getName());
 
         // 5️⃣ Enviar email al comprador
         emailService.sendEmail(
@@ -57,11 +64,11 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         // 6️⃣ Variables para el vendedor
         Map<String, Object> sellerVars = new HashMap<>();
-        sellerVars.put("buyerName", buyer.getName());
+        sellerVars.put("sellerName", "Administrador");
         sellerVars.put("landName", land.getName());
         sellerVars.put("quantity", request.getQuantity());
         sellerVars.put("totalPrice", totalPrice);
-        sellerVars.put("treeTypeId", request.getTreeTypeId());
+        sellerVars.put("treeType", treeType.getName());
 
         // 7️⃣ Enviar email al vendedor (ya conocido)
         String sellerEmail = "soyjuanmedina@gmail.com"; // aquí tu mail real
