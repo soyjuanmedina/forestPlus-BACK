@@ -1,7 +1,8 @@
 <div>
     <h2>Hola <span th:text="${sellerName}">Vendedor</span>,</h2>
 
-    <p>Se ha realizado una compra en tu terreno <strong th:text="${landName}">Mi Terreno</strong>.</p>
+    <p>El usuario <strong th:text="${buyerName}">Compardor</strong>, con el mail  <strong th:text="${buyerMail}">mail</strong>,  
+    ha realizado una compra en tu terreno <strong th:text="${landName}">Mi Terreno</strong>.</p>
     <p>Tipo de Árbol: <strong th:text="${treeType}">Roble</strong></p>
     <p>Cantidad: <strong th:text="${quantity}">1</strong></p>
     <p>Total: <strong th:text="${totalPrice}">5.00</strong> €</p>

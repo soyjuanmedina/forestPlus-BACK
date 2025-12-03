@@ -65,13 +65,15 @@ public class PurchaseServiceImpl implements PurchaseService {
         // 6️⃣ Variables para el vendedor
         Map<String, Object> sellerVars = new HashMap<>();
         sellerVars.put("sellerName", "Administrador");
+        sellerVars.put("buyerName", buyer.getName());
+        sellerVars.put("buyerMail", buyer.getEmail());
         sellerVars.put("landName", land.getName());
         sellerVars.put("quantity", request.getQuantity());
         sellerVars.put("totalPrice", totalPrice);
         sellerVars.put("treeType", treeType.getName());
 
         // 7️⃣ Enviar email al vendedor (ya conocido)
-        String sellerEmail = "soyjuanmedina@gmail.com"; // aquí tu mail real
+        String sellerEmail = "info@forestplusapp.com"; // aquí tu mail real
         emailService.sendEmail(
                 sellerEmail,
                 "Tu terreno ha recibido una compra - Forest+",
