@@ -36,4 +36,10 @@ public interface TreeService {
 	
 	TreeResponse assignTreeToCompany(Long treeId, Long companyId);
 
+	TreeResponse unassignTreeFromUser(Long treeId);
+
+	TreeResponse unassignTreeFromCompany(Long treeId);
+
+	List<TreeResponse> getTreesByOwnerAndType(Long ownerUserId, Long ownerCompanyId, Long treeTypeId);
+
 }

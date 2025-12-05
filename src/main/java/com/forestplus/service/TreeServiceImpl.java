@@ -127,6 +127,12 @@ public class TreeServiceImpl implements TreeService {
     }
     
     @Override
+    public List<TreeResponse> getTreesByOwnerAndType(Long ownerUserId, Long ownerCompanyId, Long treeTypeId) {
+        List<TreeEntity> trees = treeRepository.findByOwnerAndType(ownerUserId, ownerCompanyId, treeTypeId);
+        return treeMapper.toResponseList(trees);
+    }
+    
+    @Override
     public TreeBatchPlantResponse plantTreeBatch(TreeBatchPlantRequest request) {
 
         LandEntity land = landRepository.findById(request.getLandId())
@@ -232,6 +238,30 @@ public class TreeServiceImpl implements TreeService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         tree.setOwnerUser(user);
+        treeRepository.save(tree);
+
+        return treeMapper.toResponse(tree);
+    }
+    
+    @Override
+    public TreeResponse unassignTreeFromUser(Long treeId) {
+    	TreeEntity tree = treeRepository.findById(treeId)
+                .orElseThrow(() -> new RuntimeException("Tree not found"));
+
+        tree.setOwnerUser(null);   // 👈 QUITAMOS EL USUARIO ASIGNADO
+
+        treeRepository.save(tree);
+
+        return treeMapper.toResponse(tree);
+    }
+    
+    @Override
+    public TreeResponse unassignTreeFromCompany(Long treeId) {
+    	TreeEntity tree = treeRepository.findById(treeId)
+                .orElseThrow(() -> new RuntimeException("Tree not found"));
+
+    	tree.setOwnerCompany(null);
+
         treeRepository.save(tree);
 
         return treeMapper.toResponse(tree);

@@ -6,14 +6,17 @@ import com.forestplus.dto.response.UserResponse;
 import com.forestplus.entity.CompanyEntity;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.exception.EmailAlreadyExistsException;
+import com.forestplus.exception.ForestPlusException;
 import com.forestplus.mapper.UserMapper;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -145,7 +148,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        try {
+            userRepository.deleteById(id);
+
+        } catch (DataIntegrityViolationException ex) {
+            // Obtienes la causa real de MariaDB
+            Throwable root = ex.getMostSpecificCause();
+            String originalMessage = root != null ? root.getMessage() : ex.getMessage();
+
+            throw new ForestPlusException(
+                    HttpStatus.CONFLICT,
+                    originalMessage
+            ) {};
+        }
     }
     
     @Override

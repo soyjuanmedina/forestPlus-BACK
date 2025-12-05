@@ -92,6 +92,29 @@ public class TreeController {
         // Si no envía parámetros → devolver sus árboles
         return ResponseEntity.ok(treeService.getTreesByOwner(currentUserId, null));
     }
+    
+    @GetMapping("/owner/trees")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<TreeResponse>> getTreesByOwnerAndType(
+            @RequestParam(required = false) Long ownerUserId,
+            @RequestParam(required = false) Long ownerCompanyId,
+            @RequestParam Long treeTypeId
+    ) {
+        Long currentUserId = currentUserService.getCurrentUserId();
+        String currentRole = currentUserService.getCurrentUserRole();
+
+        // Admin o COMPANY_ADMIN pueden pedir cualquiera
+        if ("ADMIN".equals(currentRole) || "COMPANY_ADMIN".equals(currentRole)) {
+            return ResponseEntity.ok(treeService.getTreesByOwnerAndType(ownerUserId, ownerCompanyId, treeTypeId));
+        }
+
+        // Usuario normal solo sus árboles
+        if (ownerUserId != null && !ownerUserId.equals(currentUserId)) {
+            return ResponseEntity.status(403).build();
+        }
+
+        return ResponseEntity.ok(treeService.getTreesByOwnerAndType(currentUserId, null, treeTypeId));
+    }
 
     
     @PostMapping("/plant-batch")
@@ -110,6 +133,20 @@ public class TreeController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<TreeResponse> assignTreeToUser(@RequestParam Long treeId, @RequestParam Long userId) {
         return ResponseEntity.ok(treeService.assignTreeToUser(treeId, userId));
+    }
+    
+    @PostMapping("/unassign")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TreeResponse> unassignTreeFromUser(
+            @RequestParam Long treeId
+    ) {
+        return ResponseEntity.ok(treeService.unassignTreeFromUser(treeId));
+    }
+    
+    @PostMapping("/unassign-company")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TreeResponse> unassignTreeFromCompany(@RequestParam Long treeId) {
+        return ResponseEntity.ok(treeService.unassignTreeFromCompany(treeId));
     }
     
     @GetMapping("/land/{landId}/type/{treeTypeId}")
