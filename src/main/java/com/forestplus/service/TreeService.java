@@ -42,4 +42,6 @@ public interface TreeService {
 
 	List<TreeResponse> getTreesByOwnerAndType(Long ownerUserId, Long ownerCompanyId, Long treeTypeId);
 
+	List<TreeResponse> getAllTreesByOwner(Long ownerUserId, Long ownerCompanyId);
+
 }

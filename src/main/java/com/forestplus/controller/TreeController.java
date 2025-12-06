@@ -166,4 +166,24 @@ public class TreeController {
     ) {
         return ResponseEntity.ok(treeService.assignTreeToCompany(treeId, companyId));
     }
+    
+    @GetMapping("/owner/all")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<TreeResponse>> getAllTreesByOwner(
+            @RequestParam(required = false) Long ownerUserId,
+            @RequestParam(required = false) Long ownerCompanyId
+    ) {
+        Long currentUserId = currentUserService.getCurrentUserId();
+        String currentRole = currentUserService.getCurrentUserRole();
+
+        if ("ADMIN".equals(currentRole) || "COMPANY_ADMIN".equals(currentRole)) {
+            return ResponseEntity.ok(treeService.getAllTreesByOwner(ownerUserId, ownerCompanyId));
+        }
+
+        if (ownerUserId != null && !ownerUserId.equals(currentUserId)) {
+            return ResponseEntity.status(403).build();
+        }
+
+        return ResponseEntity.ok(treeService.getAllTreesByOwner(currentUserId, null));
+    }
 }

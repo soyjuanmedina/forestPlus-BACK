@@ -302,5 +302,12 @@ public class TreeServiceImpl implements TreeService {
         return treeMapper.toResponse(tree);
     }
     
+    @Override
+    public List<TreeResponse> getAllTreesByOwner(Long ownerUserId, Long ownerCompanyId) {
+        return treeMapper.toResponseList(
+                treeRepository.findOwnerTrees(ownerUserId, ownerCompanyId)
+        );
+    }
+    
 }
 
