@@ -17,5 +17,6 @@ public class TreeRequest {
     private Long treeTypeId;
     private Long landId;
     private Long ownerUserId;     // opcional, null si es compañía
-    private Long ownerCompanyId;  // opcional, null si es usuario
+    private Long ownerCompanyId;
+    private String customName; 
 }

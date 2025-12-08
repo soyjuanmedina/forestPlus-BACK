@@ -87,6 +87,7 @@ public class TreeServiceImpl implements TreeService {
         tree.setSpecies(request.getSpecies());
         tree.setPlantedAt(request.getPlantedAt());
         tree.setCo2Absorption(request.getCo2Absorption());
+        tree.setCustomName(request.getCustomName());
 
         if (request.getLandId() != null) {
             tree.setLand(landRepository.findById(request.getLandId())

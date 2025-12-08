@@ -19,10 +19,13 @@ public class TreeResponse {
     private LocalDate plantedAt;
     private Long treeTypeId;
     private String treeTypeName;
+    private TreeTypeResponse treeType;
     private Long landId;
     private String landName;
+    private LandResponse land;
     private Long ownerUserId;
     private String ownerUserName;
     private Long ownerCompanyId;
     private String ownerCompanyName;
+    private String customName;
 }

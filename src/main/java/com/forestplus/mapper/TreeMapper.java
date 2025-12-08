@@ -15,8 +15,10 @@ public interface TreeMapper {
     // --- ENTITY -> RESPONSE ---
     @Mapping(target = "treeTypeId", source = "treeType.id")
     @Mapping(target = "treeTypeName", source = "treeType.name")
+    @Mapping(target = "treeType", source = "treeType")
     @Mapping(target = "landId", source = "land.id")
     @Mapping(target = "landName", source = "land.name")
+    @Mapping(target = "land", source = "land")
     @Mapping(target = "ownerUserId", source = "ownerUser.id")
     @Mapping(target = "ownerUserName", source = "ownerUser.name")
     @Mapping(target = "ownerCompanyId", source = "ownerCompany.id")

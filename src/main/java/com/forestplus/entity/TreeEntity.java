@@ -30,6 +30,9 @@ public class TreeEntity {
 	    @Column(name = "species")
 	    private String species;
 
+	    @Column(name = "custom_name")
+	    private String customName;
+	    
 	    @ManyToOne
 	    @JoinColumn(name = "tree_type_id", nullable = false)
 	    private TreeTypeEntity treeType;

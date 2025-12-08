@@ -18,4 +18,5 @@ public class TreeUpdateRequest {
     private Long landId;
     private Long ownerUserId;
     private Long ownerCompanyId;
+    private String customName;
 }

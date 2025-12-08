@@ -34,7 +34,7 @@ public class TreeController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<TreeResponse> getTreeById(@PathVariable Long id) {
         return ResponseEntity.ok(treeService.getTreeById(id));
     }
@@ -46,7 +46,7 @@ public class TreeController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@treeSecurity.canEdit(#id)")
     public ResponseEntity<TreeResponse> updateTree(
             @PathVariable Long id,
             @RequestBody TreeUpdateRequest request
