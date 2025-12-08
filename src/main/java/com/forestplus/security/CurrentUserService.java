@@ -39,4 +39,11 @@ public class CurrentUserService {
                 .map(a -> a.getAuthority().replace("ROLE_", ""))
                 .orElse(null);
     }
+    
+    public Long getCurrentUserCompanyId() {
+        UserEntity user = getCurrentUser();
+        return (user != null && user.getCompany() != null)
+                ? user.getCompany().getId()
+                : null;
+    }
 }

@@ -76,20 +76,42 @@ public class TreeController {
             @RequestParam(required = false) Long ownerCompanyId
     ) {
         Long currentUserId = currentUserService.getCurrentUserId();
+        Long currentCompanyId = currentUserService.getCurrentUserCompanyId(); 
         String currentRole = currentUserService.getCurrentUserRole();
 
-        // --- LÓGICA ---
+        // --- ADMIN & COMPANY_ADMIN: acceso total ---
         if ("ADMIN".equals(currentRole) || "COMPANY_ADMIN".equals(currentRole)) {
-            // Admin: puede pedir cualquiera
             return ResponseEntity.ok(treeService.getTreesByOwner(ownerUserId, ownerCompanyId));
         }
 
-        // Usuario normal: solo puede pedir sus propios árboles
-        if (ownerUserId != null && !ownerUserId.equals(currentUserId)) {
-            return ResponseEntity.status(403).build(); // No permitido
+        // --- COMPANY_USER ---
+        if ("COMPANY_USER".equals(currentRole)) {
+
+            // Si pide userId → solo puede ser él mismo
+            if (ownerUserId != null) {
+                if (!ownerUserId.equals(currentUserId)) {
+                    return ResponseEntity.status(403).build();
+                }
+                return ResponseEntity.ok(treeService.getTreesByOwner(ownerUserId, null));
+            }
+
+            // Si pide companyId → solo su propia compañía
+            if (ownerCompanyId != null) {
+                if (!ownerCompanyId.equals(currentCompanyId)) {
+                    return ResponseEntity.status(403).build();
+                }
+                return ResponseEntity.ok(treeService.getTreesByOwner(null, ownerCompanyId));
+            }
+
+            // Sin parámetros → sus propios árboles
+            return ResponseEntity.ok(treeService.getTreesByOwner(currentUserId, null));
         }
 
-        // Si no envía parámetros → devolver sus árboles
+        // --- USER normal (no COMPANY_USER) ---
+        if (ownerUserId != null && !ownerUserId.equals(currentUserId)) {
+            return ResponseEntity.status(403).build();
+        }
+
         return ResponseEntity.ok(treeService.getTreesByOwner(currentUserId, null));
     }
     
@@ -173,17 +195,6 @@ public class TreeController {
             @RequestParam(required = false) Long ownerUserId,
             @RequestParam(required = false) Long ownerCompanyId
     ) {
-        Long currentUserId = currentUserService.getCurrentUserId();
-        String currentRole = currentUserService.getCurrentUserRole();
-
-        if ("ADMIN".equals(currentRole) || "COMPANY_ADMIN".equals(currentRole)) {
-            return ResponseEntity.ok(treeService.getAllTreesByOwner(ownerUserId, ownerCompanyId));
-        }
-
-        if (ownerUserId != null && !ownerUserId.equals(currentUserId)) {
-            return ResponseEntity.status(403).build();
-        }
-
-        return ResponseEntity.ok(treeService.getAllTreesByOwner(currentUserId, null));
+        return ResponseEntity.ok(treeService.getAllTreesByOwner(ownerUserId, ownerCompanyId));
     }
 }

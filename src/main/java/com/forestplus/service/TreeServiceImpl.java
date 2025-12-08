@@ -10,6 +10,7 @@ import com.forestplus.entity.TreeEntity;
 import com.forestplus.entity.TreeTypeEntity;
 import com.forestplus.entity.LandEntity;
 import com.forestplus.entity.UserEntity;
+import com.forestplus.exception.ForestPlusException;
 import com.forestplus.exception.ResourceNotFoundException;
 import com.forestplus.mapper.TreeMapper;
 import com.forestplus.entity.CompanyEntity;
@@ -17,6 +18,7 @@ import com.forestplus.repository.TreeRepository;
 import com.forestplus.repository.TreeTypeRepository;
 import com.forestplus.repository.LandRepository;
 import com.forestplus.repository.UserRepository;
+import com.forestplus.security.CurrentUserService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -25,6 +27,7 @@ import com.forestplus.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +40,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TreeServiceImpl implements TreeService {
 
-    private final TreeRepository treeRepository;
+    
+	private final CurrentUserService currentUserService;
+	private final TreeRepository treeRepository;
     private final TreeTypeRepository treeTypeRepository;
     private final LandRepository landRepository;
     private final UserRepository userRepository;
@@ -305,10 +310,62 @@ public class TreeServiceImpl implements TreeService {
     
     @Override
     public List<TreeResponse> getAllTreesByOwner(Long ownerUserId, Long ownerCompanyId) {
+
+        Long currentUserId = currentUserService.getCurrentUserId();
+        Long currentCompanyId = currentUserService.getCurrentUserCompanyId();
+        String currentRole = currentUserService.getCurrentUserRole();
+
+        // --- ADMIN & COMPANY_ADMIN ---
+        if ("ADMIN".equals(currentRole) || "COMPANY_ADMIN".equals(currentRole)) {
+            return treeMapper.toResponseList(
+                    treeRepository.findOwnerTrees(ownerUserId, ownerCompanyId)
+            );
+        }
+
+        // --- COMPANY_USER ---
+        if ("COMPANY_USER".equals(currentRole)) {
+
+            // Pide usuario concreto
+            if (ownerUserId != null) {
+                if (!ownerUserId.equals(currentUserId)) {
+                    throw new ForestPlusException("No puedes ver los árboles de otro usuario.", 
+                            HttpStatus.FORBIDDEN.value()) {};
+                }
+
+                return treeMapper.toResponseList(
+                        treeRepository.findOwnerTrees(ownerUserId, null)
+                );
+            }
+
+            // Pide compañía
+            if (ownerCompanyId != null) {
+                if (!ownerCompanyId.equals(currentCompanyId)) {
+                    throw new ForestPlusException("No puedes ver los árboles de otra compañía.", 
+                            HttpStatus.FORBIDDEN.value()) {};
+                }
+
+                return treeMapper.toResponseList(
+                        treeRepository.findOwnerTrees(null, ownerCompanyId)
+                );
+            }
+
+            // Sin parámetros → sus árboles
+            return treeMapper.toResponseList(
+                    treeRepository.findOwnerTrees(currentUserId, null)
+            );
+        }
+
+        // --- USER normal ---
+        if (ownerUserId != null && !ownerUserId.equals(currentUserId)) {
+            throw new ForestPlusException("No puedes ver los árboles de otro usuario.", 
+                    HttpStatus.FORBIDDEN.value()) {};
+        }
+
         return treeMapper.toResponseList(
-                treeRepository.findOwnerTrees(ownerUserId, ownerCompanyId)
+                treeRepository.findOwnerTrees(currentUserId, null)
         );
     }
+
     
 }
 

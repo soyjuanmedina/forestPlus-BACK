@@ -46,7 +46,7 @@ public class CompanyController {
     // Obtener una compañía por ID
     // ============================
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN') or hasRole('COMPANY_USER')")
     public ResponseEntity<CompanyResponse> getCompanyById(@PathVariable Long id) {
         try {
             CompanyResponse company = companyService.getCompanyById(id);
