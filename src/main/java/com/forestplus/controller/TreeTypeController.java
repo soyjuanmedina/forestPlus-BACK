@@ -77,12 +77,8 @@ public class TreeTypeController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteTreeType(@PathVariable Long id) {
-        try {
-            treeTypeService.deleteTreeType(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        treeTypeService.deleteTreeType(id);
+        return ResponseEntity.noContent().build(); // 204 si todo va bien
     }
 
     // ============================
