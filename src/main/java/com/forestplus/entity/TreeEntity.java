@@ -17,43 +17,60 @@ import lombok.NoArgsConstructor;
 @Table(name = "trees")
 public class TreeEntity {
 
-	 @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	    @Column(name = "co2_absorption", nullable = false)
-	    private BigDecimal co2Absorption;
+    // Valores de CO₂
+    @Column(name = "co2_absorption_at_20")
+    private BigDecimal co2AbsorptionAt20;
 
-	    @Column(name = "planted_at")
-	    private LocalDate plantedAt;
+    @Column(name = "co2_absorption_at_25")
+    private BigDecimal co2AbsorptionAt25;
 
-	    @Column(name = "species")
-	    private String species;
+    @Column(name = "co2_absorption_at_30")
+    private BigDecimal co2AbsorptionAt30;
 
-	    @Column(name = "custom_name")
-	    private String customName;
-	    
-	    @ManyToOne
-	    @JoinColumn(name = "tree_type_id", nullable = false)
-	    private TreeTypeEntity treeType;
+    @Column(name = "co2_absorption_at_35")
+    private BigDecimal co2AbsorptionAt35;
 
-	    @ManyToOne
-	    @JoinColumn(name = "land_id", nullable = false)
-	    private LandEntity land;
+    @Column(name = "co2_absorption_at_40")
+    private BigDecimal co2AbsorptionAt40;
 
-	    @ManyToOne
-	    @JoinColumn(name = "owner_user_id")
-	    private UserEntity ownerUser;
+    // Foto del árbol
+    @Column(columnDefinition = "TEXT")
+    private String picture;
 
-	    @ManyToOne
-	    @JoinColumn(name = "owner_company_id")
-	    private CompanyEntity ownerCompany;
+    @Column(name = "planted_at")
+    private LocalDate plantedAt;
 
-	    @Column(name = "created_at", updatable = false)
-	    private LocalDateTime createdAt;
+    @Column(name = "scientific_name")
+    private String scientificName;
 
-	    @PrePersist
-	    public void prePersist() {
-	        createdAt = LocalDateTime.now();
-	    }
+    @Column(name = "custom_name")
+    private String customName;
+
+    @ManyToOne
+    @JoinColumn(name = "tree_type_id", nullable = false)
+    private TreeTypeEntity treeType;
+
+    @ManyToOne
+    @JoinColumn(name = "land_id", nullable = false)
+    private LandEntity land;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_user_id")
+    private UserEntity ownerUser;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_company_id")
+    private CompanyEntity ownerCompany;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
 }

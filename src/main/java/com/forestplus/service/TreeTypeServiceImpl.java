@@ -51,16 +51,13 @@ public class TreeTypeServiceImpl implements TreeTypeService {
     @Override
     @Transactional
     public TreeTypeResponse updateTreeType(Long id, TreeTypeUpdateRequest request) {
-        TreeTypeEntity updated = treeTypeRepository.findById(id)
-            .map(treeType -> {
-                treeType.setName(request.getName());
-                treeType.setDescription(request.getDescription());
-                treeType.setCo2Absorption(request.getCo2Absorption());
-                treeType.setTypicalHeight(request.getTypicalHeight());
-                treeType.setLifespanYears(request.getLifespanYears());
-                return treeTypeRepository.save(treeType);
-            })
+        TreeTypeEntity entity = treeTypeRepository.findById(id)
             .orElseThrow(() -> new TreeTypeNotFoundException(id));
+
+        // Mapper actualiza la entidad existente con los datos del DTO
+        treeTypeMapper.updateEntityFromDto(request, entity);
+
+        TreeTypeEntity updated = treeTypeRepository.save(entity);
 
         return treeTypeMapper.toResponse(updated);
     }

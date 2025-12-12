@@ -85,15 +85,15 @@ public class TreeServiceImpl implements TreeService {
     }
 
     @Override
+    @Transactional
     public TreeResponse updateTree(Long id, TreeUpdateRequest request) {
         TreeEntity tree = treeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tree not found with id " + id));
 
-        tree.setSpecies(request.getSpecies());
-        tree.setPlantedAt(request.getPlantedAt());
-        tree.setCo2Absorption(request.getCo2Absorption());
-        tree.setCustomName(request.getCustomName());
+        // Actualizar campos simples con mapper
+        treeMapper.updateEntityFromDto(request, tree);
 
+        // Relaciones (land, treeType, ownerUser, ownerCompany)
         if (request.getLandId() != null) {
             tree.setLand(landRepository.findById(request.getLandId())
                     .orElseThrow(() -> new RuntimeException("Land not found")));
@@ -114,6 +114,7 @@ public class TreeServiceImpl implements TreeService {
                     .orElseThrow(() -> new RuntimeException("Company not found")));
         }
 
+        // Guardar y convertir a DTO de respuesta
         return treeMapper.toResponse(treeRepository.save(tree));
     }
 
@@ -139,6 +140,7 @@ public class TreeServiceImpl implements TreeService {
     }
     
     @Override
+    @Transactional
     public TreeBatchPlantResponse plantTreeBatch(TreeBatchPlantRequest request) {
 
         LandEntity land = landRepository.findById(request.getLandId())
@@ -148,33 +150,19 @@ public class TreeServiceImpl implements TreeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Tree type not found"));
 
         // ==============================
-        // 🔹 LÓGICA DE MAX TREES
+        // 🔹 Lógica de máximo árboles
         // ==============================
         long currentTrees = treeRepository.countByLandId(land.getId());
+        long available = land.getMaxTrees() == null ? Long.MAX_VALUE : land.getMaxTrees() - currentTrees;
 
-        long available;
-
-        if (land.getMaxTrees() == null) {
-            // ✔ No hay límite de árboles
-            available = Long.MAX_VALUE;
-        } else {
-            // ✔ Límite normal
-            available = land.getMaxTrees() - currentTrees;
-
-            if (available <= 0) {
-                return new TreeBatchPlantResponse(
-                        0,
-                        request.getQuantity(),
-                        "Land is full"
-                );
-            }
+        if (available <= 0) {
+            return new TreeBatchPlantResponse(0, request.getQuantity(), "Land is full");
         }
 
         // ==============================
-        // 🔹 Cálculo de cuántos plantar
+        // 🔹 Calcular cuántos plantar
         // ==============================
         int toPlant = (int) Math.min(request.getQuantity(), available);
-
         if (toPlant <= 0) {
             return new TreeBatchPlantResponse(0, request.getQuantity(), "Land is full");
         }
@@ -182,33 +170,38 @@ public class TreeServiceImpl implements TreeService {
         // ==============================
         // 🔹 Propietarios (usuario / compañía)
         // ==============================
-        UserEntity ownerUser = null;
-        CompanyEntity ownerCompany = null;
+        UserEntity ownerUser = request.getOwnerUserId() != null
+                ? userRepository.findById(request.getOwnerUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"))
+                : null;
 
-        if (request.getOwnerUserId() != null) {
-            ownerUser = userRepository.findById(request.getOwnerUserId())
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        }
-
-        if (request.getOwnerCompanyId() != null) {
-            ownerCompany = companyRepository.findById(request.getOwnerCompanyId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Company not found"));
-        }
+        CompanyEntity ownerCompany = request.getOwnerCompanyId() != null
+                ? companyRepository.findById(request.getOwnerCompanyId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Company not found"))
+                : null;
 
         // ==============================
-        // 🔹 Crear los árboles
+        // 🔹 Crear los árboles con mapper
         // ==============================
         List<TreeEntity> trees = new ArrayList<>();
-
         for (int i = 0; i < toPlant; i++) {
-            TreeEntity tree = new TreeEntity();
+            TreeEntity tree = treeMapper.toEntity(request);
+
             tree.setLand(land);
             tree.setTreeType(type);
-            tree.setPlantedAt(LocalDate.now());
-            tree.setCo2Absorption(type.getCo2Absorption());
-
             tree.setOwnerUser(ownerUser);
             tree.setOwnerCompany(ownerCompany);
+            tree.setPlantedAt(LocalDate.now());
+
+            // Setear CO₂ desde el tipo de árbol
+            tree.setCo2AbsorptionAt20(type.getCo2AbsorptionAt20());
+            tree.setCo2AbsorptionAt25(type.getCo2AbsorptionAt25());
+            tree.setCo2AbsorptionAt30(type.getCo2AbsorptionAt30());
+            tree.setCo2AbsorptionAt35(type.getCo2AbsorptionAt35());
+            tree.setCo2AbsorptionAt40(type.getCo2AbsorptionAt40());
+
+            // Foto del árbol opcional
+            tree.setPicture(type.getPicture());
 
             trees.add(tree);
         }
@@ -216,7 +209,7 @@ public class TreeServiceImpl implements TreeService {
         treeRepository.saveAll(trees);
 
         // ==============================
-        // 🔹 Marcar terreno lleno (solo si hay máximo definido)
+        // 🔹 Marcar terreno lleno si corresponde
         // ==============================
         if (land.getMaxTrees() != null && toPlant == available) {
             land.setIsFull(true);

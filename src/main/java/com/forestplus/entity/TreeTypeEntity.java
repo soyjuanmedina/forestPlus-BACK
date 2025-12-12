@@ -23,11 +23,26 @@ public class TreeTypeEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
-    private String description; // Nuevo campo
+    @Column(name = "scientific_name")
+    private String scientificName;
 
-    @Column(name = "co2_absorption")
-    private BigDecimal co2Absorption;
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "co2_absorption_at_20")
+    private BigDecimal co2AbsorptionAt20;
+
+    @Column(name = "co2_absorption_at_25")
+    private BigDecimal co2AbsorptionAt25;
+
+    @Column(name = "co2_absorption_at_30")
+    private BigDecimal co2AbsorptionAt30;
+
+    @Column(name = "co2_absorption_at_35")
+    private BigDecimal co2AbsorptionAt35;
+
+    @Column(name = "co2_absorption_at_40")
+    private BigDecimal co2AbsorptionAt40;
 
     @Column(name = "typical_height")
     private BigDecimal typicalHeight;

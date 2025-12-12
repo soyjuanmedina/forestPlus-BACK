@@ -1,11 +1,13 @@
 package com.forestplus.mapper;
 
+import com.forestplus.dto.request.TreeBatchPlantRequest;
 import com.forestplus.dto.request.TreeRequest;
 import com.forestplus.dto.request.TreeUpdateRequest;
 import com.forestplus.dto.response.TreeResponse;
 import com.forestplus.entity.TreeEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -29,8 +31,8 @@ public interface TreeMapper {
 
     // --- REQUEST -> ENTITY (sin ID) ---
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "treeType", ignore = true) // se setea en el service
-    @Mapping(target = "land", ignore = true)     // se setea en el service
+    @Mapping(target = "treeType", ignore = true)
+    @Mapping(target = "land", ignore = true)
     @Mapping(target = "ownerUser", ignore = true)
     @Mapping(target = "ownerCompany", ignore = true)
     TreeEntity toEntity(TreeRequest request);
@@ -41,4 +43,20 @@ public interface TreeMapper {
     @Mapping(target = "ownerUser", ignore = true)
     @Mapping(target = "ownerCompany", ignore = true)
     TreeEntity toEntity(TreeUpdateRequest request);
+
+    // --- TreeBatchPlantRequest -> TreeEntity ---
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "treeType", ignore = true)
+    @Mapping(target = "land", ignore = true)
+    @Mapping(target = "ownerUser", ignore = true)
+    @Mapping(target = "ownerCompany", ignore = true)
+    @Mapping(target = "plantedAt", ignore = true) // lo seteas en el service
+    @Mapping(target = "co2AbsorptionAt20", ignore = true) // lo seteas en el service
+    @Mapping(target = "co2AbsorptionAt25", ignore = true)
+    @Mapping(target = "co2AbsorptionAt30", ignore = true)
+    @Mapping(target = "co2AbsorptionAt35", ignore = true)
+    @Mapping(target = "co2AbsorptionAt40", ignore = true)
+    TreeEntity toEntity(TreeBatchPlantRequest request);
+    
+    void updateEntityFromDto(TreeUpdateRequest request, @MappingTarget TreeEntity entity);
 }
