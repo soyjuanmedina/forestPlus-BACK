@@ -59,7 +59,7 @@ public class PlannedPlantationController {
     }
 
     @GetMapping("/land/{landId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<PlannedPlantationResponse>> getByLand(@PathVariable Long landId) {
         return ResponseEntity.ok(plannedPlantationService.getPlannedPlantationsByLand(landId));
     }
