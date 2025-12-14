@@ -11,7 +11,10 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+	    componentModel = "spring",
+	    uses = { PlannedPlantationMapper.class }
+	)
 public interface TreeMapper {
 
     // --- ENTITY -> RESPONSE ---
@@ -25,6 +28,7 @@ public interface TreeMapper {
     @Mapping(target = "ownerUserName", source = "ownerUser.name")
     @Mapping(target = "ownerCompanyId", source = "ownerCompany.id")
     @Mapping(target = "ownerCompanyName", source = "ownerCompany.name")
+    @Mapping(target = "plannedPlantation", source = "plannedPlantation")
     TreeResponse toResponse(TreeEntity tree);
 
     List<TreeResponse> toResponseList(List<TreeEntity> trees);

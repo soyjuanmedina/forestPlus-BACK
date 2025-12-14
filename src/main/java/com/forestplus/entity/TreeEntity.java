@@ -68,6 +68,10 @@ public class TreeEntity {
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "planned_plantation_id")
+    private PlannedPlantationEntity plannedPlantation;
 
     @PrePersist
     public void prePersist() {

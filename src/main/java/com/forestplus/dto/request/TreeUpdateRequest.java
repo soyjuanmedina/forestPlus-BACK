@@ -35,6 +35,7 @@ public class TreeUpdateRequest {
     private Long landId;
     private Long ownerUserId;
     private Long ownerCompanyId;
+    private Long plannedPlantationId;
 
     private String picture; // URL o path a la foto del árbol
 }

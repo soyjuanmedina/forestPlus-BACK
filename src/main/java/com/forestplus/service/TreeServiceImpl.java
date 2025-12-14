@@ -17,6 +17,7 @@ import com.forestplus.entity.CompanyEntity;
 import com.forestplus.repository.TreeRepository;
 import com.forestplus.repository.TreeTypeRepository;
 import com.forestplus.repository.LandRepository;
+import com.forestplus.repository.PlannedPlantationRepository;
 import com.forestplus.repository.UserRepository;
 import com.forestplus.security.CurrentUserService;
 
@@ -47,6 +48,7 @@ public class TreeServiceImpl implements TreeService {
     private final LandRepository landRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+	private final PlannedPlantationRepository plannedPlantationRepository;
     private final TreeMapper treeMapper;
 
     @Override
@@ -80,6 +82,13 @@ public class TreeServiceImpl implements TreeService {
             tree.setOwnerCompany(companyRepository.findById(request.getOwnerCompanyId())
                     .orElseThrow(() -> new RuntimeException("Company not found")));
         }
+        
+        if (request.getPlannedPlantationId() != null) {
+            tree.setPlannedPlantation(
+                plannedPlantationRepository.findById(request.getPlannedPlantationId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Planned plantation not found"))
+            );
+        }
 
         return treeMapper.toResponse(treeRepository.save(tree));
     }
@@ -112,6 +121,15 @@ public class TreeServiceImpl implements TreeService {
         if (request.getOwnerCompanyId() != null) {
             tree.setOwnerCompany(companyRepository.findById(request.getOwnerCompanyId())
                     .orElseThrow(() -> new RuntimeException("Company not found")));
+        }
+        
+        if (request.getPlannedPlantationId() != null) {
+            tree.setPlannedPlantation(
+                plannedPlantationRepository.findById(request.getPlannedPlantationId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Planned plantation not found"))
+            );
+        } else {
+            tree.setPlannedPlantation(null); // 🔹 Permite quitar la planificación
         }
 
         // Guardar y convertir a DTO de respuesta

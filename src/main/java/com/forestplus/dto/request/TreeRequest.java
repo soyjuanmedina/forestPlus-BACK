@@ -35,6 +35,7 @@ public class TreeRequest {
     private Long landId;
     private Long ownerUserId;     // opcional, null si es compañía
     private Long ownerCompanyId;
+    private Long plannedPlantationId;
     
     private String picture;       // URL o path a la foto del árbol
 }

@@ -13,4 +13,6 @@ public class TreeBatchPlantRequest {
     private int quantity;
     private Long ownerUserId;
     private Long ownerCompanyId;
+    // 🔹 Nueva propiedad para asignar planned plantation
+    private Long plannedPlantationId; // opcional
 }

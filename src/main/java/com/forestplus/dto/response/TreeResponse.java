@@ -41,6 +41,7 @@ public class TreeResponse {
 
     // Fechas
     private LocalDate plantedAt;
+    private PlannedPlantationResponse plannedPlantation;
 
     // Tipo de árbol
     private Long treeTypeId;
