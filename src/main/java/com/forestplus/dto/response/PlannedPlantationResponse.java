@@ -36,4 +36,6 @@ public class PlannedPlantationResponse {
 
     @Schema(description = "Cantidad máxima de árboles a plantar (opcional)")
     private Integer maxTrees;
+    
+    private Boolean isActive;
 }

@@ -56,6 +56,10 @@ public class PlannedPlantationEntity {
      */
     @Column(name = "max_trees")
     private Integer maxTrees;
+    
+    @Column(name = "is_active", nullable = false)
+    @Builder.Default
+    private Boolean isActive = false;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

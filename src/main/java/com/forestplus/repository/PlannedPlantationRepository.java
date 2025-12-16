@@ -65,4 +65,6 @@ public interface PlannedPlantationRepository
           AND pp.effectiveDate <> pp.plannedDate
         """)
     List<PlannedPlantationEntity> findExecutedWithDateDeviation();
+    
+    List<PlannedPlantationEntity> findAllByIsActiveTrue();
 }

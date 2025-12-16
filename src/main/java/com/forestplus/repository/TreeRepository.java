@@ -76,5 +76,18 @@ public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
     	        @Param("ownerUserId") Long ownerUserId,
     	        @Param("ownerCompanyId") Long ownerCompanyId
     	);
+    
+    @Query("""
+    	    SELECT COUNT(t)
+    	    FROM TreeEntity t
+    	    WHERE 
+    	        (:userId IS NOT NULL AND t.ownerUser.id = :userId)
+    	        OR
+    	        (:companyIds IS NOT NULL AND t.ownerCompany.id IN :companyIds)
+    	""")
+    	long countOwnedTrees(
+    	    @Param("userId") Long userId,
+    	    @Param("companyIds") List<Long> companyIds
+    	);
 
 }

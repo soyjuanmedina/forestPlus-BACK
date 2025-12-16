@@ -9,6 +9,7 @@ import com.forestplus.dto.response.TreeResponse;
 import com.forestplus.entity.TreeEntity;
 import com.forestplus.entity.TreeTypeEntity;
 import com.forestplus.entity.LandEntity;
+import com.forestplus.entity.PlannedPlantationEntity;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.exception.ForestPlusException;
 import com.forestplus.exception.ResourceNotFoundException;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -166,6 +168,13 @@ public class TreeServiceImpl implements TreeService {
 
         TreeTypeEntity type = treeTypeRepository.findById(request.getTreeTypeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Tree type not found"));
+        
+        PlannedPlantationEntity plannedPlantation =
+                Optional.ofNullable(request.getPlannedPlantationId())
+                        .map(id -> plannedPlantationRepository.findById(id)
+                                .orElseThrow(() -> new EntityNotFoundException(
+                                        "PlannedPlantation not found")))
+                        .orElse(null);
 
         // ==============================
         // 🔹 Lógica de máximo árboles
@@ -209,7 +218,7 @@ public class TreeServiceImpl implements TreeService {
             tree.setTreeType(type);
             tree.setOwnerUser(ownerUser);
             tree.setOwnerCompany(ownerCompany);
-            tree.setPlantedAt(LocalDate.now());
+            tree.setPlannedPlantation(plannedPlantation);
 
             // Setear CO₂ desde el tipo de árbol
             tree.setCo2AbsorptionAt20(type.getCo2AbsorptionAt20());

@@ -19,4 +19,12 @@ public interface CompanyRepository extends JpaRepository<CompanyEntity, Long> {
         WHERE u.id = :adminId AND u.role = 'COMPANY_ADMIN'
     """)
     List<CompanyEntity> findByAdminId(@Param("adminId") Long adminId);
+    
+    @Query("""
+    	    SELECT c.id
+    	    FROM CompanyEntity c
+    	    JOIN c.users u
+    	    WHERE u.id = :userId
+    	""")
+    	List<Long> findCompanyIdsByUserId(@Param("userId") Long userId);
 }
