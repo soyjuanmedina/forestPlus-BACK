@@ -140,6 +140,17 @@ public class UserServiceImpl implements UserService {
                         .orElseThrow(() -> new RuntimeException("Company not found with id " + request.getCompanyId()));
                 existing.setCompany(company);
             }
+            
+            // ✅ NUEVO: actualizar árboles pendientes
+            if (request.getPendingTreesCount() != null) {
+                if (request.getPendingTreesCount() < 0) {
+                    throw new ForestPlusException(
+                        HttpStatus.BAD_REQUEST,
+                        "pendingTreesCount no puede ser negativo"
+                    ) {};
+                }
+                existing.setPendingTreesCount(request.getPendingTreesCount());
+            }
 
             UserEntity updated = userRepository.save(existing);
             return userMapper.toResponse(updated);

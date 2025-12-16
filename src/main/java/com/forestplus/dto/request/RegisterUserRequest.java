@@ -13,5 +13,5 @@ public class RegisterUserRequest {
     private String password;
     private RolesEnum role;
     private Long companyId;
-    private String picture; 
+    private String picture;
 }

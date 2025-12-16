@@ -27,6 +27,6 @@ public class UserResponse {
     private RolesEnum role;
     private boolean emailVerified;
     private Boolean forcePasswordChange;
-    
+    private int pendingTreesCount;
     private CompanyResponse company;
 }

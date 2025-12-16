@@ -65,6 +65,10 @@ public class UserEntity {
     @Column(name = "uuid")
     private String uuid;
     
+    @Builder.Default
+    @Column(name = "pending_trees_count", nullable = false)
+    private Integer pendingTreesCount = 0;
+    
     // Relación muchos a muchos con terrenos
     @ManyToMany(mappedBy = "users")
     private List<LandEntity> lands;
