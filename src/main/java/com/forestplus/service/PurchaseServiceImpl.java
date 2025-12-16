@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.forestplus.dto.request.PurchaseRequest;
 import com.forestplus.dto.response.PurchaseResponse;
@@ -26,27 +27,31 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final EmailService emailService;
     private final CurrentUserService currentUserService;
 
+    @Transactional
     @Override
     public PurchaseResponse processPurchase(PurchaseRequest request) {
 
         // 1️⃣ Obtener terreno
         LandEntity land = landRepository.findById(request.getLandId())
                 .orElseThrow(() -> new RuntimeException("Terreno no encontrado"));
-        
-        // 1️⃣ Obtener terreno
+
+        // 2️⃣ Obtener tipo de árbol
         TreeTypeEntity treeType = treeTypeRepository.findById(request.getTreeTypeId())
                 .orElseThrow(() -> new RuntimeException("Tipo de árbol no encontrado"));
 
-        // 2️⃣ Obtener comprador
+        // 3️⃣ Obtener comprador
         UserEntity buyer = currentUserService.getCurrentUser();
         if (buyer == null) {
             throw new RuntimeException("Usuario no autenticado");
         }
 
-        // 3️⃣ Calcular total
+        // 4️⃣ Actualizar árboles pendientes
+        buyer.setPendingTreesCount(buyer.getPendingTreesCount() + request.getQuantity());
+
+        // 5️⃣ Calcular total
         BigDecimal totalPrice = request.getPricePerUnit().multiply(BigDecimal.valueOf(request.getQuantity()));
 
-        // 4️⃣ Variables para el template de comprador
+        // 6️⃣ Variables y email comprador
         Map<String, Object> buyerVars = new HashMap<>();
         buyerVars.put("buyerName", buyer.getName());
         buyerVars.put("landName", land.getName());
@@ -54,7 +59,6 @@ public class PurchaseServiceImpl implements PurchaseService {
         buyerVars.put("totalPrice", totalPrice);
         buyerVars.put("treeType", treeType.getName());
 
-        // 5️⃣ Enviar email al comprador
         emailService.sendEmail(
                 buyer.getEmail(),
                 "Compra realizada - Forest+",
@@ -62,7 +66,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 buyerVars
         );
 
-        // 6️⃣ Variables para el vendedor
+        // 7️⃣ Variables y email vendedor
         Map<String, Object> sellerVars = new HashMap<>();
         sellerVars.put("sellerName", "Administrador");
         sellerVars.put("buyerName", buyer.getName());
@@ -72,8 +76,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         sellerVars.put("totalPrice", totalPrice);
         sellerVars.put("treeType", treeType.getName());
 
-        // 7️⃣ Enviar email al vendedor (ya conocido)
-        String sellerEmail = "info@forestplusapp.com"; // aquí tu mail real
+        String sellerEmail = "info@forestplusapp.com";
         emailService.sendEmail(
                 sellerEmail,
                 "Tu terreno ha recibido una compra - Forest+",
@@ -90,4 +93,5 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         return response;
     }
+
 }
