@@ -232,6 +232,15 @@ public class TreeServiceImpl implements TreeService {
 
             trees.add(tree);
         }
+        
+     // ==============================
+     // 🔹 Restar árboles pendientes del usuario
+     // ==============================
+     if (ownerUser != null) {
+         int newPending = Math.max(ownerUser.getPendingTreesCount() - toPlant, 0);
+         ownerUser.setPendingTreesCount(newPending);
+         userRepository.save(ownerUser);
+     }
 
         treeRepository.saveAll(trees);
 
