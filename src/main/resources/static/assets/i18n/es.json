@@ -1,4 +1,18 @@
 {
+  "COMMON": {
+    "CANCEL": "Cancelar",
+    "EDIT": "Editar",
+    "DELETE": "Eliminar",
+    "CLOSE": "Cerrar",
+    "SAVE_CHANGES": "Guardar cambios",
+    "SAVE": "Guardar",
+    "PREVIOUS": "Anterior",
+    "NEXT": "Siguiente",
+    "CONFIRM_DELETE": "Confirmar eliminación",
+    "CONFIRM_DELETE_MESSAGE": "¿Esta seguro de eliminar este elemento?",
+    "MORE_INFO": "Más información",
+    "SELECT_OPTION": "Seleccionar"
+  },
   "MENU": {
     "MENU": "Menú",
     "HOME": "Inicio",
@@ -30,6 +44,8 @@
     "NEXT": "Siguiente"
   },
   "LANDS": {
+    "PLANNED_PLANTATIONS": "Plantaciones planificadas",
+    "NO_PLANNED_PLANTATIONS": "Sin plantaciones planificadas",
     "SEARCH_PLACEHOLDER": "Buscar terreno...",
     "NEW_LAND": "Nuevo terreno",
     "PREVIOUS": "Anterior",
@@ -49,11 +65,13 @@
   },
   "ASSIGN_TREES": {
     "TITLE": "Asignar árbol",
+    "PLANNED_PLANTATION": "Plantaciones previstas",
+    "QUANTITY": "Cantidad",
     "LAND": "Seleccionar terreno",
     "TREES": "Árboles disponibles",
     "NO_TREES": "No hay árboles disponibles en este terreno",
     "ASSIGN": "Asignar",
-    "ASSIGN_PLANTED_TREES": "Asignar árboles plantados",
+    "ASSIGN_PLANTED_TREES": "Asignar árboles",
     "UNASSIGN": "Gestionar",
     "NO_TREES_TO_MANAGE": "No hay árboles para gestionar"
   },
@@ -87,11 +105,9 @@
   "HOME": {
     "TITLE": "Bienvenido a Forest+",
     "LINES": [
-      "La plataforma que combina tecnología e innovación para cuidar nuestro planeta.",
-      "Con imágenes satelitales e Inteligencia Artificial, hacemos posible la reforestación digital con trazabilidad y resultados medibles.",
-      "Regeneramos ecosistemas y ayudamos a organizaciones a cumplir sus metas climáticas de manera eficiente.",
-      "Juntos, construimos un futuro más verde."
-    ]
+      "La plataforma que combina tecnología e innovación para cuidar nuestro planeta."
+    ],
+    "PLANTED_TREES": "Árboles plantados"
   },
   "PROFILE": {
     "ROLE": "Rol",
@@ -191,17 +207,6 @@
     "EDIT_BUTTON": "Editar",
     "CO2_ESTIMATIONS_TITLE": "Absorciones CO₂ estimadas",
     "DELETE_ERROR": "No se puede eliminar el tipo de árbol porque hay árboles asociados"
-  },
-  "COMMON": {
-    "CANCEL": "Cancelar",
-    "CLOSE": "Cerrar",
-    "SAVE_CHANGES": "Guardar cambios",
-    "SAVE": "Guardar",
-    "PREVIOUS": "Anterior",
-    "NEXT": "Siguiente",
-    "CONFIRM_DELETE": "Confirmar eliminación",
-    "CONFIRM_DELETE_MESSAGE": "¿Esta seguro de eliminar este elemento?",
-    "MORE_INFO": "Más información"
   },
   "ADMIN_TREE_TYPES": {
     "CONFIRM_DELETE_TREE_TYPE": {
@@ -410,10 +415,16 @@
     "ID_ARBOL": "ID del árbol",
     "TIPO": "Tipo",
     "CO2_ABSORBIDO": "CO₂ absorbido",
+    "CO2_ABS_20": "CO₂ absorbido a los 20 años",
+    "CO2_ABS_25": "CO₂ absorbido a los 25 años",
+    "CO2_ABS_30": "CO₂ absorbido a los 30 años",
+    "CO2_ABS_35": "CO₂ absorbido a los 35 años",
+    "CO2_ABS_40": "CO₂ absorbido a los 40 años",
     "PLANTADO_EL": "Plantado el",
     "TERRENO": "Terreno",
     "SIN_ASIGNAR": "Sin asignar",
     "PROPIETARIO": "Propietario",
+    "PLANTACION_PLANIFICADA": "Plantación planificada",
     "INFORMACION_TIPO_ARBOL": "Información del tipo de árbol",
     "DESCRIPCION": "Descripción",
     "CO2_ABSORCION_TIPO": "CO₂ que absorbe este tipo",
@@ -429,6 +440,7 @@
     "TITLE": "Gestión de árboles"
   },
   "PLANNED_PLANTATION": {
+    "ACTIVE": "Plantación Activa",
     "TITLE": "Plantaciones previstas",
     "NEW": "Nueva plantación",
     "EDIT": "Editar plantación",
