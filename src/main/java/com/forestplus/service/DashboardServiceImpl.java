@@ -12,6 +12,7 @@ import com.forestplus.entity.TreeEntity;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.PlannedPlantationRepository;
 import com.forestplus.repository.TreeRepository;
+import com.forestplus.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +23,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final TreeRepository treeRepository;
     private final CompanyRepository companyRepository;
+    private final UserRepository userRepository;
     private final PlannedPlantationRepository plannedPlantationRepository;
 
     @Override
@@ -33,6 +35,10 @@ public class DashboardServiceImpl implements DashboardService {
 
         // 2️⃣ KPI: árboles plantados (usuario + empresas)
         long plantedTrees = treeRepository.countOwnedTrees(userId, companyIds);
+        
+        int pendingTreesCount = userRepository.findById(userId)
+                .map(user -> user.getPendingTreesCount())
+                .orElse(0);
 
         // 3️⃣ Plantaciones activas
         List<PlannedPlantationEntity> activePlantations = plannedPlantationRepository.findAllByIsActiveTrue();
@@ -57,6 +63,7 @@ public class DashboardServiceImpl implements DashboardService {
         // 5️⃣ Construir response
         return HomeDashboardKpiResponse.builder()
                 .plantedTrees(plantedTrees)
+                .pendingTreesCount(pendingTreesCount)
                 .plannedPlantations(plantationKpis)
                 .build();
     }

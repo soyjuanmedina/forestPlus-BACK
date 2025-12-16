@@ -19,7 +19,7 @@ public class DashboardController {
     private final DashboardService dashboardService;
     private final CurrentUserService currentUserService;
 
-    @GetMapping("/home")
+    @GetMapping(value = "/home", produces = "application/json")
     public HomeDashboardKpiResponse getHomeKpis() {
         Long userId = currentUserService.getCurrentUserId();
         return dashboardService.getHomeKpis(userId);

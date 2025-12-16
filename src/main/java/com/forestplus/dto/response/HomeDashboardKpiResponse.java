@@ -14,6 +14,11 @@ public class HomeDashboardKpiResponse {
      */
     private long plantedTrees;
     
+    /**
+     * Número total de árboles pendientes de plantar por el usuario y sus empresas
+     */
+    private long pendingTreesCount;
+    
     private List<PlannedPlantationKpiResponse> plannedPlantations;
 
 }
