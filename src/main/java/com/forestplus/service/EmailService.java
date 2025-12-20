@@ -76,7 +76,7 @@ public class EmailService {
             helper.setText(html, true); // true = HTML
             helper.setTo(to);
             helper.setSubject("Confirma tu correo en ForestPlus");
-            helper.setFrom("noreply@forestplustech.com");
+            helper.setFrom("noreply@forestplusapp.com");
             mailSender.send(message);
 
         } catch (MessagingException e) {
