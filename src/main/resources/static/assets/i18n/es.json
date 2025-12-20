@@ -396,6 +396,7 @@
   },
   "MY_TREES": {
     "SEARCH_PLACEHOLDER": "Buscar por tipo de árbol...",
+    "ADD_NEW_TREE": "Añade un nuevo árbol a tu bosque",
     "BUY_NEW_TREE": "Comprar un árbol",
     "QUANTITY": "Cantidad",
     "PREVIOUS": "Anterior",

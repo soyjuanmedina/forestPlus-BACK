@@ -52,8 +52,6 @@ public class DashboardServiceImpl implements DashboardService {
                 .<PlannedPlantationKpiResponse>map(pp -> {
                     List<TreeEntity> trees = treeRepository.findByLandId(pp.getLand().getId());
                     long soldTrees = trees.stream()
-                            .filter(t -> (t.getOwnerUser() != null && t.getOwnerUser().getId().equals(userId))
-                                    || (t.getOwnerCompany() != null && companyIds != null && companyIds.contains(t.getOwnerCompany().getId())))
                             .count();
                     return PlannedPlantationKpiResponse.builder()
                             .plantationId(pp.getId())
