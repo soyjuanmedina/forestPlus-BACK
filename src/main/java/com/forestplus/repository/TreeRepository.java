@@ -1,5 +1,6 @@
 package com.forestplus.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -88,6 +89,19 @@ public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
     	long countOwnedTrees(
     	    @Param("userId") Long userId,
     	    @Param("companyIds") List<Long> companyIds
+    	);
+    
+    @Query("""
+    	    SELECT COALESCE(SUM(t.co2AbsorptionAt20), 0)
+    	    FROM TreeEntity t
+    	    WHERE 
+    	        (:userId IS NOT NULL AND t.ownerUser.id = :userId)
+    	        OR
+    	        (:companyIds IS NOT NULL AND t.ownerCompany.id IN :companyIds)
+    	""")
+    	BigDecimal sumAnnualCo2At20(
+    	        @Param("userId") Long userId,
+    	        @Param("companyIds") List<Long> companyIds
     	);
 
 }

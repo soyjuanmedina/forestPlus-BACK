@@ -1,5 +1,6 @@
 package com.forestplus.dto.response;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import lombok.Builder;
@@ -18,6 +19,8 @@ public class HomeDashboardKpiResponse {
      * Número total de árboles pendientes de plantar por el usuario y sus empresas
      */
     private long pendingTreesCount;
+    
+    private BigDecimal annualCo2Compensated;
     
     private List<PlannedPlantationKpiResponse> plannedPlantations;
 

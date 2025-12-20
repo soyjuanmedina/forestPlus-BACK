@@ -104,10 +104,24 @@
   },
   "HOME": {
     "TITLE": "Bienvenido a Forest+",
-    "LINES": [
-      "La plataforma que combina tecnología e innovación para cuidar nuestro planeta."
-    ],
-    "PLANTED_TREES": "Árboles plantados"
+    "LINES": "Aquí puedes ver el impacto positivo de tu contribución.<br>Cada árbol cuenta para un futuro más sostenible.",
+    "PENDING_TREES_WARNING": "⚠️ Tienes {{count}} árbol(es) pendiente(s) de plantar.",
+    "PLANTED_TREES": "Árboles plantados",
+    "ENVIRONMENTAL_IMPACT": {
+      "TITLE": "Impacto ambiental",
+      "VALUE": "{{value}} kg CO₂ / año",
+      "INTRO": "Enhorabuena, con tu actuación estás contribuyendo a compensar el CO₂ producido por:",
+      "CAR": "{{value}} km en coche",
+      "PLANE": "{{value}} km en avión",
+      "HOMES": "{{value}} hogares / año",
+      "HOME_PERCENT": "{{value}}% de un hogar"
+    },
+    "NO_TREES": {
+      "TITLE": "¡Aún no tienes árboles plantados!",
+      "DESCRIPTION": "Comienza a plantar un árbol y contribuye al bosque.",
+      "CTA": "Plantar un árbol"
+    },
+    "NEXT_PLANTATION": "Próxima plantación"
   },
   "PROFILE": {
     "ROLE": "Rol",

@@ -1,5 +1,6 @@
 package com.forestplus.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -39,6 +40,9 @@ public class DashboardServiceImpl implements DashboardService {
         int pendingTreesCount = userRepository.findById(userId)
                 .map(user -> user.getPendingTreesCount())
                 .orElse(0);
+        
+        BigDecimal annualCo2Compensated =
+                treeRepository.sumAnnualCo2At20(userId, companyIds);
 
         // 3️⃣ Plantaciones activas
         List<PlannedPlantationEntity> activePlantations = plannedPlantationRepository.findAllByIsActiveTrue();
@@ -64,6 +68,7 @@ public class DashboardServiceImpl implements DashboardService {
         return HomeDashboardKpiResponse.builder()
                 .plantedTrees(plantedTrees)
                 .pendingTreesCount(pendingTreesCount)
+                .annualCo2Compensated(annualCo2Compensated)
                 .plannedPlantations(plantationKpis)
                 .build();
     }
