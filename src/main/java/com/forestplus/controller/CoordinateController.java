@@ -29,7 +29,7 @@ public class CoordinateController {
     // LISTAR TODAS LAS COORDENADAS
     // ---------------------------------------------------------
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtener todas las coordenadas")
     public ResponseEntity<List<CoordinateResponse>> getAllCoordinates() {
         return ResponseEntity.ok(coordinateService.getAllCoordinates());
@@ -39,7 +39,7 @@ public class CoordinateController {
     // OBTENER COORDENADA POR ID
     // ---------------------------------------------------------
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtener coordenada por ID")
     public ResponseEntity<CoordinateResponse> getCoordinateById(
             @Parameter(description = "ID de la coordenada") @PathVariable Long id) {
@@ -85,7 +85,7 @@ public class CoordinateController {
     // LISTAR COORDENADAS POR PARCELA
     // ---------------------------------------------------------
     @GetMapping("/land/{landId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtener coordenadas de una parcela por ID de land")
     public ResponseEntity<List<CoordinateResponse>> getCoordinatesByLand(
             @Parameter(description = "ID de la parcela") @PathVariable Long landId) {
