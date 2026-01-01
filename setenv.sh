@@ -9,4 +9,5 @@ export DB_USERNAME="forestplspp_user"
 export DB_PASSWORD="j3W^WPbsi9r8@wwl"
 export JWT_SECRET="12345678901234567890123456789012"
 export JWT_REFRESH_SECRET="OtroSecretoParaRefresh1234567890"
+export REDSYS_SECRET="RedsysSecret"
 
