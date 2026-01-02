@@ -1,4 +1,4 @@
-name: Build & Deploy Spring Boot App
+name: Build & Deploy Spring Boot + Angular
 
 on:
   push:
@@ -20,10 +20,10 @@ jobs:
         id: deploy-branch
         run: |
           if [[ "${GITHUB_REF_NAME}" == "development" ]]; then
-            echo "DEPLOY_PATH=/appservers/apache-tomcat-10x/webapps/forestplus-dev" >> $GITHUB_ENV
+            echo "DEPLOY_FILENAME=forestplus-dev.war" >> $GITHUB_ENV
             echo "FRONT_BRANCH=development" >> $GITHUB_ENV
           else
-            echo "DEPLOY_PATH=/appservers/apache-tomcat-10x/webapps/ROOT" >> $GITHUB_ENV
+            echo "DEPLOY_FILENAME=ROOT.war" >> $GITHUB_ENV
             echo "FRONT_BRANCH=main" >> $GITHUB_ENV
           fi
 
@@ -62,22 +62,23 @@ jobs:
           distribution: 'temurin'
           java-version: 21
 
-      - name: Build with Maven
+      - name: Build Spring Boot WAR
         run: mvn clean package -DskipTests
 
-      # ---------- Deploy via lftp ----------
+      # ---------- Install lftp ----------
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
+      # ---------- Deploy WAR via lftp ----------
       - name: Deploy WAR via lftp
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          DEPLOY_PATH: ${{ env.DEPLOY_PATH }}
+          DEPLOY_FILENAME: ${{ env.DEPLOY_FILENAME }}
         run: |
           WAR_FILE=$(find target -name "*.war" | head -n 1)
-          echo "Deploying $WAR_FILE to $DEPLOY_PATH"
+          echo "Deploying $WAR_FILE as $DEPLOY_FILENAME"
 
           lftp -c "
             set ftp:ssl-allow true
@@ -87,6 +88,6 @@ jobs:
             set ssl:verify-certificate no
             open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_SERVER
 
-            rm -f $DEPLOY_PATH/*.war || true
-            put -O $DEPLOY_PATH $WAR_FILE
+            # Subir WAR directamente con el nombre correcto
+            put -O /appservers/apache-tomcat-10x/webapps/ $WAR_FILE -o $DEPLOY_FILENAME
           "
