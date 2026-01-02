@@ -11,35 +11,35 @@ jobs:
 
     steps:
       - name: Checkout backend repository
-      uses: actions/checkout@v4
+        uses: actions/checkout@v4
 
-      # ---------- NEW: Clone Frontend ----------
+      # ---------- Clone Angular Frontend ----------
       - name: Clone Angular Frontend
         run: |
           git clone https://github.com/soyjuanmedina/forestPlus-FRONT
 
-      # ---------- NEW: Node ----------
+      # ---------- Node ----------
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # ---------- NEW: Build Angular ----------
+      # ---------- Build Angular ----------
       - name: Install Angular dependencies
         run: |
-          cd frontend
+          cd forestPlus-FRONT
           npm ci
 
       - name: Build Angular
         run: |
-          cd frontend
+          cd forestPlus-FRONT
           npm run build -- --configuration=production
 
-      # ---------- NEW: Copy Angular build into Spring Boot static ----------
+      # ---------- Copy Angular build into Spring Boot static ----------
       - name: Copy Angular build to Spring Boot static
         run: |
           rm -rf src/main/resources/static/*
-          cp -r frontend/dist/forest-plus/browser/* src/main/resources/static/
+          cp -r forestPlus-FRONT/dist/forest-plus/browser/* src/main/resources/static/
 
       # ---------- JAVA ----------
       - name: Set up JDK 21
