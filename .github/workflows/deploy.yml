@@ -15,14 +15,16 @@ jobs:
       - name: Checkout backend repository
         uses: actions/checkout@v4
 
-      # ---------- Determine branch and deploy path ----------
+      # ---------- Determine deploy path, filename and frontend branch ----------
       - name: Set deploy path and frontend branch
         id: deploy-branch
         run: |
           if [[ "${GITHUB_REF_NAME}" == "development" ]]; then
-            echo "DEPLOY_FILENAME=forestplus-dev.war" >> $GITHUB_ENV
+            echo "DEPLOY_PATH=/appservers/apache-tomcat-10x/webapps-dev" >> $GITHUB_ENV
+            echo "DEPLOY_FILENAME=ROOT.war" >> $GITHUB_ENV
             echo "FRONT_BRANCH=development" >> $GITHUB_ENV
           else
+            echo "DEPLOY_PATH=/appservers/apache-tomcat-10x/webapps" >> $GITHUB_ENV
             echo "DEPLOY_FILENAME=ROOT.war" >> $GITHUB_ENV
             echo "FRONT_BRANCH=main" >> $GITHUB_ENV
           fi
@@ -32,7 +34,7 @@ jobs:
         run: |
           git clone --branch $FRONT_BRANCH https://github.com/soyjuanmedina/forestPlus-FRONT frontend
 
-      # ---------- Node ----------
+      # ---------- Node.js ----------
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -55,7 +57,7 @@ jobs:
           rm -rf src/main/resources/static/*
           cp -r frontend/dist/forest-plus/browser/* src/main/resources/static/
 
-      # ---------- JAVA ----------
+      # ---------- Java ----------
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -75,10 +77,11 @@ jobs:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          DEPLOY_PATH: ${{ env.DEPLOY_PATH }}
           DEPLOY_FILENAME: ${{ env.DEPLOY_FILENAME }}
         run: |
           WAR_FILE=$(find target -name "*.war" | head -n 1)
-          echo "Deploying $WAR_FILE as $DEPLOY_FILENAME"
+          echo "Deploying $WAR_FILE to $DEPLOY_PATH as $DEPLOY_FILENAME"
 
           lftp -c "
             set ftp:ssl-allow true
@@ -88,6 +91,6 @@ jobs:
             set ssl:verify-certificate no
             open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_SERVER
 
-            # Subir WAR directamente con el nombre correcto
-            put -O /appservers/apache-tomcat-10x/webapps/ $WAR_FILE -o $DEPLOY_FILENAME
+            # Subir WAR en la carpeta correcta con el nombre ROOT.war
+            put -O $DEPLOY_PATH $WAR_FILE -o $DEPLOY_FILENAME
           "
