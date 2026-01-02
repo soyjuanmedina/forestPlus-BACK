@@ -3,47 +3,65 @@ name: Build & Deploy Spring Boot App
 on:
   push:
     branches:
-      - master  # o la rama que uses para producción
+      - master
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout backend repository
+      uses: actions/checkout@v4
 
-      # Configurar JDK para compilar el backend
+      # ---------- NEW: Clone Frontend ----------
+      - name: Clone Angular Frontend
+        run: |
+          git clone https://github.com/soyjuanmedina/forestPlus-FRONT
+
+      # ---------- NEW: Node ----------
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # ---------- NEW: Build Angular ----------
+      - name: Install Angular dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build Angular
+        run: |
+          cd frontend
+          npm run build -- --configuration=production
+
+      # ---------- NEW: Copy Angular build into Spring Boot static ----------
+      - name: Copy Angular build to Spring Boot static
+        run: |
+          rm -rf src/main/resources/static/*
+          cp -r frontend/dist/forest-plus/browser/* src/main/resources/static/
+
+      # ---------- JAVA ----------
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 21
 
-      # Construir el WAR usando Maven o Gradle (ajusta según tu caso)
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      # Instalar lftp
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      # Subir el WAR a tu servidor Tomcat
       - name: Deploy WAR via lftp
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          # Ruta donde se genera el WAR (ajusta si tu proyecto lo pone en otro sitio)
           WAR_FILE=$(find target -name "*.war" | head -n 1)
-          if [ -z "$WAR_FILE" ]; then
-            echo "❌ No se encontró ningún archivo WAR en target/"
-            exit 1
-          fi
-          echo "✅ WAR encontrado: $WAR_FILE"
 
-          # Subir el WAR al servidor Tomcat
           lftp -c "
             set ftp:ssl-allow true
             set ftp:ssl-force true
@@ -52,9 +70,6 @@ jobs:
             set ssl:verify-certificate no
             open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_SERVER
 
-            # Eliminar el WAR anterior
             rm -f /appservers/apache-tomcat-10x/webapps/ROOT.war || true
-
-            # Subir el nuevo WAR
             put -O /appservers/apache-tomcat-10x/webapps/ $WAR_FILE
           "
