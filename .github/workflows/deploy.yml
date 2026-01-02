@@ -20,7 +20,7 @@ jobs:
         id: deploy-branch
         run: |
           if [[ "${GITHUB_REF_NAME}" == "development" ]]; then
-            echo "DEPLOY_FILENAME=forestplus-dev.war" >> $GITHUB_ENV
+            echo "DEPLOY_FILENAME=ROOT.war" >> $GITHUB_ENV
             echo "DEPLOY_PATH=/appservers/apache-tomcat-10x/webapps-dev" >> $GITHUB_ENV
             echo "FRONT_BRANCH=development" >> $GITHUB_ENV
           else
