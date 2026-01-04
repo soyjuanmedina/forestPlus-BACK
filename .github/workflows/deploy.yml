@@ -82,6 +82,13 @@ jobs:
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
+      # ---------- Create development.env ----------
+      - name: Create development.env
+        if: github.ref_name == 'development'
+        run: |
+          echo "SPRING_PROFILES_ACTIVE=dev" > development.env
+
+      # ---------- Deploy WAR + .env via lftp ----------
       - name: Deploy WAR via lftp
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
@@ -104,9 +111,9 @@ jobs:
             # Subir WAR directamente con el nombre correcto
             put -O $DEPLOY_PATH $WAR_FILE -o $DEPLOY_FILENAME
 
-            # Crear .env para development
-            $(if [[ "${GITHUB_REF_NAME}" == "development" ]]; then
-                echo "echo 'SPRING_PROFILES_ACTIVE=dev' > $DEPLOY_PATH/development.env"
+            # Subir development.env solo si existe
+            $(if [[ "${GITHUB_REF_NAME}" == 'development' ]]; then
+                echo "put development.env -o $DEPLOY_PATH/development.env"
               fi)
           "
 
