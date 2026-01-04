@@ -57,6 +57,12 @@ jobs:
           rm -rf src/main/resources/static/*
           cp -r frontend/dist/forest-plus/browser/* src/main/resources/static/
 
+      # ---------- Set Spring profile for development ----------
+      - name: Set Spring profile to dev for development branch
+        if: github.ref_name == 'development'
+        run: |
+          echo "spring.profiles.active=dev" > src/main/resources/application.properties
+
       # ---------- JAVA ----------
       - name: Set up JDK 21
         uses: actions/setup-java@v4
