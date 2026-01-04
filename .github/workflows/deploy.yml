@@ -71,7 +71,12 @@ jobs:
           java-version: 21
 
       - name: Build Spring Boot WAR
-        run: mvn clean package -DskipTests
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "development" ]]; then
+            mvn clean package -DskipTests -Dspring-boot.run.profiles=dev
+          else
+            mvn clean package -DskipTests
+          fi
 
       # ---------- Install lftp ----------
       - name: Install lftp
