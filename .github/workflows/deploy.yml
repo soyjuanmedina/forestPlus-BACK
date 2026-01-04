@@ -49,7 +49,11 @@ jobs:
       - name: Build Angular
         run: |
           cd frontend
-          npm run build -- --configuration=production
+          if [[ "${GITHUB_REF_NAME}" == "development" ]]; then
+            npm run build -- --configuration=production --base-href /development/ --deploy-url /development/
+          else
+            npm run build -- --configuration=production --base-href / --deploy-url /
+          fi
 
       # ---------- Copy Angular build into Spring Boot static ----------
       - name: Copy Angular build to Spring Boot static
