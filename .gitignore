@@ -32,6 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-.env
+setenv.sh
 forestPlus-temp/
 /src/main/resources/application-local.properties
