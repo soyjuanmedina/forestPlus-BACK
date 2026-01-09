@@ -20,8 +20,8 @@ jobs:
         id: deploy-branch
         run: |
           if [[ "${GITHUB_REF_NAME}" == "development" ]]; then
-            echo "DEPLOY_FILENAME=ROOT.war" >> $GITHUB_ENV
-            echo "DEPLOY_PATH=/appservers/apache-tomcat-10x/webapps-dev" >> $GITHUB_ENV
+            echo "DEPLOY_FILENAME=development.war" >> $GITHUB_ENV
+            echo "DEPLOY_PATH=/appservers/apache-tomcat-10x/webapps" >> $GITHUB_ENV
             echo "FRONT_BRANCH=development" >> $GITHUB_ENV
           else
             echo "DEPLOY_FILENAME=ROOT.war" >> $GITHUB_ENV
@@ -49,13 +49,23 @@ jobs:
       - name: Build Angular
         run: |
           cd frontend
-          npm run build -- --configuration=production
+          if [[ "${GITHUB_REF_NAME}" == "development" ]]; then
+            npm run build -- --configuration=development --base-href /development/ --deploy-url /development/
+          else
+            npm run build -- --configuration=production --base-href / --deploy-url /
+          fi
 
       # ---------- Copy Angular build into Spring Boot static ----------
       - name: Copy Angular build to Spring Boot static
         run: |
           rm -rf src/main/resources/static/*
           cp -r frontend/dist/forest-plus/browser/* src/main/resources/static/
+
+      # ---------- Set Spring profile for development ----------
+      - name: Set Spring profile to dev for development branch
+        if: github.ref_name == 'development'
+        run: |
+          echo "spring.profiles.active=dev" > src/main/resources/application.properties
 
       # ---------- JAVA ----------
       - name: Set up JDK 21
@@ -65,13 +75,24 @@ jobs:
           java-version: 21
 
       - name: Build Spring Boot WAR
-        run: mvn clean package -DskipTests
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "development" ]]; then
+            mvn clean package -DskipTests -Dspring-boot.run.profiles=dev
+          else
+            mvn clean package -DskipTests
+          fi
 
       # ---------- Install lftp ----------
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      # ---------- Deploy WAR via lftp ----------
+      # ---------- Create development.env ----------
+      - name: Create development.env
+        if: github.ref_name == 'development'
+        run: |
+          echo "SPRING_PROFILES_ACTIVE=dev" > development.env
+
+      # ---------- Deploy WAR + .env via lftp ----------
       - name: Deploy WAR via lftp
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
@@ -93,6 +114,11 @@ jobs:
 
             # Subir WAR directamente con el nombre correcto
             put -O $DEPLOY_PATH $WAR_FILE -o $DEPLOY_FILENAME
+
+            # Subir development.env solo si existe
+            $(if [[ "${GITHUB_REF_NAME}" == 'development' ]]; then
+                echo "put development.env -o $DEPLOY_PATH/development.env"
+              fi)
           "
 
       # ---------- Trigger Tomcat autoDeploy ----------

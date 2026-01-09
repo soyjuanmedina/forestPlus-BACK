@@ -21,6 +21,9 @@ public class TestConnection implements CommandLineRunner {
     public void run(String... args) throws Exception {
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
+        	
+            System.out.println("🔍 JDBC URL: " + conn.getMetaData().getURL());
+            System.out.println("🔍 JDBC USER: " + conn.getMetaData().getUserName());
 
             ResultSet rs = stmt.executeQuery("SELECT NOW()");
             if (rs.next()) {
