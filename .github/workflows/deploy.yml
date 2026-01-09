@@ -3,7 +3,7 @@ name: Build & Deploy Spring Boot + Angular
 on:
   push:
     branches:
-      - master
+      - main
       - development
 
 jobs:
