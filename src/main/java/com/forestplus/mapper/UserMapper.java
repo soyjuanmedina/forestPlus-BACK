@@ -31,6 +31,11 @@ public interface UserMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "lands", ignore = true)
+    @Mapping(target = "lastLoginAt", ignore = true)
+    @Mapping(target = "loginCount", ignore = true)
+    @Mapping(target = "loginErrorCount", ignore = true)
+    @Mapping(target = "accountLocked", ignore = true)
+    @Mapping(target = "receiveEmails", ignore = true)
     UserEntity toEntity(RegisterUserRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -40,5 +45,8 @@ public interface UserMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "lands", ignore = true)
+    @Mapping(target = "lastLoginAt", ignore = true)
+    @Mapping(target = "loginCount", ignore = true)
+    @Mapping(target = "loginErrorCount", ignore = true)
     UserEntity toEntity(RegisterUserByAdminRequest request);
 }
