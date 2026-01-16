@@ -8,6 +8,7 @@ import com.forestplus.entity.UserEntity;
 import com.forestplus.exception.EmailAlreadyExistsException;
 import com.forestplus.exception.ForestPlusException;
 import com.forestplus.mapper.UserMapper;
+import com.forestplus.model.RolesEnum;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
 
@@ -68,18 +69,22 @@ public class UserServiceImpl implements UserService {
         }
 
         String randomPassword = generateRandomPassword(8);
-        UserEntity user = userMapper.toEntity(request);
-        user.setPasswordHash(passwordEncoder.encode(randomPassword));
-        user.setForcePasswordChange(true);
-        user.setEmailVerified(true);
-        user.setUuid(null);
 
-        // --- Asignar compañía ---
-        if (request.getCompanyId() != null) {
-            CompanyEntity company = companyRepository.findById(request.getCompanyId())
-                    .orElseThrow(() -> new RuntimeException("Company not found with id " + request.getCompanyId()));
-            user.setCompany(company);
-        }
+        UserEntity user = UserEntity.builder()
+                .name(request.getName())
+                .surname(request.getSurname())
+                .secondSurname(request.getSecondSurname())
+                .email(request.getEmail())
+                .passwordHash(passwordEncoder.encode(randomPassword))
+                .role(request.getRole() != null ? request.getRole() : RolesEnum.USER)
+                .forcePasswordChange(true)
+                .emailVerified(true)
+                .uuid(null)
+                .company(request.getCompanyId() != null
+                         ? companyRepository.findById(request.getCompanyId())
+                               .orElseThrow(() -> new RuntimeException("Company not found with id " + request.getCompanyId()))
+                         : null)
+                .build();
 
         UserEntity saved = userRepository.save(user);
 
@@ -106,6 +111,7 @@ public class UserServiceImpl implements UserService {
             existing.setSurname(request.getSurname());
             existing.setSecondSurname(request.getSecondSurname());
             existing.setEmail(request.getEmail());
+            existing.setReceiveEmails(request.getReceiveEmails());
 
             if (request.getPassword() != null && !request.getPassword().isEmpty()) {
                 existing.setPasswordHash(passwordEncoder.encode(request.getPassword()));
@@ -133,6 +139,7 @@ public class UserServiceImpl implements UserService {
             existing.setSecondSurname(request.getSecondSurname());
             existing.setEmail(request.getEmail());
             existing.setRole(request.getRole());
+            existing.setReceiveEmails(request.getReceiveEmails());
 
             // --- Actualizar compañía ---
             if (request.getCompanyId() != null) {

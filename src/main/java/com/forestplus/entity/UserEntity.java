@@ -33,6 +33,25 @@ public class UserEntity {
     @Column(name = "second_surname")
     private String secondSurname;
     
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+    @Builder.Default
+    @Column(name = "login_count", nullable = false)
+    private Integer loginCount = 0;
+
+    @Builder.Default
+    @Column(name = "login_error_count", nullable = false)
+    private Integer loginErrorCount = 0;
+
+    @Builder.Default
+    @Column(name = "account_locked", nullable = false)
+    private Boolean accountLocked = false;
+
+    @Builder.Default
+    @Column(name = "receive_emails", nullable = false)
+    private Boolean receiveEmails = true;
+    
     private String picture; 
 
     // Relación con compañía

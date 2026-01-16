@@ -14,4 +14,7 @@ public class RegisterUserByAdminRequest {
     private Long companyId;
     private String picture;
     private Integer pendingTreesCount;
+    
+    private Boolean accountLocked;
+    private Boolean receiveEmails;
 }

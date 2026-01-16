@@ -1,4 +1,6 @@
 package com.forestplus.dto.response;
+import java.time.LocalDateTime;
+
 import com.forestplus.model.RolesEnum;
 
 import lombok.AllArgsConstructor;
@@ -28,5 +30,18 @@ public class UserResponse {
     private boolean emailVerified;
     private Boolean forcePasswordChange;
     private int pendingTreesCount;
+    
+    // --------------------
+    // Login / estado
+    // --------------------
+    private LocalDateTime lastLoginAt;
+    private Integer loginCount;
+    private Boolean accountLocked;
+
+    // --------------------
+    // Preferencias
+    // --------------------
+    private Boolean receiveEmails;
+    
     private CompanyResponse company;
 }
