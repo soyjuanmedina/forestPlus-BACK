@@ -11,6 +11,7 @@ public class RegisterUserRequest {
     private String secondSurname;
     private String email;
     private String password;
+    private Boolean receiveEmails;
     private RolesEnum role;
     private Long companyId;
     private String picture;

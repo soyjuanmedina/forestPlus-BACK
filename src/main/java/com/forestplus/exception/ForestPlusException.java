@@ -2,7 +2,7 @@ package com.forestplus.exception;
 
 import org.springframework.http.HttpStatus;
 
-public abstract class ForestPlusException extends RuntimeException {
+public class ForestPlusException extends RuntimeException {
     private final int status;
 
     public ForestPlusException(String message, int status) {

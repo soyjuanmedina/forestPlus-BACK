@@ -20,6 +20,7 @@ import com.forestplus.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -42,6 +43,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserMapper userMapper;
+    
+    private static final int MAX_LOGIN_ERRORS = 5;
     
     @Value("${app.frontend.url}")
     private String frontendUrl;
@@ -83,10 +86,21 @@ public class AuthService {
         return userMapper.toResponse(saved);
     }
 
+    @Transactional(noRollbackFor = WrongPasswordException.class)
     public AuthResponse login(String email, String password) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
+        
+        if (Boolean.TRUE.equals(user.getAccountLocked())) {
+            throw new ForestPlusException(HttpStatus.FORBIDDEN, "ACCOUNT_LOCKED");
+        }
+        
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+            user.setLoginErrorCount(user.getLoginErrorCount() + 1);
+            if (user.getLoginErrorCount() >= MAX_LOGIN_ERRORS) {
+                user.setAccountLocked(true);
+            }
+            userRepository.save(user);
             throw new WrongPasswordException();
         }
         if (!Boolean.TRUE.equals(user.getEmailVerified())) {
@@ -94,6 +108,10 @@ public class AuthService {
         }
         String token = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
+        user.setLastLoginAt(LocalDateTime.now());
+        user.setLoginCount(user.getLoginCount() + 1);
+        user.setLoginErrorCount(0);
+        userRepository.save(user);
         UserResponse userResponse = userMapper.toResponse(user);
         Boolean forcePasswordChange = user.getForcePasswordChange() ? true : null;
         return new AuthResponse(token, refreshToken,userResponse, forcePasswordChange);
@@ -159,6 +177,8 @@ public class AuthService {
                 .orElseThrow(() -> new UserNotFoundException("UUID_INVALIDO"));
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         user.setUuid(null);
+        user.setLoginErrorCount(0);
+        user.setAccountLocked(false);
         userRepository.save(user);
     }
 }
