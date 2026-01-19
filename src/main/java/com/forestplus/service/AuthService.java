@@ -19,6 +19,7 @@ import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuthService {
 
@@ -148,10 +150,15 @@ public class AuthService {
 
     @Transactional
     public void resetPassword(String email, ResetPasswordRequest request) {
+    	
+        log.info("Request to reset Password");
+
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
         
         if (request.getCurrentPassword() != null) {
+        	
+            log.info("Request to reset Password to user with current password"); 
             if (!passwordEncoder.matches(
                     request.getCurrentPassword(),
                     user.getPasswordHash()
