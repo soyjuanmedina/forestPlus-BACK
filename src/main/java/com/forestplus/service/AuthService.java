@@ -150,6 +150,19 @@ public class AuthService {
     public void resetPassword(String email, ResetPasswordRequest request) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
+        
+        if (request.getCurrentPassword() != null) {
+            if (!passwordEncoder.matches(
+                    request.getCurrentPassword(),
+                    user.getPasswordHash()
+            )) {
+                throw new ForestPlusException(
+                    HttpStatus.BAD_REQUEST,
+                    "CURRENT_PASSWORD_INVALID"
+                );
+            }
+        }
+        
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         user.setForcePasswordChange(false);
         userRepository.save(user);
