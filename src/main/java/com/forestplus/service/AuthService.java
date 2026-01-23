@@ -85,7 +85,7 @@ public class AuthService {
 
         String link = frontendUrl + "verify-email?uuid=" + verificationUuid;
         
-        // Enviar email de confirmación desde Loops
+        // Crear usuario en Loops
         Map<String, Object> contactProperties = new HashMap<>();
         contactProperties.put("firstName", user.getName());
         contactProperties.put("lastName", user.getSurname());
@@ -97,12 +97,8 @@ public class AuthService {
         
         Map<String, Object> eventProperties = new HashMap<>();
         eventProperties.put("verificationLink", link);
-        eventProperties.put("role", user.getRole().name());
 
-        if (user.getCompany() != null) {
-            eventProperties.put("companyId", user.getCompany().getId());
-        }
-
+        // Enviar email de confirmación desde Loops
         LoopsEventRequest loopsEvent = new LoopsEventRequest(
             user.getEmail(),
             "user_confirmation",

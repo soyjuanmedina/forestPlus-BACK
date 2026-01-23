@@ -1,7 +1,5 @@
 package com.forestplus.integrations.loops;
 
-import com.forestplus.integrations.loops.dto.LoopsEventRequest;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +10,15 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.forestplus.integrations.loops.dto.LoopsEventRequest;
+import com.forestplus.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class LoopsService {
 
     @Value("${loops.api.key}")
@@ -25,6 +31,8 @@ public class LoopsService {
     private String loopsContactsUrl;
 
     private final RestTemplate restTemplate = new RestTemplate();
+    
+    private final UserRepository userRepository;
     
     // -------------------------------------------------
     // 1️⃣ Crear / actualizar contacto (Audience)
@@ -61,5 +69,13 @@ public class LoopsService {
         } catch (Exception e) {
             System.err.println("Error enviando evento a Loops: " + e.getMessage());
         }
+    }
+    
+    public void contactUnsubscribed(String email) {
+        userRepository.findByEmail(email)
+            .ifPresent(user -> {
+                user.setReceiveEmails(false);
+                userRepository.save(user);
+            });
     }
 }
