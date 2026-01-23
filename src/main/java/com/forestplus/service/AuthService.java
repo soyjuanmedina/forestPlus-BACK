@@ -206,12 +206,17 @@ public class AuthService {
         userRepository.save(user);
 
         String link = frontendUrl + "reset-password?token=" + uuid;
-        Map<String, Object> vars = new HashMap<>();
-        vars.put("name", user.getName());
-        vars.put("link", link);
+        // Enviar email de confirmación desde Loops
+        Map<String, Object> eventProperties = new HashMap<>();
+        eventProperties.put("link", link);
+        
+        LoopsEventRequest loopsEvent = new LoopsEventRequest(
+            user.getEmail(),
+            "reset_password",
+            eventProperties
+        );
 
-        emailService.sendEmail(user.getEmail(), "Restablece tu contraseña en ForestPlus",
-                "contents/reset-password-content", vars);
+        loopsService.sendEvent(loopsEvent);
     }
 
     public void resetPasswordWithUuid(String uuid, String newPassword) {
