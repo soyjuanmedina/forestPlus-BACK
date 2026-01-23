@@ -13,6 +13,8 @@ import com.forestplus.exception.ForestPlusException;
 import com.forestplus.exception.UserNotFoundException;
 import com.forestplus.exception.UuidNotFoundException;
 import com.forestplus.exception.WrongPasswordException;
+import com.forestplus.integrations.loops.LoopsService;
+import com.forestplus.integrations.loops.dto.LoopsEventRequest;
 import com.forestplus.mapper.UserMapper;
 import com.forestplus.model.RolesEnum;
 import com.forestplus.repository.CompanyRepository;
@@ -45,6 +47,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserMapper userMapper;
+    private final LoopsService loopsService;
     
     private static final int MAX_LOGIN_ERRORS = 5;
     
@@ -80,10 +83,29 @@ public class AuthService {
 
         UserEntity saved = userRepository.save(user);
 
-        // Enviar email de confirmación
-        String subject = "Confirma tu correo en ForestPlus";
         String link = frontendUrl + "verify-email?uuid=" + verificationUuid;
-        emailService.sendVerificationEmail(user.getEmail(), user.getName(), link);
+        
+        // Crear usuario en Loops
+        Map<String, Object> contactProperties = new HashMap<>();
+        contactProperties.put("firstName", user.getName());
+        contactProperties.put("lastName", user.getSurname());
+
+        loopsService.upsertContact(
+            user.getEmail(),
+            contactProperties
+        );
+        
+        Map<String, Object> eventProperties = new HashMap<>();
+        eventProperties.put("verificationLink", link);
+
+        // Enviar email de confirmación desde Loops
+        LoopsEventRequest loopsEvent = new LoopsEventRequest(
+            user.getEmail(),
+            "user_confirmation",
+            eventProperties
+        );
+
+        loopsService.sendEvent(loopsEvent);
 
         return userMapper.toResponse(saved);
     }
