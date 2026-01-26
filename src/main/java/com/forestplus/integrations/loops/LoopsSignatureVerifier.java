@@ -39,8 +39,11 @@ public class LoopsSignatureVerifier {
             SecretKeySpec key =
                     new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
             mac.init(key);
+
             byte[] rawHmac = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(rawHmac);
+
+            // Devuelve Base64, que es lo que Loops envía
+            return java.util.Base64.getEncoder().encodeToString(rawHmac);
         } catch (Exception e) {
             throw new IllegalStateException("Error verifying Loops signature", e);
         }
