@@ -144,6 +144,17 @@ public class AuthService {
     public void verifyEmail(String uuid) {
         UserEntity user = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new UuidNotFoundException(uuid));
+        // Enviar email de confirmación desde Loops
+        String link = frontendUrl;
+        Map<String, Object> eventProperties = new HashMap<>();
+        eventProperties.put("link", link);
+        
+        LoopsEventRequest loopsEvent = new LoopsEventRequest(
+            user.getEmail(),
+            "verifyEmail",
+            eventProperties
+        );
+        loopsService.sendEvent(loopsEvent);
         user.setEmailVerified(true);
         userRepository.save(user);
     }
