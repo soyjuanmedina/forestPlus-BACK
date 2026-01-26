@@ -57,6 +57,12 @@ public class LoopsWebhookController {
             );
         }
         
+        if (event.isContactResubscribed()) {
+            event.getEmailAddress().ifPresent(email ->
+                loopsService.contactResubscribed(email)
+            );
+        }
+        
         return ResponseEntity.ok().build();
     }
 }

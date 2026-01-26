@@ -72,9 +72,21 @@ public class LoopsService {
     }
     
     public void contactUnsubscribed(String email) {
+    	log.info("[contactUnsubscribed]: Unsubscribing email {}", email);
         userRepository.findByEmail(email)
             .ifPresent(user -> {
+            	log.info("[contactUnsubscribed]: User find");
                 user.setReceiveEmails(false);
+                userRepository.save(user);
+            });
+    }
+    
+    public void contactResubscribed(String email) {
+    	log.info("[contactResubscribed]: Resubscribing email {}", email);
+        userRepository.findByEmail(email)
+            .ifPresent(user -> {
+            	log.info("[contactResubscribed]: User find");
+                user.setReceiveEmails(true);
                 userRepository.save(user);
             });
     }

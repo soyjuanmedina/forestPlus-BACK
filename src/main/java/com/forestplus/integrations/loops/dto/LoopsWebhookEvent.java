@@ -22,6 +22,10 @@ public class LoopsWebhookEvent {
     public boolean isContactUnsubscribed() {
         return "contact.unsubscribed".equals(eventName);
     }
+    
+    public boolean isContactResubscribed() {
+        return "contact.resubscribed".equals(eventName);
+    }
 
     public Optional<String> getEmailAddress() {
         if (contactIdentity != null) {
