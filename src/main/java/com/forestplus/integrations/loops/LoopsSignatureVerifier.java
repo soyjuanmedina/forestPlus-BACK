@@ -22,10 +22,11 @@ public class LoopsSignatureVerifier {
     private String signingSecret;
 
     public boolean isValid(String headerSignature, String payload) {
-    	
-    	log.info("Expected: v1={}", hmacSha256(payload, signingSecret));
-        // header suele venir como: "v1=abcdef..."
-        String expected = "v1=" + hmacSha256(payload, signingSecret);
+
+        String expected = hmacSha256(payload, signingSecret); // SIN v1=
+        log.info("Expected signature: {}", expected);
+        log.info("Header signature: {}", headerSignature);
+
         return MessageDigest.isEqual(
                 expected.getBytes(StandardCharsets.UTF_8),
                 headerSignature.getBytes(StandardCharsets.UTF_8)
