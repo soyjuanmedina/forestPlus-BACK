@@ -51,13 +51,13 @@ public class LoopsWebhookController {
         LoopsWebhookEvent event =
                 objectMapper.readValue(rawBody, LoopsWebhookEvent.class);
 
-        if (event.isContactUnsubscribed()) {
+        if (event.isEmailUnsubscribed()) {
             event.getEmailAddress().ifPresent(email ->
                 loopsService.contactUnsubscribed(email)
             );
         }
         
-        if (event.isContactResubscribed()) {
+        if (event.isEmailResubscribed()) {
             event.getEmailAddress().ifPresent(email ->
                 loopsService.contactResubscribed(email)
             );

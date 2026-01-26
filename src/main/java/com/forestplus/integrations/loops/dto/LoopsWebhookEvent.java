@@ -19,12 +19,12 @@ public class LoopsWebhookEvent {
 
     // getters y setters
 
-    public boolean isContactUnsubscribed() {
-        return "contact.unsubscribed".equals(eventName);
+    public boolean isEmailUnsubscribed() {
+        return "email.unsubscribed".equals(eventName);
     }
     
-    public boolean isContactResubscribed() {
-        return "contact.resubscribed".equals(eventName);
+    public boolean isEmailResubscribed() {
+        return "email.resubscribed".equals(eventName);
     }
 
     public Optional<String> getEmailAddress() {
