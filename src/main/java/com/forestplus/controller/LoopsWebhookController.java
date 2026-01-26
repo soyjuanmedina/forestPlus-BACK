@@ -1,8 +1,5 @@
 package com.forestplus.controller;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,13 +30,11 @@ public class LoopsWebhookController {
 
     @PostMapping
     public ResponseEntity<Void> handleWebhook(
-            @RequestHeader("X-Loops-Signature") String signature,
+    		@RequestHeader("Webhook-Signature") String signature,
+    		@RequestHeader("Webhook-Id") String webhookId,
+    		@RequestHeader("Webhook-Timestamp") String webhookTimestamp,
             @RequestBody String rawBody
     ) {
-    	
-    	log.info("RAW BODY (len={}): >>>{}<<<", rawBody.length(), rawBody);
-    	log.info("RAW BODY bytes: {}", Arrays.toString(rawBody.getBytes(StandardCharsets.UTF_8)));
-    	log.info("Signature header: {}", signature);
 
         if (!loopsSignatureVerifier.isValid(signature, rawBody)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
