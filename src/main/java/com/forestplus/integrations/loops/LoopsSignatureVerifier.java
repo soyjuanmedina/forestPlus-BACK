@@ -22,6 +22,10 @@ public class LoopsSignatureVerifier {
     private String signingSecret;
 
     public boolean isValid(String headerSignature, String payload) {
+    	
+    	if (headerSignature.startsWith("v1,")) {
+    	    headerSignature = headerSignature.substring(3);
+    	}
 
         String expected = hmacSha256(payload, signingSecret); // SIN v1=
         log.info("Expected signature: {}", expected);

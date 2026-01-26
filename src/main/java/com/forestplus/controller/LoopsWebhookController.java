@@ -35,8 +35,10 @@ public class LoopsWebhookController {
     		@RequestHeader("Webhook-Timestamp") String webhookTimestamp,
             @RequestBody String rawBody
     ) {
+    	
+    	String signedContent = webhookId + "." + webhookTimestamp + "." + rawBody;
 
-        if (!loopsSignatureVerifier.isValid(signature, rawBody)) {
+        if (!loopsSignatureVerifier.isValid(signature, signedContent)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
