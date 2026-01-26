@@ -1,5 +1,8 @@
 package com.forestplus.controller;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +18,7 @@ import com.forestplus.integrations.loops.LoopsSignatureVerifier;
 import com.forestplus.integrations.loops.dto.LoopsWebhookEvent;
 import com.forestplus.service.AuthService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,43 +34,25 @@ public class LoopsWebhookController {
 
     @PostMapping
     public ResponseEntity<Void> handleWebhook(
-    		@RequestHeader("Webhook-Signature") String signature,
-    		@RequestHeader("Webhook-Id") String webhookId,
-    		@RequestHeader("Webhook-Timestamp") String webhookTimestamp,
-            @RequestBody String rawBody
-    ) {
-    	
-    	String signedContent = webhookId + "." + webhookTimestamp + "." + rawBody;
-    	
-        // Logs para depuración
-        log.info("📨 Header Webhook-Signature: {}", signature);
-        log.info("🆔 Webhook-Id: {}", webhookId);
-        log.info("⏱ Webhook-Timestamp: {}", webhookTimestamp);
-        log.info("🖋 Raw body length: {}, first 200 chars: {}", rawBody.length(),
-                 rawBody.substring(0, Math.min(rawBody.length(), 200)));
-        log.info("🔐 Signed content used for HMAC (first 200 chars): {}", 
-                 signedContent.substring(0, Math.min(signedContent.length(), 200)));
+            @RequestHeader("Webhook-Signature") String signature,
+            @RequestHeader("Webhook-Id") String webhookId,
+            @RequestHeader("Webhook-Timestamp") String webhookTimestamp,
+            HttpServletRequest request
+    ) throws IOException {
+
+        byte[] rawBytes = request.getInputStream().readAllBytes();
+        String rawBody = new String(rawBytes, StandardCharsets.UTF_8);
+
+        String signedContent = webhookId + "." + webhookTimestamp + "." + rawBody;
+
+        log.info("Signed content used for HMAC: {}", signedContent);
+        log.info("Header signature: {}", signature);
 
         if (!loopsSignatureVerifier.isValid(signature, signedContent)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        try {
-            LoopsWebhookEvent event =
-                    objectMapper.readValue(rawBody, LoopsWebhookEvent.class);
-
-            if (event.isContactUnsubscribed()) {
-                event.getEmailAddress().ifPresent(email ->
-                    loopsService.contactUnsubscribed(email)
-                );
-            }
-
-        } catch (JsonProcessingException e) {
-            // ❌ payload inválido o esquema cambiado
-            log.error("Invalid Loops webhook payload", e);
-            return ResponseEntity.badRequest().build();
-        }
-
+        // procesar payload
         return ResponseEntity.ok().build();
     }
 }
