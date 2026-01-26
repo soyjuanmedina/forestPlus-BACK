@@ -43,16 +43,20 @@ public class LoopsWebhookController {
         byte[] rawBytes = request.getInputStream().readAllBytes();
         String rawBody = new String(rawBytes, StandardCharsets.UTF_8);
 
-        String signedContent = webhookId + "." + webhookTimestamp + "." + rawBody;
-
-        log.info("Signed content used for HMAC: {}", signedContent);
-        log.info("Header signature: {}", signature);
-
-        if (!loopsSignatureVerifier.isValid(signature, signedContent)) {
+        if (!loopsSignatureVerifier.isValid(signature, webhookId, webhookTimestamp, rawBody)) {
+            log.warn("Invalid Loops webhook signature!");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        
+        LoopsWebhookEvent event =
+                objectMapper.readValue(rawBody, LoopsWebhookEvent.class);
 
-        // procesar payload
+        if (event.isContactUnsubscribed()) {
+            event.getEmailAddress().ifPresent(email ->
+                loopsService.contactUnsubscribed(email)
+            );
+        }
+        
         return ResponseEntity.ok().build();
     }
 }
