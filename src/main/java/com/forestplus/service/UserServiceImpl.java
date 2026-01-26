@@ -110,6 +110,8 @@ public class UserServiceImpl implements UserService {
             "register_user_by_admin",
             eventProperties
         );
+        
+        loopsService.sendEvent(loopsEvent);
 
         return userMapper.toResponse(saved);
     }
