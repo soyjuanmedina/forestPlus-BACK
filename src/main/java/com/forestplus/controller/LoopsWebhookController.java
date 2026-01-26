@@ -37,6 +37,15 @@ public class LoopsWebhookController {
     ) {
     	
     	String signedContent = webhookId + "." + webhookTimestamp + "." + rawBody;
+    	
+        // Logs para depuración
+        log.info("📨 Header Webhook-Signature: {}", signature);
+        log.info("🆔 Webhook-Id: {}", webhookId);
+        log.info("⏱ Webhook-Timestamp: {}", webhookTimestamp);
+        log.info("🖋 Raw body length: {}, first 200 chars: {}", rawBody.length(),
+                 rawBody.substring(0, Math.min(rawBody.length(), 200)));
+        log.info("🔐 Signed content used for HMAC (first 200 chars): {}", 
+                 signedContent.substring(0, Math.min(signedContent.length(), 200)));
 
         if (!loopsSignatureVerifier.isValid(signature, signedContent)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
