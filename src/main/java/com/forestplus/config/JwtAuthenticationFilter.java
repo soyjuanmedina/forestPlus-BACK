@@ -1,5 +1,6 @@
 package com.forestplus.config;
 
+import com.forestplus.controller.LoopsWebhookController;
 import com.forestplus.service.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -10,6 +11,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,6 +28,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final CustomUserDetailsService userDetailsService;
@@ -121,7 +125,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
 
-        return path.startsWith("/api/webhooks/loops")
-            || path.startsWith("/development/api/webhooks/loops");
+        boolean skip = path.startsWith("/api/webhooks/loops")
+                    || path.startsWith("/development/api/webhooks/loops");
+
+        log.info("📡 shouldNotFilter check for path: {} → skip={}", path, skip);
+
+        return skip;
     }
 }

@@ -10,13 +10,20 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.forestplus.controller.LoopsWebhookController;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class LoopsSignatureVerifier {
 
     @Value("${loops.signing.secret}")
     private String signingSecret;
 
     public boolean isValid(String headerSignature, String payload) {
+    	
+    	log.info("Expected: v1={}", hmacSha256(payload, signingSecret));
         // header suele venir como: "v1=abcdef..."
         String expected = "v1=" + hmacSha256(payload, signingSecret);
         return MessageDigest.isEqual(
