@@ -48,6 +48,7 @@ public class LandServiceImpl implements LandService {
                 .orElseThrow(() -> new RuntimeException("Land not found"));
 
         land.setName(request.getName());
+        land.setDescription(request.getDescription());
         land.setLocation(request.getLocation());
         land.setArea(request.getArea());
         land.setPicture(request.getPicture());

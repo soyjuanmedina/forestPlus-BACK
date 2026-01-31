@@ -13,6 +13,7 @@ import java.util.List;
 public class LandRequest {
 
     private String name;
+    private String description;
     private String location;
     private BigDecimal area;
     private List<Long> userIds;

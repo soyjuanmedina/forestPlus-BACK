@@ -14,6 +14,7 @@ import java.util.List;
 public class LandResponse {
     private Long id;
     private String name;
+    private String description;
     private String location;
     private BigDecimal area;
     private String picture;

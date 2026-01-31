@@ -13,6 +13,8 @@ import com.forestplus.entity.PlannedPlantationEntity;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.exception.ForestPlusException;
 import com.forestplus.exception.ResourceNotFoundException;
+import com.forestplus.integrations.loops.LoopsService;
+import com.forestplus.integrations.loops.dto.LoopsEventRequest;
 import com.forestplus.mapper.TreeMapper;
 import com.forestplus.entity.CompanyEntity;
 import com.forestplus.repository.TreeRepository;
@@ -28,6 +30,7 @@ import com.forestplus.repository.CompanyRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -35,7 +38,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -43,6 +48,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TreeServiceImpl implements TreeService {
 
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
     
 	private final CurrentUserService currentUserService;
 	private final TreeRepository treeRepository;
@@ -52,6 +59,7 @@ public class TreeServiceImpl implements TreeService {
     private final CompanyRepository companyRepository;
 	private final PlannedPlantationRepository plannedPlantationRepository;
     private final TreeMapper treeMapper;
+    private final LoopsService loopsService;
 
     @Override
     public List<TreeResponse> getAllTrees() {
@@ -233,26 +241,44 @@ public class TreeServiceImpl implements TreeService {
             trees.add(tree);
         }
         
-     // ==============================
-     // 🔹 Restar árboles pendientes del usuario
-     // ==============================
-     if (ownerUser != null) {
-         int newPending = Math.max(ownerUser.getPendingTreesCount() - toPlant, 0);
-         ownerUser.setPendingTreesCount(newPending);
-         userRepository.save(ownerUser);
+	     // ==============================
+	     // 🔹 Restar árboles pendientes del usuario
+	     // ==============================
+	     if (ownerUser != null) {
+	         int newPending = Math.max(ownerUser.getPendingTreesCount() - toPlant, 0);
+	         ownerUser.setPendingTreesCount(newPending);
+	         userRepository.save(ownerUser);
      }
 
-        treeRepository.saveAll(trees);
+    treeRepository.saveAll(trees);
+    
+    // ==============================
+    // Mandar mail al usuario
+    // ==============================
+    String link = frontendUrl;
+    
+    Map<String, Object> buyerEventProperties = new HashMap<>();
+    buyerEventProperties.put("landName", land.getName());
+    buyerEventProperties.put("quantity", request.getQuantity());
+    buyerEventProperties.put("link", link);
+    
+    LoopsEventRequest buyerLoopsEvent = new LoopsEventRequest(
+    	ownerUser.getEmail(),
+        "assigned_tree",
+        buyerEventProperties
+    );
 
-        // ==============================
-        // 🔹 Marcar terreno lleno si corresponde
-        // ==============================
-        if (land.getMaxTrees() != null && toPlant == available) {
-            land.setIsFull(true);
-            landRepository.save(land);
-        }
+    loopsService.sendEvent(buyerLoopsEvent);
 
-        return new TreeBatchPlantResponse(toPlant, request.getQuantity() - toPlant, "OK");
+    // ==============================
+    // 🔹 Marcar terreno lleno si corresponde
+    // ==============================
+    if (land.getMaxTrees() != null && toPlant == available) {
+        land.setIsFull(true);
+        landRepository.save(land);
+    }
+
+    return new TreeBatchPlantResponse(toPlant, request.getQuantity() - toPlant, "OK");
     }
 
     

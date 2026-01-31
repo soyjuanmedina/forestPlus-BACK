@@ -13,12 +13,15 @@ import com.forestplus.exception.ForestPlusException;
 import com.forestplus.exception.UserNotFoundException;
 import com.forestplus.exception.UuidNotFoundException;
 import com.forestplus.exception.WrongPasswordException;
+import com.forestplus.integrations.loops.LoopsService;
+import com.forestplus.integrations.loops.dto.LoopsEventRequest;
 import com.forestplus.mapper.UserMapper;
 import com.forestplus.model.RolesEnum;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -34,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuthService {
 
@@ -43,6 +47,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserMapper userMapper;
+    private final LoopsService loopsService;
     
     private static final int MAX_LOGIN_ERRORS = 5;
     
@@ -78,10 +83,29 @@ public class AuthService {
 
         UserEntity saved = userRepository.save(user);
 
-        // Enviar email de confirmación
-        String subject = "Confirma tu correo en ForestPlus";
         String link = frontendUrl + "verify-email?uuid=" + verificationUuid;
-        emailService.sendVerificationEmail(user.getEmail(), user.getName(), link);
+        
+        // Crear usuario en Loops
+        Map<String, Object> contactProperties = new HashMap<>();
+        contactProperties.put("firstName", user.getName());
+        contactProperties.put("lastName", user.getSurname());
+
+        loopsService.upsertContact(
+            user.getEmail(),
+            contactProperties
+        );
+        
+        Map<String, Object> eventProperties = new HashMap<>();
+        eventProperties.put("verificationLink", link);
+
+        // Enviar email de confirmación desde Loops
+        LoopsEventRequest loopsEvent = new LoopsEventRequest(
+            user.getEmail(),
+            "user_confirmation",
+            eventProperties
+        );
+
+        loopsService.sendEvent(loopsEvent);
 
         return userMapper.toResponse(saved);
     }
@@ -120,6 +144,17 @@ public class AuthService {
     public void verifyEmail(String uuid) {
         UserEntity user = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new UuidNotFoundException(uuid));
+        // Enviar email de confirmación desde Loops
+        String link = frontendUrl;
+        Map<String, Object> eventProperties = new HashMap<>();
+        eventProperties.put("link", link);
+        
+        LoopsEventRequest loopsEvent = new LoopsEventRequest(
+            user.getEmail(),
+            "verifyEmail",
+            eventProperties
+        );
+        loopsService.sendEvent(loopsEvent);
         user.setEmailVerified(true);
         userRepository.save(user);
     }
@@ -148,8 +183,26 @@ public class AuthService {
 
     @Transactional
     public void resetPassword(String email, ResetPasswordRequest request) {
+    	
+        log.info("Request to reset Password");
+
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
+        
+        if (request.getCurrentPassword() != null) {
+        	
+            log.info("Request to reset Password to user with current password"); 
+            if (!passwordEncoder.matches(
+                    request.getCurrentPassword(),
+                    user.getPasswordHash()
+            )) {
+                throw new ForestPlusException(
+                    HttpStatus.BAD_REQUEST,
+                    "CURRENT_PASSWORD_INVALID"
+                );
+            }
+        }
+        
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         user.setForcePasswordChange(false);
         userRepository.save(user);
@@ -164,12 +217,17 @@ public class AuthService {
         userRepository.save(user);
 
         String link = frontendUrl + "reset-password?token=" + uuid;
-        Map<String, Object> vars = new HashMap<>();
-        vars.put("name", user.getName());
-        vars.put("link", link);
+        // Enviar email de confirmación desde Loops
+        Map<String, Object> eventProperties = new HashMap<>();
+        eventProperties.put("link", link);
+        
+        LoopsEventRequest loopsEvent = new LoopsEventRequest(
+            user.getEmail(),
+            "reset_password",
+            eventProperties
+        );
 
-        emailService.sendEmail(user.getEmail(), "Restablece tu contraseña en ForestPlus",
-                "contents/reset-password-content", vars);
+        loopsService.sendEvent(loopsEvent);
     }
 
     public void resetPasswordWithUuid(String uuid, String newPassword) {

@@ -7,13 +7,17 @@ import com.forestplus.entity.CompanyEntity;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.exception.EmailAlreadyExistsException;
 import com.forestplus.exception.ForestPlusException;
+import com.forestplus.integrations.loops.LoopsService;
+import com.forestplus.integrations.loops.dto.LoopsEventRequest;
 import com.forestplus.mapper.UserMapper;
 import com.forestplus.model.RolesEnum;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,12 +30,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+	
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository; // <--- nuevo
@@ -39,6 +48,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final EmailService emailService;
     private final FileStorageService fileStorageService;
+    private final LoopsService loopsService;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -88,18 +98,20 @@ public class UserServiceImpl implements UserService {
 
         UserEntity saved = userRepository.save(user);
 
-        // Enviar email con contraseña generada
-        Map<String, Object> vars = new HashMap<>();
-        vars.put("name", saved.getName());
-        vars.put("email", saved.getEmail());
-        vars.put("password", randomPassword);
+        // Enviar email con la password desde Loops      
+        String link = frontendUrl;
+        
+        Map<String, Object> eventProperties = new HashMap<>();
+        eventProperties.put("link", link);
+        eventProperties.put("password", randomPassword);
 
-        emailService.sendEmail(
-                saved.getEmail(),
-                "Tu nueva cuenta en ForestPlus",
-                "contents/new-account-content",
-                vars
+        LoopsEventRequest loopsEvent = new LoopsEventRequest(
+        	saved.getEmail(),
+            "register_user_by_admin",
+            eventProperties
         );
+        
+        loopsService.sendEvent(loopsEvent);
 
         return userMapper.toResponse(saved);
     }
@@ -107,6 +119,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateUser(Long id, RegisterUserRequest request) {
         return userRepository.findById(id).map(existing -> {
+        	
+        	// If any change in Loops data communicate to them
+        	syncWithLoopsIfNeeded(existing, request.getName(), request.getSurname(), request.getReceiveEmails());
+        	
             existing.setName(request.getName());
             existing.setSurname(request.getSurname());
             existing.setSecondSurname(request.getSecondSurname());
@@ -134,6 +150,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateUserByAdmin(Long id, RegisterUserByAdminRequest request) {
         return userRepository.findById(id).map(existing -> {
+        	
+        	// If any change in Loops data communicate to them
+        	syncWithLoopsIfNeeded(existing, request.getName(), request.getSurname(), request.getReceiveEmails());
+        	
             existing.setName(request.getName());
             existing.setSurname(request.getSurname());
             existing.setSecondSurname(request.getSecondSurname());
@@ -163,6 +183,26 @@ public class UserServiceImpl implements UserService {
             return userMapper.toResponse(updated);
         }).orElseThrow(() -> new RuntimeException("User not found with id " + id));
     }
+    
+    private void syncWithLoopsIfNeeded(
+    	    UserEntity existing,
+    	    String name,
+    	    String surname,
+    	    Boolean receiveEmails
+    	) {
+    	    if (!Objects.equals(existing.getName(), name) ||
+    	        !Objects.equals(existing.getSurname(), surname) ||
+    	        !Objects.equals(existing.getReceiveEmails(), receiveEmails)) {
+
+    	        log.info("Updating user in Loops");
+    	        Map<String, Object> contactProperties = new HashMap<>();
+    	        contactProperties.put("firstName", name);
+    	        contactProperties.put("lastName", surname);
+    	        contactProperties.put("subscribed", receiveEmails);
+
+    	        loopsService.upsertContact(existing.getEmail(), contactProperties);
+    	    }
+    	}
 
     @Override
     public void deleteUser(Long id) {

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LandUpdateRequest {
     private String name;
+    private String description;
     private String location;
     private BigDecimal area;
     private String picture;
