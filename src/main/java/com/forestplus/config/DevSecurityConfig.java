@@ -67,8 +67,8 @@ public class DevSecurityConfig {
     public UserDetailsService devUserDetailsService(PasswordEncoder encoder) {
 
         return new InMemoryUserDetailsManager(
-            User.withUsername("dev")
-                .password(encoder.encode("clave-dev-fuerte"))
+                User.withUsername("dev")    // usuario fijo
+                .password("{noop}clave") // contraseña sin encriptar
                 .roles("DEV")
                 .build()
         );
