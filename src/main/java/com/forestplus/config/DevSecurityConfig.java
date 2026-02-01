@@ -28,36 +28,11 @@ public class DevSecurityConfig {
     public SecurityFilterChain devSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            .cors(cors -> {})
             .csrf(csrf -> csrf.disable())
-
-            // 👈 IMPORTANTE: permitir sesión
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            )
-
-            // 🔐 TODO protegido por el candado
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/login",
-                    "/error",
-                    "/*.js",
-                    "/*.css",
-                    "/assets/**"
-                ).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().authenticated() // TODO el WAR dev protegido
             )
-
-            // 🔐 Login de entorno
-            .formLogin(form -> form
-                .defaultSuccessUrl("/", true)
-            )
-
-            // 🔓 JWT sigue funcionando después
-            .addFilterBefore(
-                jwtFilter,
-                UsernamePasswordAuthenticationFilter.class
-            );
+            .httpBasic(); // 👈 usa la ventana de login del navegador, muy simple
 
         return http.build();
     }
