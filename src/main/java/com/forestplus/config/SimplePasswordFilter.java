@@ -31,31 +31,28 @@ public class SimplePasswordFilter implements Filter {
 
         String path = request.getRequestURI();
 
-        // ✅ NO proteger la API
-        if (path.startsWith("/api/") || path.startsWith("/development/api/")) {
+        // 🔓 TODO pasa excepto la raíz /development/
+        if (!path.equals("/development/")) {
             chain.doFilter(req, res);
             return;
         }
 
-        // Si ya pasó el candado, deja pasar
+        // 🔐 Revisar si ya autorizado
         Boolean authorized = (Boolean) session.getAttribute("AUTHORIZED");
         if (authorized != null && authorized) {
             chain.doFilter(req, res);
             return;
         }
 
-        // Si envían la contraseña por POST, comprueba
+        // 🔐 Comprobar contraseña enviada
         if ("POST".equalsIgnoreCase(request.getMethod())
-                && request.getParameter("password") != null) {
-
-            if (PASSWORD.equals(request.getParameter("password"))) {
-                session.setAttribute("AUTHORIZED", true);
-                response.sendRedirect(request.getRequestURI());
-                return;
-            }
+                && PASSWORD.equals(request.getParameter("password"))) {
+            session.setAttribute("AUTHORIZED", true);
+            response.sendRedirect(request.getRequestURI());
+            return;
         }
 
-        // Mostrar formulario
+        // 🔐 Mostrar formulario
         response.setContentType("text/html;charset=UTF-8");
         response.getWriter().write(
             "<html><body style='font-family:sans-serif;display:flex;flex-direction:column;align-items:center;margin-top:100px'>" +
