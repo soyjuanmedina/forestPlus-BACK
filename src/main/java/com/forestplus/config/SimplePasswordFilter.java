@@ -29,6 +29,14 @@ public class SimplePasswordFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpSession session = request.getSession();
 
+        String path = request.getRequestURI();
+
+        // ✅ NO proteger la API
+        if (path.startsWith("/api/")) {
+            chain.doFilter(req, res);
+            return;
+        }
+
         // Si ya pasó el candado, deja pasar
         Boolean authorized = (Boolean) session.getAttribute("AUTHORIZED");
         if (authorized != null && authorized) {
@@ -37,17 +45,18 @@ public class SimplePasswordFilter implements Filter {
         }
 
         // Si envían la contraseña por POST, comprueba
-        if ("POST".equalsIgnoreCase(request.getMethod()) && request.getParameter("password") != null) {
-            String pass = request.getParameter("password");
-            if (PASSWORD.equals(pass)) {
+        if ("POST".equalsIgnoreCase(request.getMethod())
+                && request.getParameter("password") != null) {
+
+            if (PASSWORD.equals(request.getParameter("password"))) {
                 session.setAttribute("AUTHORIZED", true);
                 response.sendRedirect(request.getRequestURI());
                 return;
             }
         }
 
-        // Si no está autorizado, muestra un form simple
-        response.setContentType("text/html");
+        // Mostrar formulario
+        response.setContentType("text/html;charset=UTF-8");
         response.getWriter().write(
             "<html><body style='font-family:sans-serif;display:flex;flex-direction:column;align-items:center;margin-top:100px'>" +
             "<h2>Entorno de pruebas</h2>" +
