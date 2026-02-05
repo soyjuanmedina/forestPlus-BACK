@@ -8,8 +8,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
@@ -17,7 +15,6 @@ import org.springframework.core.annotation.Order;
 import java.io.IOException;
 
 @Configuration
-@Slf4j
 @Profile("dev") // solo se aplica en development
 @Order(1)      // se ejecuta antes que cualquier otra cosa
 public class SimplePasswordFilter implements Filter {
@@ -33,11 +30,9 @@ public class SimplePasswordFilter implements Filter {
         HttpSession session = request.getSession();
 
         String path = request.getRequestURI();
-        
-        log.info("[doFilter] Path request: {}", path);
 
         // ✅ NO proteger la API
-        if (path.startsWith("/api/")) {
+        if (path.startsWith("/api/") || path.startsWith("/development/api/")) {
             chain.doFilter(req, res);
             return;
         }
