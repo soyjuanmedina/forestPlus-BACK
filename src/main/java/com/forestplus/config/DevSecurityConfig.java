@@ -39,7 +39,8 @@ public class DevSecurityConfig {
                     "/ping",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
-                    "/swagger-ui.html"
+                    "/swagger-ui.html",
+                    "/api/loops/waitlist" 
                 ).permitAll()
 
                 // 🔓 API dev (pero con JWT)
