@@ -264,8 +264,10 @@ public class UserServiceImpl implements UserService {
         System.out.println("📁 Guardando imagen para usuario " + id + ", original filename: " 
                             + file.getOriginalFilename());
 
+        String imageUuid = UUID.randomUUID().toString();
+        
         // 2️⃣ Guardar la imagen con id para evitar colisiones
-        String imageUrl = fileStorageService.storeFile(file, "users", user.getUuid());
+        String imageUrl = fileStorageService.storeFile(file, "users", imageUuid);
         
         System.out.println("Imagen guardada en: " + imageUrl);
 

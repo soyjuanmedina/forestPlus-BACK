@@ -1,6 +1,7 @@
 package com.forestplus.service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -103,7 +104,9 @@ public class TreeTypeServiceImpl implements TreeTypeService {
     		    .orElseThrow(() -> new ForestPlusException(HttpStatus.NOT_FOUND,
     		        "No se encontró el tipo de árbol con id " + id) {});
 
-        String imageUrl = fileStorageService.storeFile(file, "tree-types", entity.getId());
+        String imageUuid = UUID.randomUUID().toString();
+        
+        String imageUrl = fileStorageService.storeFile(file, "tree-types", imageUuid);
         entity.setPicture(imageUrl);
 
         treeTypeRepository.save(entity);

@@ -72,11 +72,6 @@ public class FileStorageServiceImpl implements FileStorageService {
             throw new RuntimeException("Error al guardar el archivo", e);
         }
     }
-    
-    @Override
-    public String storeFile(MultipartFile file, String subdirectory, Long id) {
-        return storeFile(file, subdirectory, String.valueOf(id));
-    }
 
     @Override
     public String getFileUrl(String filename) {
