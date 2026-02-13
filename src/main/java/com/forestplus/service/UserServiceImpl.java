@@ -265,8 +265,7 @@ public class UserServiceImpl implements UserService {
                             + file.getOriginalFilename());
 
         // 2️⃣ Guardar la imagen con id para evitar colisiones
-        String imageUrl = fileStorageService.storeFile(file, "users", user.getId());
-        // Ejemplo de storeFile: /uploads/users/{uuid}-{originalFilename}
+        String imageUrl = fileStorageService.storeFile(file, "users", user.getUuid());
         
         System.out.println("Imagen guardada en: " + imageUrl);
 

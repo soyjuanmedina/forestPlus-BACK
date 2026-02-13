@@ -14,7 +14,12 @@ public interface FileStorageService {
      * @param id id con el que se guardará el archivo
      * @return ruta o URL de acceso al archivo
      */
-    String storeFile(MultipartFile file, String subdirectory, Long id);
+    String storeFile(MultipartFile file, String subdirectory, String uuid);
+    
+ // Sobrecarga para compatibilidad con Long (id de usuario)
+    default String storeFile(MultipartFile file, String subdirectory, Long id) {
+        return storeFile(file, subdirectory, String.valueOf(id));
+    }
 
     /**
      * Elimina un archivo si es necesario.
