@@ -43,6 +43,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.GrantedAuthority;
 
 @Service
 @RequiredArgsConstructor
@@ -106,44 +109,67 @@ public class TreeServiceImpl implements TreeService {
     @Override
     @Transactional
     public TreeResponse updateTree(Long id, TreeUpdateRequest request) {
+
         TreeEntity tree = treeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tree not found with id " + id));
 
-        // Actualizar campos simples con mapper
+        if (isAdmin()) {
+            updateAsAdmin(tree, request);
+        } else {
+            updateAsUser(tree, request);
+        }
+
+        return treeMapper.toResponse(treeRepository.save(tree));
+    }
+    
+    private void updateAsUser(TreeEntity tree, TreeUpdateRequest request) {
+        if (request.getCustomName() != null) {
+            tree.setCustomName(request.getCustomName());
+        }
+    }
+    
+    private void updateAsAdmin(TreeEntity tree, TreeUpdateRequest request) {
+
+        // Campos simples
         treeMapper.updateEntityFromDto(request, tree);
 
-        // Relaciones (land, treeType, ownerUser, ownerCompany)
+        // Relaciones
         if (request.getLandId() != null) {
-            tree.setLand(landRepository.findById(request.getLandId())
-                    .orElseThrow(() -> new RuntimeException("Land not found")));
+            tree.setLand(
+                landRepository.findById(request.getLandId())
+                    .orElseThrow(() -> new RuntimeException("Land not found"))
+            );
         }
 
         if (request.getTreeTypeId() != null) {
-            tree.setTreeType(treeTypeRepository.findById(request.getTreeTypeId())
-                    .orElseThrow(() -> new RuntimeException("TreeType not found")));
+            tree.setTreeType(
+                treeTypeRepository.findById(request.getTreeTypeId())
+                    .orElseThrow(() -> new RuntimeException("TreeType not found"))
+            );
         }
 
         if (request.getOwnerUserId() != null) {
-            tree.setOwnerUser(userRepository.findById(request.getOwnerUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found")));
+            tree.setOwnerUser(
+                userRepository.findById(request.getOwnerUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+            );
         }
 
         if (request.getOwnerCompanyId() != null) {
-            tree.setOwnerCompany(companyRepository.findById(request.getOwnerCompanyId())
-                    .orElseThrow(() -> new RuntimeException("Company not found")));
+            tree.setOwnerCompany(
+                companyRepository.findById(request.getOwnerCompanyId())
+                    .orElseThrow(() -> new RuntimeException("Company not found"))
+            );
         }
-        
+
         if (request.getPlannedPlantationId() != null) {
             tree.setPlannedPlantation(
                 plannedPlantationRepository.findById(request.getPlannedPlantationId())
                     .orElseThrow(() -> new ResourceNotFoundException("Planned plantation not found"))
             );
         } else {
-            tree.setPlannedPlantation(null); // 🔹 Permite quitar la planificación
+            tree.setPlannedPlantation(null);
         }
-
-        // Guardar y convertir a DTO de respuesta
-        return treeMapper.toResponse(treeRepository.save(tree));
     }
 
     @Override
@@ -419,6 +445,14 @@ public class TreeServiceImpl implements TreeService {
         return treeMapper.toResponseList(
                 treeRepository.findOwnerTrees(currentUserId, null)
         );
+    }
+    
+    private boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        return auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
     }
 
     
