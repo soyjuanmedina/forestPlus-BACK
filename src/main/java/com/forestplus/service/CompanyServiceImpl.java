@@ -1,6 +1,7 @@
 package com.forestplus.service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -86,8 +87,10 @@ public class CompanyServiceImpl implements CompanyService {
     public CompanyResponse updateCompanyPicture(Long id, MultipartFile file) {
         CompanyEntity company = companyRepository.findById(id)
                 .orElseThrow(() -> new CompanyNotFoundException(id));
+        
+        String imageUuid = UUID.randomUUID().toString();
 
-        String imageUrl = fileStorageService.storeFile(file, "companies", company.getId());
+        String imageUrl = fileStorageService.storeFile(file, "companies", imageUuid);
         company.setPicture(imageUrl);
         System.out.println("[#updateCompanyPicture] Imagen guardada en: " + imageUrl);
         companyRepository.save(company);

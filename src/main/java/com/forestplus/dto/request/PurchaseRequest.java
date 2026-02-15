@@ -14,5 +14,4 @@ public class PurchaseRequest {
     private Long landId;
     private Long treeTypeId;
     private Integer quantity;
-    private BigDecimal pricePerUnit;
 }

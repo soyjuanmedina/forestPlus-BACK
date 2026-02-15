@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.forestplus.controller.LoopsController.EmailDto;
 import com.forestplus.integrations.loops.dto.LoopsEventRequest;
 import com.forestplus.repository.UserRepository;
 
@@ -89,5 +90,15 @@ public class LoopsService {
                 user.setReceiveEmails(true);
                 userRepository.save(user);
             });
+    }
+
+    public boolean registerEmail(EmailDto emailDto) {
+        LoopsEventRequest loopsEvent = new LoopsEventRequest(
+        		emailDto.getEmail(),
+                "subscribe", null
+            );
+
+            sendEvent(loopsEvent);
+            return true;
     }
 }
