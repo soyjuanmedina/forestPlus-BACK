@@ -132,17 +132,28 @@ public class UserServiceImpl implements UserService {
         	// If any change in Loops data communicate to them
         	syncWithLoopsIfNeeded(existing, request.getName(), request.getSurname(), request.getReceiveEmails());
         	
-            existing.setName(request.getName());
-            existing.setSurname(request.getSurname());
-            existing.setSecondSurname(request.getSecondSurname());
-            existing.setEmail(request.getEmail());
-            existing.setReceiveEmails(request.getReceiveEmails());
+        	if (request.getName() != null) {
+                existing.setName(request.getName());
+            }
+            if (request.getSurname() != null) {
+                existing.setSurname(request.getSurname());
+            }
+            if (request.getSecondSurname() != null) {
+                existing.setSecondSurname(request.getSecondSurname());
+            }
+            if (request.getEmail() != null) {
+                existing.setEmail(request.getEmail());
+            }
+            if (request.getReceiveEmails() != null) {
+                existing.setReceiveEmails(request.getReceiveEmails());
+            }
+            if (request.getRole() != null) {
+                existing.setRole(request.getRole());
+            }
 
             if (request.getPassword() != null && !request.getPassword().isEmpty()) {
                 existing.setPasswordHash(passwordEncoder.encode(request.getPassword()));
             }
-
-            existing.setRole(request.getRole());
 
             // --- Actualizar compañía ---
             if (request.getCompanyId() != null) {
