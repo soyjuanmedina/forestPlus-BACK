@@ -120,6 +120,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse updateUser(Long id, RegisterUserRequest request) {
+    	
+    	if (request.getCompanyId() != null) {
+    	    // Bloqueamos cualquier intento de un usuario normal de asignarse a otra compañía
+    	    throw new ForestPlusException(HttpStatus.FORBIDDEN,
+    	        "No tienes permisos para asignar compañías");
+    	}
+    	
         return userRepository.findById(id).map(existing -> {
         	
         	// If any change in Loops data communicate to them
@@ -263,7 +270,7 @@ public class UserServiceImpl implements UserService {
         boolean isAdmin = securityUtils.isAdmin();
         
         if (!isAdmin && !authUserId.equals(id)) {
-            throw new AccessDeniedException("No puedes modificar la foto de otro usuario");
+            throw new ForestPlusException(HttpStatus.FORBIDDEN, "No puedes modificar la foto de otro usuario");
         }
         
         
