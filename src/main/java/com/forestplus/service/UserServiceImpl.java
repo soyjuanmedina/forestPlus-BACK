@@ -13,6 +13,7 @@ import com.forestplus.mapper.UserMapper;
 import com.forestplus.model.RolesEnum;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
+import com.forestplus.util.SecurityUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,9 +48,9 @@ public class UserServiceImpl implements UserService {
     private final CompanyRepository companyRepository; // <--- nuevo
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-    private final EmailService emailService;
     private final FileStorageService fileStorageService;
     private final LoopsService loopsService;
+    private final SecurityUtils securityUtils;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -256,6 +258,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse updateUserPicture(Long id, MultipartFile file) {
+    	
+        Long authUserId = securityUtils.getAuthenticatedUserId();
+        boolean isAdmin = securityUtils.isAdmin();
+        
+        if (!isAdmin && !authUserId.equals(id)) {
+            throw new AccessDeniedException("No puedes modificar la foto de otro usuario");
+        }
+        
+        
         // 1️⃣ Buscar el usuario
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));

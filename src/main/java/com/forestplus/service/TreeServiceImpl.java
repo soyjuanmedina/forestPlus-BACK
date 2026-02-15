@@ -23,6 +23,7 @@ import com.forestplus.repository.LandRepository;
 import com.forestplus.repository.PlannedPlantationRepository;
 import com.forestplus.repository.UserRepository;
 import com.forestplus.security.CurrentUserService;
+import com.forestplus.util.SecurityUtils;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -63,6 +64,7 @@ public class TreeServiceImpl implements TreeService {
 	private final PlannedPlantationRepository plannedPlantationRepository;
     private final TreeMapper treeMapper;
     private final LoopsService loopsService;
+    private final SecurityUtils securityUtils;
 
     @Override
     public List<TreeResponse> getAllTrees() {
@@ -113,7 +115,7 @@ public class TreeServiceImpl implements TreeService {
         TreeEntity tree = treeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tree not found with id " + id));
 
-        if (isAdmin()) {
+        if (securityUtils.isAdmin()) {
             updateAsAdmin(tree, request);
         } else {
             updateAsUser(tree, request);
@@ -446,15 +448,6 @@ public class TreeServiceImpl implements TreeService {
                 treeRepository.findOwnerTrees(currentUserId, null)
         );
     }
-    
-    private boolean isAdmin() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        return auth.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(role -> role.equals("ROLE_ADMIN"));
-    }
-
     
 }
 
