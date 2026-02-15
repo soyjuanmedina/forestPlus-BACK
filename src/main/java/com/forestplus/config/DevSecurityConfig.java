@@ -41,6 +41,7 @@ public class DevSecurityConfig {
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/api/loops/waitlist",
+                    "/api/uploads/**",  
                     "/development/api/uploads/**"
                 ).permitAll()
 
