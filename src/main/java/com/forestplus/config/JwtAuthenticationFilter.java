@@ -126,7 +126,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         boolean skip = path.startsWith("/api/webhooks/loops")
-                    || path.startsWith("/development/api/webhooks/loops");
+                    || path.startsWith("/development/api/webhooks/loops")
+                    || path.equals("/api/loops/waitlist");
 
         log.info("📡 shouldNotFilter check for path: {} → skip={}", path, skip);
 
