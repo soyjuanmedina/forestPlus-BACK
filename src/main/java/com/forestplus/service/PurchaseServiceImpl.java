@@ -25,7 +25,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PurchaseServiceImpl implements PurchaseService {
 	
-    @Value("${app.frontend.url}")
+	private static final BigDecimal DEFAULT_TREE_PRICE = new BigDecimal("10");
+
+	@Value("${app.frontend.url}")
     private String frontendUrl;
 
 	private final LandRepository landRepository;
@@ -56,7 +58,9 @@ public class PurchaseServiceImpl implements PurchaseService {
         buyer.setPendingTreesCount(buyer.getPendingTreesCount() + request.getQuantity());
 
         // 5️⃣ Calcular total
-        BigDecimal totalPrice = request.getPricePerUnit().multiply(BigDecimal.valueOf(request.getQuantity()));
+        // TODO añadir campo en BBDD para el precio de los árboles
+        BigDecimal officialPricePerUnit = DEFAULT_TREE_PRICE;
+        BigDecimal totalPrice = officialPricePerUnit.multiply(BigDecimal.valueOf(request.getQuantity()));
 
         // 6️⃣ Variables y email comprador
         String link = frontendUrl;
