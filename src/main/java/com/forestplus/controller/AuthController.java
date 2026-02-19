@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
@@ -200,10 +200,25 @@ public class AuthController {
     @PostMapping(value = "/forgot-password", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> forgotPassword(
         @Parameter(description = "Email del usuario que olvidó la contraseña")
-        @RequestBody ForgotPasswordRequest request
+        @RequestBody ForgotPasswordRequest request,
+        HttpServletRequest servletRequest
     ) {
-        authService.forgotPassword(request.getEmail());
+        // Obtener la IP real del cliente
+        String ip = extractClientIp(servletRequest);
+        authService.forgotPassword(request.getEmail(), ip);
         return ResponseEntity.ok(new MessageResponse("Email de recuperación enviado"));
+    }
+    
+    /**
+     * Obtiene la IP del cliente considerando posibles proxies.
+     */
+    private String extractClientIp(HttpServletRequest request) {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null) {
+            return request.getRemoteAddr();
+        }
+        // En caso de que haya múltiples IPs en X-Forwarded-For
+        return xfHeader.split(",")[0];
     }
 
     @Operation(
