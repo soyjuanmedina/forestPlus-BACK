@@ -288,15 +288,37 @@ public class UserServiceImpl implements UserService {
     
     @Override
     public Page<UserResponse> getUsers(Pageable pageable, String role, Long companyId) {
+    	
+        // Obtenemos al usuario que hace la petición
+        UserEntity currentUser = currentUserService.getCurrentUser();
+        String currentRole = currentUserService.getCurrentUserRole();
+        Long currentCompanyId = currentUserService.getCurrentUserCompanyId();
+        
+        
         Page<UserEntity> page;
-        if (role != null && companyId != null) {
-            page = userRepository.findByRoleAndCompanyId(role, companyId, pageable);
-        } else if (role != null) {
-            page = userRepository.findByRole(role, pageable);
-        } else if (companyId != null) {
-            page = userRepository.findByCompanyId(companyId, pageable);
+
+        if ("ADMIN".equals(currentRole)) {
+            // Admin puede ver todo
+            if (role != null && companyId != null) {
+                page = userRepository.findByRoleAndCompanyId(role, companyId, pageable);
+            } else if (role != null) {
+                page = userRepository.findByRole(role, pageable);
+            } else if (companyId != null) {
+                page = userRepository.findByCompanyId(companyId, pageable);
+            } else {
+                page = userRepository.findAll(pageable);
+            }
+        } else if ("COMPANY_ADMIN".equals(currentRole)) {
+            // CompanyAdmin solo ve usuarios de su compañía
+            Long companyFilter = companyId != null ? companyId : currentCompanyId;
+            if (role != null) {
+                page = userRepository.findByRoleAndCompanyId(role, companyFilter, pageable);
+            } else {
+                page = userRepository.findByCompanyId(companyFilter, pageable);
+            }
         } else {
-            page = userRepository.findAll(pageable);
+            // Usuario normal no puede acceder
+            page = Page.empty();
         }
 
         return page.map(user -> userMapper.toResponse(user));

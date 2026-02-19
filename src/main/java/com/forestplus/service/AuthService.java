@@ -19,6 +19,7 @@ import com.forestplus.mapper.UserMapper;
 import com.forestplus.model.RolesEnum;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
+import com.forestplus.security.RateLimitService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -48,6 +50,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final UserMapper userMapper;
     private final LoopsService loopsService;
+    private final RateLimitService rateLimitService;
     
     private static final int MAX_LOGIN_ERRORS = 5;
     
@@ -208,9 +211,24 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public void forgotPassword(String email) {
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+    public void forgotPassword(String email, String ip) {
+    	if (!rateLimitService.tryConsumeByIp(ip)) {
+            // Podrías lanzar excepción específica o simplemente retornar
+            throw new RuntimeException("Too many requests from this IP, please try later.");
+        }
+
+        // --- 2️⃣ Limitar por email ---
+        if (!rateLimitService.tryConsumeByEmail(email)) {
+            throw new RuntimeException("Too many requests for this email, please try later.");
+        }
+	    Optional<UserEntity> optionalUser = userRepository.findByEmail(email);
+
+	    if (optionalUser.isEmpty()) {
+	        sleepSmallDelay();
+	        return;
+	    }
+
+    	UserEntity user = optionalUser.get();
 
         String uuid = UUID.randomUUID().toString();
         user.setUuid(uuid);
@@ -238,6 +256,16 @@ public class AuthService {
         user.setLoginErrorCount(0);
         user.setAccountLocked(false);
         userRepository.save(user);
+    }
+    
+    /**
+     * Pequeño delay para evitar enumeración de usuarios
+     */
+    private void sleepSmallDelay() {
+        try {
+            Thread.sleep(500); // 0.5s
+        } catch (InterruptedException ignored) {
+        }
     }
 }
 
