@@ -13,6 +13,7 @@ import com.forestplus.mapper.UserMapper;
 import com.forestplus.model.RolesEnum;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.UserRepository;
+import com.forestplus.security.CurrentUserService;
 import com.forestplus.util.SecurityUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,7 @@ public class UserServiceImpl implements UserService {
     private final FileStorageService fileStorageService;
     private final LoopsService loopsService;
     private final SecurityUtils securityUtils;
+    private final CurrentUserService currentUserService;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -121,8 +123,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateUser(Long id, RegisterUserRequest request) {
     	
+	    // Bloqueamos cualquier intento de un usuario normal de cambiar roles
+    	if (request.getRole() != null) {
+    	    throw new ForestPlusException(HttpStatus.FORBIDDEN,
+    	        "No tienes permisos para asignar roles");
+    	}
+    	
+	    // Bloqueamos cualquier intento de un usuario normal de asignarse a otra compañía
     	if (request.getCompanyId() != null) {
-    	    // Bloqueamos cualquier intento de un usuario normal de asignarse a otra compañía
     	    throw new ForestPlusException(HttpStatus.FORBIDDEN,
     	        "No tienes permisos para asignar compañías");
     	}
@@ -147,19 +155,8 @@ public class UserServiceImpl implements UserService {
             if (request.getReceiveEmails() != null) {
                 existing.setReceiveEmails(request.getReceiveEmails());
             }
-            if (request.getRole() != null) {
-                existing.setRole(request.getRole());
-            }
-
             if (request.getPassword() != null && !request.getPassword().isEmpty()) {
                 existing.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-            }
-
-            // --- Actualizar compañía ---
-            if (request.getCompanyId() != null) {
-                CompanyEntity company = companyRepository.findById(request.getCompanyId())
-                        .orElseThrow(() -> new RuntimeException("Company not found with id " + request.getCompanyId()));
-                existing.setCompany(company);
             }
 
             UserEntity updated = userRepository.save(existing);
@@ -169,17 +166,59 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse updateUserByAdmin(Long id, RegisterUserByAdminRequest request) {
+    	
+        // Obtener usuario autenticado
+        Long currentUserId = currentUserService.getCurrentUserId();
+        String currentUserRole = currentUserService.getCurrentUserRole();
+        Long currentUserCompanyId = currentUserService.getCurrentUserCompanyId();
+        
+        
         return userRepository.findById(id).map(existing -> {
+        	
+        	if (!"ADMIN".equals(currentUserRole)) {
+
+                if (!currentUserCompanyId.equals(existing.getCompany().getId())) {
+                    throw new ForestPlusException(HttpStatus.FORBIDDEN,
+                        "No tienes permisos para modificar usuarios de otra compañía");
+                }
+
+                // COMPANY_ADMIN no puede asignar roles distintos a COMPANY_ADMIN o COMPANY_USER
+                if (request.getRole() != null &&
+                	    !"COMPANY_ADMIN".equals(request.getRole()) &&
+                	    !"COMPANY_USER".equals(request.getRole())) {
+                    throw new ForestPlusException(HttpStatus.FORBIDDEN,
+                        "No tienes permisos para asignar roles");
+                }
+
+                // COMPANY_ADMIN no puede cambiar la compañía
+                if (request.getCompanyId() != null &&
+                    !request.getCompanyId().equals(existing.getCompany().getId())) {
+                    throw new ForestPlusException(HttpStatus.FORBIDDEN,
+                        "No tienes permisos para cambiar la compañía del usuario");
+                }
+            }
         	
         	// If any change in Loops data communicate to them
         	syncWithLoopsIfNeeded(existing, request.getName(), request.getSurname(), request.getReceiveEmails());
         	
-            existing.setName(request.getName());
-            existing.setSurname(request.getSurname());
-            existing.setSecondSurname(request.getSecondSurname());
-            existing.setEmail(request.getEmail());
-            existing.setRole(request.getRole());
-            existing.setReceiveEmails(request.getReceiveEmails());
+        	if (request.getName() != null) {
+        	    existing.setName(request.getName());
+        	}
+        	if (request.getSurname() != null) {
+        	    existing.setSurname(request.getSurname());
+        	}
+        	if (request.getSecondSurname() != null) {
+        	    existing.setSecondSurname(request.getSecondSurname());
+        	}
+        	if (request.getEmail() != null) {
+        	    existing.setEmail(request.getEmail());
+        	}
+        	if (request.getReceiveEmails() != null) {
+        	    existing.setReceiveEmails(request.getReceiveEmails());
+        	}
+        	if (request.getRole() != null) {
+        	    existing.setRole(request.getRole());
+        	}
 
             // --- Actualizar compañía ---
             if (request.getCompanyId() != null) {
