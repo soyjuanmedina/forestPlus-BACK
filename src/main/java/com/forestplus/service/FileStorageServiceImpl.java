@@ -17,7 +17,7 @@ import javax.imageio.ImageIO;
 public class FileStorageServiceImpl implements FileStorageService {
 
     @Value("${file.upload-dir}")
-    private String baseUploadDir;
+    String baseUploadDir;
     private static final Set<String> ALLOWED_EXTENSIONS =
             Set.of("png", "jpg", "jpeg", "webp");
 

@@ -53,7 +53,7 @@ import org.springframework.security.core.GrantedAuthority;
 public class TreeServiceImpl implements TreeService {
 
     @Value("${app.frontend.url}")
-    private String frontendUrl;
+    String frontendUrl;
     
 	private final CurrentUserService currentUserService;
 	private final TreeRepository treeRepository;

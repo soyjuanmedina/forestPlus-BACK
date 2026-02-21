@@ -28,7 +28,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 	private static final BigDecimal DEFAULT_TREE_PRICE = new BigDecimal("10");
 
 	@Value("${app.frontend.url}")
-    private String frontendUrl;
+    String frontendUrl;
 
 	private final LandRepository landRepository;
 	private final TreeTypeRepository treeTypeRepository;
