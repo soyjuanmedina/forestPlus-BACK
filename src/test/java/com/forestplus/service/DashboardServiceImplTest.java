@@ -80,6 +80,8 @@ class DashboardServiceImplTest {
         PlannedPlantationEntity plantation = new PlannedPlantationEntity();
         plantation.setId(1L);
         plantation.setMinTrees(50);
+        plantation.setOptimalTrees(60);
+        plantation.setMaxTrees(70);
         plantation.setLand(land);
 
         when(plannedPlantationRepository.findAllByIsActiveTrue())
@@ -149,6 +151,8 @@ class DashboardServiceImplTest {
         PlannedPlantationEntity plantation = new PlannedPlantationEntity();
         plantation.setId(99L);
         plantation.setMinTrees(10);
+        plantation.setOptimalTrees(20);
+        plantation.setMaxTrees(30);
         LandEntity land = new LandEntity();
         land.setId(123L);
         land.setName("Terreno Test");
