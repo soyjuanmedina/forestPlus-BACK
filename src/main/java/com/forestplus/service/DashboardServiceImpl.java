@@ -57,6 +57,8 @@ public class DashboardServiceImpl implements DashboardService {
                             .plantationId(pp.getId())
                             .plantationName(pp.getLand() != null ? pp.getLand().getName() : "Sin terreno")
                             .minTrees(pp.getMinTrees())
+                            .optimalTrees(pp.getOptimalTrees())
+                            .maxTrees(pp.getMaxTrees())
                             .soldTrees(soldTrees)
                             .build();
                 })
