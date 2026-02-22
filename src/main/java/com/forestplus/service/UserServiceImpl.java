@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 	
     @Value("${app.frontend.url}")
-    private String frontendUrl;
+    String frontendUrl;
 
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository; // <--- nuevo

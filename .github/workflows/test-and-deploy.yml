@@ -74,12 +74,16 @@ jobs:
           distribution: 'temurin'
           java-version: 21
 
+      # ---------- Run backend tests ----------
+      - name: Run backend tests
+        run: mvn clean test
+
       - name: Build Spring Boot WAR
         run: |
           if [[ "${GITHUB_REF_NAME}" == "development" ]]; then
-            mvn clean package -DskipTests -Dspring-boot.run.profiles=dev
+            mvn clean package -Dspring-boot.run.profiles=dev
           else
-            mvn clean package -DskipTests
+            mvn clean package
           fi
 
       # ---------- Install lftp ----------

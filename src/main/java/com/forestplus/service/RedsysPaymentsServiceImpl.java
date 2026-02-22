@@ -28,22 +28,22 @@ public class RedsysPaymentsServiceImpl implements RedsysPaymentsService {
 
     // Valores de Redsys (en producción, mejor en application.properties o env)
     @Value("${redsys.merchant-code}")
-    private String merchantCode;
+    String merchantCode;
 
     @Value("${redsys.terminal}")
-    private String terminal;
+    String terminal;
 
     @Value("${redsys.secret-key}")
-    private String secretKey;
+    String secretKey;
 
     @Value("${redsys.url}")
-    private String redsysUrl;
+    String redsysUrl;
 
     @Value("${redsys.url-ok}")
-    private String urlOk;
+    String urlOk;
 
     @Value("${redsys.url-ko}")
-    private String urlKo;
+    String urlKo;
 
     @Override
     @Transactional(readOnly = true)

@@ -9,5 +9,7 @@ public class PlannedPlantationKpiResponse {
     private Long plantationId;
     private String plantationName; // opcional, si quieres mostrar nombre o terreno
     private int minTrees;
+    private int optimalTrees;
+    private int maxTrees;
     private long soldTrees;
 }
