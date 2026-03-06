@@ -266,6 +266,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         try {
+        	
+            // 1️⃣ Buscar el usuario
+            UserEntity user = userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        	
+            // Eliminar en Loops primero
+            loopsService.deleteContact(user.getEmail());
+            
             userRepository.deleteById(id);
 
         } catch (DataIntegrityViolationException ex) {

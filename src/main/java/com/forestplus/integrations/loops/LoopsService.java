@@ -101,4 +101,26 @@ public class LoopsService {
             sendEvent(loopsEvent);
             return true;
     }
+    
+    public void deleteContact(String email) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + loopsApiKey);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("email", email);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+
+        try {
+            restTemplate.postForEntity(
+                "https://app.loops.so/api/v1/contacts/delete",
+                request,
+                String.class
+            );
+            log.info("Deleted contact in Loops: {}", email);
+        } catch (Exception e) {
+            log.error("Error deleting contact in Loops: {}", e.getMessage());
+        }
+    }
 }
