@@ -165,13 +165,38 @@ class UserServiceImplTest {
     // ===================== DELETE USER =====================
     @Test
     void testDeleteUser_success() {
+        // Mockear findById para devolver un usuario válido
+        UserEntity user = new UserEntity();
+        user.setId(1L);
+        user.setEmail("test@example.com");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        // Mockear loopsService para que no haga nada
+        doNothing().when(loopsService).deleteContact(user.getEmail());
+
+        // Mockear deleteById para que no haga nada
         doNothing().when(userRepository).deleteById(1L);
+
+        // Ejecutar y comprobar que no lanza excepción
         assertDoesNotThrow(() -> service.deleteUser(1L));
+
+        // Verificar que se llamó a deleteById
         verify(userRepository).deleteById(1L);
+
+        // Opcional: verificar que se llamó a loopsService
+        verify(loopsService).deleteContact(user.getEmail());
     }
 
     @Test
     void testDeleteUser_constraintViolation() {
+        // Mockear findById para que devuelva un usuario válido
+        UserEntity user = new UserEntity();
+        user.setId(1L);
+        user.setEmail("test@example.com");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        // Mockear deleteById para que lance la excepción
         doThrow(new org.springframework.dao.DataIntegrityViolationException("constraint"))
                 .when(userRepository).deleteById(1L);
 
