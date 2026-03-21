@@ -24,17 +24,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,10 +43,9 @@ public class UserServiceImpl implements UserService {
     String frontendUrl;
 
     private final UserRepository userRepository;
-    private final CompanyRepository companyRepository; // <--- nuevo
+    private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-    private final FileStorageService fileStorageService;
     private final LoopsService loopsService;
     private final SecurityUtils securityUtils;
     private final CurrentUserService currentUserService;
@@ -168,10 +164,8 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUserByAdmin(Long id, RegisterUserByAdminRequest request) {
     	
         // Obtener usuario autenticado
-        Long currentUserId = currentUserService.getCurrentUserId();
         String currentUserRole = currentUserService.getCurrentUserRole();
         Long currentUserCompanyId = currentUserService.getCurrentUserCompanyId();
-        
         
         return userRepository.findById(id).map(existing -> {
         	
@@ -227,7 +221,7 @@ public class UserServiceImpl implements UserService {
                 existing.setCompany(company);
             }
             
-            // ✅ NUEVO: actualizar árboles pendientes
+            // Actualizar árboles pendientes
             if (request.getPendingTreesCount() != null) {
                 if (request.getPendingTreesCount() < 0) {
                     throw new ForestPlusException(
@@ -266,7 +260,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         try {
-        	
             // 1️⃣ Buscar el usuario
             UserEntity user = userRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -277,7 +270,6 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteById(id);
 
         } catch (DataIntegrityViolationException ex) {
-            // Obtienes la causa real de MariaDB
             Throwable root = ex.getMostSpecificCause();
             String originalMessage = root != null ? root.getMessage() : ex.getMessage();
 
@@ -290,23 +282,17 @@ public class UserServiceImpl implements UserService {
     
     @Override
     public Page<UserResponse> getUsers(Pageable pageable) {
-        // simplemente delegamos al método más completo sin filtros
         return getUsers(pageable, null, null);
     }
     
     @Override
     public Page<UserResponse> getUsers(Pageable pageable, String role, Long companyId) {
-    	
-        // Obtenemos al usuario que hace la petición
-        UserEntity currentUser = currentUserService.getCurrentUser();
         String currentRole = currentUserService.getCurrentUserRole();
         Long currentCompanyId = currentUserService.getCurrentUserCompanyId();
-        
         
         Page<UserEntity> page;
 
         if ("ADMIN".equals(currentRole)) {
-            // Admin puede ver todo
             if (role != null && companyId != null) {
                 page = userRepository.findByRoleAndCompanyId(role, companyId, pageable);
             } else if (role != null) {
@@ -317,7 +303,6 @@ public class UserServiceImpl implements UserService {
                 page = userRepository.findAll(pageable);
             }
         } else if ("COMPANY_ADMIN".equals(currentRole)) {
-            // CompanyAdmin solo ve usuarios de su compañía
             Long companyFilter = companyId != null ? companyId : currentCompanyId;
             if (role != null) {
                 page = userRepository.findByRoleAndCompanyId(role, companyFilter, pageable);
@@ -325,11 +310,10 @@ public class UserServiceImpl implements UserService {
                 page = userRepository.findByCompanyId(companyFilter, pageable);
             }
         } else {
-            // Usuario normal no puede acceder
             page = Page.empty();
         }
 
-        return page.map(user -> userMapper.toResponse(user));
+        return page.map(userMapper::toResponse);
     }
 
     private String generateRandomPassword(int length) {
@@ -344,39 +328,20 @@ public class UserServiceImpl implements UserService {
     
     @Override
     @Transactional
-    public UserResponse updateUserPicture(Long id, MultipartFile file) {
-    	
+    public UserResponse updateUserPicture(Long id, String picture) {
         Long authUserId = securityUtils.getAuthenticatedUserId();
         boolean isAdmin = securityUtils.isAdmin();
         
         if (!isAdmin && !authUserId.equals(id)) {
             throw new ForestPlusException(HttpStatus.FORBIDDEN, "No puedes modificar la foto de otro usuario");
         }
-        
-        
-        // 1️⃣ Buscar el usuario
+
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
-        // Imprimir info de debug
-        System.out.println("📁 Guardando imagen para usuario " + id + ", original filename: " 
-                            + file.getOriginalFilename());
-
-        String imageUuid = UUID.randomUUID().toString();
-        
-        // 2️⃣ Guardar la imagen con id para evitar colisiones
-        String imageUrl = fileStorageService.storeFile(file, "users", imageUuid);
-        
-        System.out.println("Imagen guardada en: " + imageUrl);
-
-        // 3️⃣ Actualizar entidad con la nueva ruta
-        user.setPicture(imageUrl);
-
-        // 4️⃣ Guardar cambios en DB
+        user.setPicture(picture);
         userRepository.save(user);
-
-        // 5️⃣ Devolver DTO
+        
         return userMapper.toResponse(user);
     }
 }
-

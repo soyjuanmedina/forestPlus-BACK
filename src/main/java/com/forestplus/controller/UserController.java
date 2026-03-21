@@ -166,21 +166,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
     
-	 // =====================================
-	 // Actualizar imagen de perfil del usuario
-	 // =====================================
 	 @PutMapping("/{id}/picture")
 	 @PreAuthorize("isAuthenticated()")
 	 @Operation(
 	     summary = "Actualizar la imagen de perfil del usuario",
-	     requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-	         description = "Archivo de imagen a subir",
-	         required = true,
-	         content = @Content(
-	             mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-	             schema = @Schema(type = "string", format = "binary")
-	         )
-	     )
+	     description = "Recibe un JSON con el campo 'picture' conteniendo la imagen en formato Base64"
 	 )
 	 @ApiResponse(
 	     responseCode = "200",
@@ -192,10 +182,11 @@ public class UserController {
 	 )
 	 public ResponseEntity<UserResponse> updateUserPicture(
 	         @PathVariable Long id,
-	         @RequestPart("file") MultipartFile file // <-- Cambiado de @RequestParam a @RequestPart
+	         @RequestBody java.util.Map<String, String> body
 	 ) {
 	     try {
-	         UserResponse response = userService.updateUserPicture(id, file);
+	         String picture = body.get("picture");
+	         UserResponse response = userService.updateUserPicture(id, picture);
 	         return ResponseEntity.ok(response);
 	     } catch (RuntimeException e) {
 	         return ResponseEntity.notFound().build();

@@ -149,17 +149,15 @@ class TreeTypeServiceImplTest {
     void testUpdateTreeTypePicture() {
         TreeTypeEntity entity = new TreeTypeEntity();
         TreeTypeResponse response = new TreeTypeResponse();
-        MultipartFile file = mock(MultipartFile.class);
+        String pictureBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 
         when(repository.findById(1L)).thenReturn(Optional.of(entity));
-        when(fileStorageService.storeFile(eq(file), eq("tree-types"), anyString()))
-        .thenReturn("url");
         when(mapper.toResponse(entity)).thenReturn(response);
 
-        TreeTypeResponse result = service.updateTreeTypePicture(1L, file);
+        TreeTypeResponse result = service.updateTreeTypePicture(1L, pictureBase64);
 
         assertSame(response, result);
-        assertEquals("url", entity.getPicture());
+        assertEquals(pictureBase64, entity.getPicture());
         verify(repository).save(entity);
     }
 }
