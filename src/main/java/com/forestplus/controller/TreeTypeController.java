@@ -110,4 +110,21 @@ public class TreeTypeController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PutMapping(value = "/{id}/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Actualizar imagen del tipo de árbol (Compatible con v1 - Multipart)")
+    public ResponseEntity<TreeTypeResponse> updateTreeTypePictureMultipart(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file
+    ) {
+        try {
+            String base64 = "data:" + file.getContentType() + ";base64," + 
+                            java.util.Base64.getEncoder().encodeToString(file.getBytes());
+            TreeTypeResponse response = treeTypeService.updateTreeTypePicture(id, base64);
+            return ResponseEntity.ok(response);
+        } catch (java.io.IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

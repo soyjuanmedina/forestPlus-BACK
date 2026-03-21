@@ -52,7 +52,7 @@ public class UserEntity {
     @Column(name = "receive_emails", nullable = false)
     private Boolean receiveEmails = true;
     
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "LONGTEXT")
     private String picture; 
 
     // Relación con compañía

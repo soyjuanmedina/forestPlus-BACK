@@ -115,4 +115,43 @@ public class LandController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // ============================
+    // Subir o actualizar imagen de la parcela (JSON - v2)
+    // ============================
+    @PutMapping(value = "/{id}/picture", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+    @Operation(summary = "Actualizar imagen de la parcela (v2 - JSON Base64)")
+    public ResponseEntity<LandResponse> updateLandPicture(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, String> body
+    ) {
+        try {
+            String picture = body.get("picture");
+            LandResponse response = landService.updateLandPicture(id, picture);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ============================
+    // Subir o actualizar imagen de la parcela (Multipart - v1)
+    // ============================
+    @PutMapping(value = "/{id}/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+    @Operation(summary = "Actualizar imagen de la parcela (v1 - Multipart)")
+    public ResponseEntity<LandResponse> updateLandPictureMultipart(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file
+    ) {
+        try {
+            String base64 = "data:" + file.getContentType() + ";base64," + 
+                            java.util.Base64.getEncoder().encodeToString(file.getBytes());
+            LandResponse response = landService.updateLandPicture(id, base64);
+            return ResponseEntity.ok(response);
+        } catch (java.io.IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

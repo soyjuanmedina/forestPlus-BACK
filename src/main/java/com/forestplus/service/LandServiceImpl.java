@@ -76,4 +76,12 @@ public class LandServiceImpl implements LandService {
         landRepository.deleteById(id);
     }
 
+    @Override
+    public LandResponse updateLandPicture(Long id, String picture) {
+        LandEntity land = landRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Land not found"));
+        land.setPicture(picture);
+        land = landRepository.save(land);
+        return landMapper.toResponse(land);
+    }
 }

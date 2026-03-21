@@ -193,4 +193,21 @@ public class UserController {
 	     }
 	 }
 
+	 @PutMapping(value = "/{id}/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	 @PreAuthorize("isAuthenticated()")
+	 @Operation(summary = "Actualizar imagen de perfil (Compatible con v1 - Multipart)")
+	 public ResponseEntity<UserResponse> updateUserPictureMultipart(
+	         @PathVariable Long id,
+	         @RequestParam("file") MultipartFile file
+	 ) {
+	     try {
+	         String base64 = "data:" + file.getContentType() + ";base64," + 
+	                         java.util.Base64.getEncoder().encodeToString(file.getBytes());
+	         UserResponse response = userService.updateUserPicture(id, base64);
+	         return ResponseEntity.ok(response);
+	     } catch (java.io.IOException e) {
+	         return ResponseEntity.internalServerError().build();
+	     }
+	 }
+
 }
