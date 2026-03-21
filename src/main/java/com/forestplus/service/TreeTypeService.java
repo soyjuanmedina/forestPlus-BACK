@@ -20,5 +20,5 @@ public interface TreeTypeService {
 
     void deleteTreeType(Long id);
 
-    TreeTypeResponse updateTreeTypePicture(Long id, MultipartFile file); // ← NUEVO
+    TreeTypeResponse updateTreeTypePicture(Long id, String picture);
 }

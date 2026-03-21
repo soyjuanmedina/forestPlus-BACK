@@ -39,5 +39,5 @@ public interface UserService {
     void deleteUser(Long id);
     
     // Carga la imagen del usuario
-    UserResponse updateUserPicture(Long id, MultipartFile file);
+    UserResponse updateUserPicture(Long id, String picture);
 }

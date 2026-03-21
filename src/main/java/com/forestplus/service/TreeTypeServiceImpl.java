@@ -99,17 +99,14 @@ public class TreeTypeServiceImpl implements TreeTypeService {
    
     @Override
     @Transactional
-    public TreeTypeResponse updateTreeTypePicture(Long id, MultipartFile file) {
+    public TreeTypeResponse updateTreeTypePicture(Long id, String picture) {
     	TreeTypeEntity entity = treeTypeRepository.findById(id)
     		    .orElseThrow(() -> new ForestPlusException(HttpStatus.NOT_FOUND,
     		        "No se encontró el tipo de árbol con id " + id) {});
 
-        String imageUuid = UUID.randomUUID().toString();
-        
-        String imageUrl = fileStorageService.storeFile(file, "tree-types", imageUuid);
-        entity.setPicture(imageUrl);
-
+        entity.setPicture(picture);
         treeTypeRepository.save(entity);
+        
         return treeTypeMapper.toResponse(entity);
     }
 }

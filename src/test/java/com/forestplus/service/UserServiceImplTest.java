@@ -132,32 +132,30 @@ class UserServiceImplTest {
     // ===================== UPDATE USER PICTURE =====================
     @Test
     void testUpdateUserPicture_success() {
-        MultipartFile file = mock(MultipartFile.class);
+        String pictureBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
         UserEntity user = new UserEntity();
         UserResponse response = new UserResponse();
 
         when(securityUtils.getAuthenticatedUserId()).thenReturn(1L);
         when(securityUtils.isAdmin()).thenReturn(true);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(fileStorageService.storeFile(any(MultipartFile.class), eq("users"), anyString()))
-        .thenReturn("url");
         when(userMapper.toResponse(user)).thenReturn(response);
 
-        UserResponse result = service.updateUserPicture(1L, file);
+        UserResponse result = service.updateUserPicture(1L, pictureBase64);
 
         assertSame(response, result);
-        assertEquals("url", user.getPicture());
+        assertEquals(pictureBase64, user.getPicture());
         verify(userRepository).save(user);
     }
 
     @Test
     void testUpdateUserPicture_forbidden() {
-        MultipartFile file = mock(MultipartFile.class);
+        String pictureBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
         when(securityUtils.getAuthenticatedUserId()).thenReturn(2L);
         when(securityUtils.isAdmin()).thenReturn(false);
 
         ForestPlusException ex = assertThrows(ForestPlusException.class,
-                () -> service.updateUserPicture(1L, file));
+                () -> service.updateUserPicture(1L, pictureBase64));
 
         assertEquals(HttpStatus.FORBIDDEN.value(), ex.getStatus());
     }

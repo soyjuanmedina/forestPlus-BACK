@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -19,6 +20,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class DevSecurityConfig {
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/public-test/**", "/api/loops/test-get-uuid");
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -35,12 +41,14 @@ public class DevSecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 🔓 públicos
                 .requestMatchers(
+                    "/public-test/**",
                     "/api/auth/**",
                     "/ping",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/api/loops/waitlist",
+                    "/api/loops/test-get-uuid",
                     "/api/uploads/**",  
                     "/development/api/uploads/**"
                 ).permitAll()

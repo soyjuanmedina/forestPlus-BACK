@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -28,6 +29,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/public-test/**");
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -56,7 +62,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/index.html" , "/*.js", "/*.css", "assets/**", "/api/auth/**", "/ping",
+                .requestMatchers("/", "/index.html" , "/*.js", "/*.css", "assets/**", "/public-test/**", "/api/auth/**", "/ping",
                         "/v3/api-docs/**", "/swagger-ui.html",
                         "/swagger-ui/**", "/swagger-resources/**",
                         "/webjars/**", "/api/uploads/**", "/api/trees/owner", "/api/webhooks/loops/**",
