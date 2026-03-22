@@ -64,11 +64,17 @@ public class DashboardServiceImpl implements DashboardService {
                 })
                 .toList();
 
+        // KPI Globales (Nuestro Proyecto)
+        long globalPlantedTrees = treeRepository.count();
+        BigDecimal globalAnnualCo2Compensated = treeRepository.sumGlobalAnnualCo2At20();
+
         // 5️⃣ Construir response
         return HomeDashboardKpiResponse.builder()
                 .plantedTrees(plantedTrees)
                 .pendingTreesCount(pendingTreesCount)
                 .annualCo2Compensated(annualCo2Compensated)
+                .globalPlantedTrees(globalPlantedTrees)
+                .globalAnnualCo2Compensated(globalAnnualCo2Compensated)
                 .plannedPlantations(plantationKpis)
                 .build();
     }
