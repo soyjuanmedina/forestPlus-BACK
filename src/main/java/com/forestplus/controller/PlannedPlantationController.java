@@ -32,7 +32,7 @@ public class PlannedPlantationController {
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<PlannedPlantationResponse> getById(@PathVariable Long id) {
+    public ResponseEntity<PlannedPlantationResponse> getById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(plannedPlantationService.getPlannedPlantationById(id));
     }
 
@@ -45,7 +45,7 @@ public class PlannedPlantationController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlannedPlantationResponse> update(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody PlannedPlantationUpdateRequest request
     ) {
         return ResponseEntity.ok(plannedPlantationService.updatePlannedPlantation(id, request));
@@ -53,14 +53,14 @@ public class PlannedPlantationController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         plannedPlantationService.deletePlannedPlantation(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/land/{landId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<PlannedPlantationResponse>> getByLand(@PathVariable Long landId) {
+    public ResponseEntity<List<PlannedPlantationResponse>> getByLand(@PathVariable("landId") Long landId) {
         return ResponseEntity.ok(plannedPlantationService.getPlannedPlantationsByLand(landId));
     }
 
@@ -73,8 +73,8 @@ public class PlannedPlantationController {
     @GetMapping("/between-dates")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PlannedPlantationResponse>> getBetweenDates(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end
+            @RequestParam(name = "start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam(name = "end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end
     ) {
         return ResponseEntity.ok(plannedPlantationService.getPlannedPlantationsBetweenDates(start, end));
     }
@@ -86,7 +86,7 @@ public class PlannedPlantationController {
     }
 
     @GetMapping("/pending")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<PlannedPlantationResponse>> getPending() {
         return ResponseEntity.ok(plannedPlantationService.getPendingPlannedPlantations());
     }

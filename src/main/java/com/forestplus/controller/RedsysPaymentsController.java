@@ -18,7 +18,7 @@ public class RedsysPaymentsController {
 
     // 1️⃣ Crear pago
     @PostMapping("/create")
-    public ResponseEntity<RedsysPaymentResponse> createPayment(@RequestParam Long orderId) {
+    public ResponseEntity<RedsysPaymentResponse> createPayment(@RequestParam(name = "orderId") Long orderId) {
         RedsysPaymentResponse response = redsysPaymentsService.generateRedsysPayment(orderId);
         return ResponseEntity.ok(response);
     }

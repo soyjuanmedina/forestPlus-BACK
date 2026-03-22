@@ -20,6 +20,11 @@ public class PlannedPlantationResponse {
     private String landName;
     private LandResponse land;
 
+    // Tipo de árbol asociado
+    private Long treeTypeId;
+    private String treeTypeName;
+    private TreeTypeResponse treeType;
+
     // Fechas
     @Schema(description = "Fecha prevista de la plantación")
     private LocalDate plannedDate;
@@ -37,5 +42,8 @@ public class PlannedPlantationResponse {
     @Schema(description = "Cantidad máxima de árboles a plantar (opcional)")
     private Integer maxTrees;
     
+    @Schema(description = "Cantidad de árboles ya comprados/asignados a esta plantación")
+    private Integer purchasedTrees;
+
     private Boolean isActive;
 }

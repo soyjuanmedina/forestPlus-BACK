@@ -66,5 +66,8 @@ public interface PlannedPlantationRepository
         """)
     List<PlannedPlantationEntity> findExecutedWithDateDeviation();
     
+    @Query("SELECT COUNT(t) FROM TreeEntity t WHERE t.plannedPlantation.id = :plantationId")
+    long countTreesByPlantationId(@Param("plantationId") Long plantationId);
+
     List<PlannedPlantationEntity> findAllByIsActiveTrue();
 }

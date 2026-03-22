@@ -39,7 +39,7 @@ public class TreeTypeController {
     // Obtener un tipo de árbol por ID
     // ============================
     @GetMapping("/{id}")
-    public ResponseEntity<TreeTypeResponse> getTreeTypeById(@PathVariable Long id) {
+    public ResponseEntity<TreeTypeResponse> getTreeTypeById(@PathVariable("id") Long id) {
         try {
             TreeTypeResponse treeType = treeTypeService.getTreeTypeById(id);
             return ResponseEntity.ok(treeType);
@@ -64,7 +64,7 @@ public class TreeTypeController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TreeTypeResponse> updateTreeType(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody TreeTypeUpdateRequest request
     ) {
         TreeTypeResponse updated = treeTypeService.updateTreeType(id, request);
@@ -76,7 +76,7 @@ public class TreeTypeController {
     // ============================
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteTreeType(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTreeType(@PathVariable("id") Long id) {
         treeTypeService.deleteTreeType(id);
         return ResponseEntity.noContent().build(); // 204 si todo va bien
     }
@@ -99,7 +99,7 @@ public class TreeTypeController {
         )
     )
     public ResponseEntity<TreeTypeResponse> updateTreeTypePicture(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody java.util.Map<String, String> body
     ) {
         try {
@@ -115,7 +115,7 @@ public class TreeTypeController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar imagen del tipo de árbol (Compatible con v1 - Multipart)")
     public ResponseEntity<TreeTypeResponse> updateTreeTypePictureMultipart(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestParam("file") MultipartFile file
     ) {
         try {

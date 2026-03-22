@@ -28,7 +28,7 @@ public class UploadsController {
             Set.of("png", "jpg", "jpeg", "webp");
 
     @GetMapping("/users/{filename:.+}")
-    public ResponseEntity<Resource> serveUserImage(@PathVariable String filename) throws MalformedURLException {
+    public ResponseEntity<Resource> serveUserImage(@PathVariable("filename") String filename) throws MalformedURLException {
         System.out.println("[UploadsController#serveUserImage] Petición recibida para: " + filename);
         
         Path file = resolveAndValidatePath("users", filename);
@@ -52,7 +52,7 @@ public class UploadsController {
     }
     
     @GetMapping("/companies/{filename:.+}")
-    public ResponseEntity<Resource> serveCompanyImage(@PathVariable String filename) throws MalformedURLException {
+    public ResponseEntity<Resource> serveCompanyImage(@PathVariable("filename") String filename) throws MalformedURLException {
         System.out.println("[UploadsController#serveCompanyImage] Petición recibida para: " + filename);
         
         Path file = resolveAndValidatePath("companies", filename);

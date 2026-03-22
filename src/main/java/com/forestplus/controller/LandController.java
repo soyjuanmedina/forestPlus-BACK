@@ -49,7 +49,7 @@ public class LandController {
         summary = "Obtener una parcela por su ID"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<LandResponse> getLandById(@PathVariable Long id) {
+    public ResponseEntity<LandResponse> getLandById(@PathVariable("id") Long id) {
         try {
             LandResponse land = landService.getLandById(id);
             return ResponseEntity.ok(land);
@@ -82,7 +82,7 @@ public class LandController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<LandResponse> updateLand(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody LandUpdateRequest request,
             @RequestHeader(name = "Authorization", required = false) String authHeader
     ) {
@@ -108,7 +108,7 @@ public class LandController {
     )
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
-    public ResponseEntity<Void> deleteLand(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLand(@PathVariable("id") Long id) {
         try {
             landService.deleteLand(id);
             return ResponseEntity.noContent().build();
@@ -124,7 +124,7 @@ public class LandController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     @Operation(summary = "Actualizar imagen de la parcela (v2 - JSON Base64)")
     public ResponseEntity<LandResponse> updateLandPicture(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody java.util.Map<String, String> body
     ) {
         try {
@@ -143,7 +143,7 @@ public class LandController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     @Operation(summary = "Actualizar imagen de la parcela (v1 - Multipart)")
     public ResponseEntity<LandResponse> updateLandPictureMultipart(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestParam("file") MultipartFile file
     ) {
         try {

@@ -41,12 +41,12 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     @Operation(summary = "Obtener usuarios con filtros, paginación y orden")
     public ResponseEntity<Page<UserResponse>> getUsers(
-            @RequestParam(required = false) String role,
-            @RequestParam(required = false) Long companyId,
-            @RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id,asc") String sort // un solo string "campo,direccion"
+            @RequestParam(name = "role", required = false) String role,
+            @RequestParam(name = "companyId", required = false) Long companyId,
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "id,asc") String sort // un solo string "campo,direccion"
     ) {
         String[] parts = sort.split(",");
         String property = parts[0];
@@ -75,7 +75,7 @@ public class UserController {
         )
     )
     @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> getUserById(@PathVariable("id") Long id) {
         UserResponse user = userService.getUserById(id);
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -118,7 +118,7 @@ public class UserController {
     )
     @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     public ResponseEntity<UserResponse> updateUserByAdmin(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody RegisterUserByAdminRequest request) {
         try {
             UserResponse response = userService.updateUserByAdmin(id, request);
@@ -144,7 +144,7 @@ public class UserController {
     )
     @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     public ResponseEntity<UserResponse> updateUser(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody RegisterUserRequest request) {
         try {
             UserResponse response = userService.updateUser(id, request);
@@ -162,7 +162,7 @@ public class UserController {
     @Operation(summary = "Eliminar un usuario")
     @ApiResponse(responseCode = "204", description = "Usuario eliminado")
     @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
@@ -182,7 +182,7 @@ public class UserController {
 	     )
 	 )
 	 public ResponseEntity<UserResponse> updateUserPicture(
-	         @PathVariable Long id,
+	         @PathVariable("id") Long id,
 	         @RequestBody java.util.Map<String, String> body
 	 ) {
 	     try {
@@ -198,7 +198,7 @@ public class UserController {
 	 @PreAuthorize("isAuthenticated()")
 	 @Operation(summary = "Actualizar imagen de perfil (Compatible con v1 - Multipart)")
 	 public ResponseEntity<UserResponse> updateUserPictureMultipart(
-	         @PathVariable Long id,
+	         @PathVariable("id") Long id,
 	         @RequestParam("file") MultipartFile file
 	 ) {
 	     try {

@@ -47,7 +47,7 @@ public class CompanyController {
     // ============================
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN') or hasRole('COMPANY_USER')")
-    public ResponseEntity<CompanyResponse> getCompanyById(@PathVariable Long id) {
+    public ResponseEntity<CompanyResponse> getCompanyById(@PathVariable("id") Long id) {
         try {
             CompanyResponse company = companyService.getCompanyById(id);
             return ResponseEntity.ok(company);
@@ -72,7 +72,7 @@ public class CompanyController {
  @PutMapping("/{id}")
  @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
  public ResponseEntity<CompanyResponse> updateCompany(
-         @PathVariable Long id,
+         @PathVariable("id") Long id,
          @RequestBody CompanyUpdateRequest request,
          @RequestHeader(name = "Authorization", required = false) String authHeader // JWT opcional
  ) {
@@ -97,7 +97,7 @@ public class CompanyController {
     // ============================
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
-    public ResponseEntity<Void> deleteCompany(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCompany(@PathVariable("id") Long id) {
         try {
             companyService.deleteCompany(id);
             return ResponseEntity.noContent().build();
@@ -131,7 +131,7 @@ public class CompanyController {
         )
     )
     public ResponseEntity<CompanyResponse> updateCompanyPicture(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestPart("file") MultipartFile file
     ) {
         try {

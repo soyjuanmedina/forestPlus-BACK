@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PurchaseRequest {
     private Long landId;
+    private Long plannedPlantationId;
     private Long treeTypeId;
     private Integer quantity;
 }
