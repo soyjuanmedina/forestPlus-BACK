@@ -282,18 +282,21 @@ public class UserServiceImpl implements UserService {
     
     @Override
     public Page<UserResponse> getUsers(Pageable pageable) {
-        return getUsers(pageable, null, null);
+        return getUsers(pageable, null, null, null);
     }
     
     @Override
-    public Page<UserResponse> getUsers(Pageable pageable, String role, Long companyId) {
+    public Page<UserResponse> getUsers(Pageable pageable, String role, Long companyId, String search) {
         String currentRole = currentUserService.getCurrentUserRole();
         Long currentCompanyId = currentUserService.getCurrentUserCompanyId();
         
         Page<UserEntity> page;
 
         if ("ADMIN".equals(currentRole)) {
-            if (role != null && companyId != null) {
+            if (search != null && !search.trim().isEmpty()) {
+                String searchTerm = "%" + search.trim().toLowerCase() + "%";
+                page = userRepository.searchUsers(searchTerm, pageable);
+            } else if (role != null && companyId != null) {
                 page = userRepository.findByRoleAndCompanyId(role, companyId, pageable);
             } else if (role != null) {
                 page = userRepository.findByRole(role, pageable);
@@ -303,8 +306,11 @@ public class UserServiceImpl implements UserService {
                 page = userRepository.findAll(pageable);
             }
         } else if ("COMPANY_ADMIN".equals(currentRole)) {
-            Long companyFilter = companyId != null ? companyId : currentCompanyId;
-            if (role != null) {
+            Long companyFilter = (companyId != null) ? companyId : currentCompanyId;
+            if (search != null && !search.trim().isEmpty()) {
+                String searchTerm = "%" + search.trim().toLowerCase() + "%";
+                page = userRepository.searchUsersInCompany(searchTerm, companyFilter, pageable);
+            } else if (role != null) {
                 page = userRepository.findByRoleAndCompanyId(role, companyFilter, pageable);
             } else {
                 page = userRepository.findByCompanyId(companyFilter, pageable);

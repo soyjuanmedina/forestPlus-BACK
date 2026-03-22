@@ -43,6 +43,7 @@ public class UserController {
     public ResponseEntity<Page<UserResponse>> getUsers(
             @RequestParam(required = false) String role,
             @RequestParam(required = false) Long companyId,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id,asc") String sort // un solo string "campo,direccion"
@@ -55,7 +56,7 @@ public class UserController {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(direction, property)));
 
-        Page<UserResponse> users = userService.getUsers(pageable, role, companyId);
+        Page<UserResponse> users = userService.getUsers(pageable, role, companyId, search);
         return ResponseEntity.ok(users);
     }
 

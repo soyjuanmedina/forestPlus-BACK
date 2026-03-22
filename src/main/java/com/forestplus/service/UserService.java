@@ -14,8 +14,8 @@ public interface UserService {
     // Obtener usuarios paginados sin filtros
     Page<UserResponse> getUsers(Pageable pageable);
 
-    // Obtener usuarios paginados con filtros opcionales de rol y compañía
-    Page<UserResponse> getUsers(Pageable pageable, String role, Long companyId);
+    // Obtener usuarios paginados con filtros opcionales de rol, compañía y búsqueda
+    Page<UserResponse> getUsers(Pageable pageable, String role, Long companyId, String search);
 
     // Obtener todos los usuarios (sin paginación)
     List<UserResponse> getAllUsers();
