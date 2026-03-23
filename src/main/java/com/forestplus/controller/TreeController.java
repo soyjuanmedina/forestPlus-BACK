@@ -6,7 +6,6 @@ import com.forestplus.dto.request.TreeUpdateRequest;
 import com.forestplus.dto.response.LandTreeSummaryResponse;
 import com.forestplus.dto.response.TreeResponse;
 import com.forestplus.security.CurrentUserService;
-import com.forestplus.service.AuthService;
 import com.forestplus.service.TreeService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,13 +23,12 @@ import java.util.List;
 public class TreeController {
 
     private final TreeService treeService;
-    private final AuthService authService;
     private final CurrentUserService currentUserService;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TreeResponse>> getAllTrees() {
-        return ResponseEntity.ok(treeService.getAllTrees());console.log('', );
+        return ResponseEntity.ok(treeService.getAllTrees());
     }
 
     @GetMapping("/{id}")
