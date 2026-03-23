@@ -16,4 +16,6 @@ public class LandUpdateRequest {
     private BigDecimal area;
     private String picture;
     private Integer maxTrees;
+
+    private java.util.List<CoordinateRequest> coordinates;
 }

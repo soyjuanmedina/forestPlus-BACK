@@ -94,6 +94,7 @@ public class UserServiceImpl implements UserService {
                          ? companyRepository.findById(request.getCompanyId())
                                .orElseThrow(() -> new RuntimeException("Company not found with id " + request.getCompanyId()))
                          : null)
+                .picture(request.getPicture())
                 .build();
 
         UserEntity saved = userRepository.save(user);
@@ -153,6 +154,9 @@ public class UserServiceImpl implements UserService {
             }
             if (request.getPassword() != null && !request.getPassword().isEmpty()) {
                 existing.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+            }
+            if (request.getPicture() != null) {
+                existing.setPicture(request.getPicture());
             }
 
             UserEntity updated = userRepository.save(existing);
@@ -230,6 +234,9 @@ public class UserServiceImpl implements UserService {
                     ) {};
                 }
                 existing.setPendingTreesCount(request.getPendingTreesCount());
+            }
+            if (request.getPicture() != null) {
+                existing.setPicture(request.getPicture());
             }
 
             UserEntity updated = userRepository.save(existing);

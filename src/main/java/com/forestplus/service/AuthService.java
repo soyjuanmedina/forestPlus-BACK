@@ -75,6 +75,7 @@ public class AuthService {
                 .emailVerified(false)
                 .forcePasswordChange(false)
                 .uuid(verificationUuid)
+                .picture(request.getPicture())
                 .build();
 
         // --- Asignar compañía si se recibe ---

@@ -30,7 +30,7 @@ public class TreeController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TreeResponse>> getAllTrees() {
-        return ResponseEntity.ok(treeService.getAllTrees());
+        return ResponseEntity.ok(treeService.getAllTrees());console.log('', );
     }
 
     @GetMapping("/{id}")
