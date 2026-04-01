@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TreeRequest {
 
-    private String scientificName;
     private String customName;
 
     @Schema(name = "co2AbsorptionAt20")

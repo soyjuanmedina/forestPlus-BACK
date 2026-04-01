@@ -28,6 +28,7 @@ public interface TreeMapper {
     @Mapping(target = "ownerUserName", source = "ownerUser.name")
     @Mapping(target = "ownerCompanyId", source = "ownerCompany.id")
     @Mapping(target = "ownerCompanyName", source = "ownerCompany.name")
+    @Mapping(target = "scientificName", source = "treeType.scientificName")
     @Mapping(target = "plannedPlantation", source = "plannedPlantation")
     TreeResponse toResponse(TreeEntity tree);
 
