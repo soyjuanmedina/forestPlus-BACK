@@ -22,4 +22,5 @@ public class TreeTypeUpdateRequest {
 
     private BigDecimal typicalHeight;
     private Integer lifespanYears;
+    private String picture;
 }

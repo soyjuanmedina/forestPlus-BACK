@@ -27,6 +27,10 @@ public class PlannedPlantationEntity {
     @JoinColumn(name = "land_id")
     private LandEntity land;
 
+    @ManyToOne
+    @JoinColumn(name = "tree_type_id")
+    private TreeTypeEntity treeType;
+
     /**
      * Fecha prevista de la plantación
      */

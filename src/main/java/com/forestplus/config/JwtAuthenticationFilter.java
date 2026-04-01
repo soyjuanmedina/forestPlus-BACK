@@ -45,10 +45,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
     	
         String path = request.getRequestURI();
-        System.out.println("📡 path: " + path);
-        System.out.println("📡 Petición recibida: " + request.getMethod() + " " + request.getRequestURI());
-        System.out.println("    Origin: " + request.getHeader("Origin"));
-        System.out.println("    Authorization: " + request.getHeader("Authorization"));
+        log.debug("📡 path: {}", path);
+        log.debug("📡 Petición recibida: {} {}", request.getMethod(), request.getRequestURI());
+        log.debug("    Origin: {}", request.getHeader("Origin"));
+        log.debug("    Authorization: {}", request.getHeader("Authorization"));
 
         // Saltar Swagger y OpenAPI
         if (path.startsWith("/v3/api-docs") ||
@@ -94,9 +94,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                 String authority = "ROLE_" + role;
-                System.out.println("📌 Usuario autenticado: " + email);
-                System.out.println("📌 Rol desde JWT: " + role);
-                System.out.println("📌 GrantedAuthority que se asignará: " + authority);
+                log.debug("📌 Usuario autenticado: {}", email);
+                log.debug("📌 Rol desde JWT: {}", role);
+                log.debug("📌 GrantedAuthority que se asignará: {}", authority);
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
@@ -107,9 +107,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                // Debug adicional para ver qué tiene Spring Security
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                        .forEach(a -> System.out.println("📌 Authority en SecurityContext: " + a.getAuthority()));
+                        .forEach(a -> log.debug("📌 Authority en SecurityContext: {}", a.getAuthority()));
             }
 
         } catch (ExpiredJwtException e) {
@@ -127,7 +126,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         boolean skip = path.startsWith("/api/webhooks/loops")
                     || path.startsWith("/development/api/webhooks/loops")
-                    || path.equals("/api/loops/waitlist");
+                    || path.equals("/api/loops/waitlist")
+                    || path.equals("/api/loops/test-get-uuid");
 
         log.info("📡 shouldNotFilter check for path: {} → skip={}", path, skip);
 

@@ -35,7 +35,13 @@ class LandServiceImplTest {
 
     @Mock
     private LandMapper landMapper;
-
+ 
+    @Mock
+    private com.forestplus.repository.CoordinateRepository coordinateRepository;
+ 
+    @Mock
+    private com.forestplus.mapper.CoordinateMapper coordinateMapper;
+ 
     @InjectMocks
     private LandServiceImpl landService;
 
@@ -54,7 +60,8 @@ class LandServiceImplTest {
 
         LandResponse response = new LandResponse();
         response.setName(request.getName());
-
+ 
+        when(landMapper.toEntity(request)).thenReturn(entity);
         when(landRepository.save(any(LandEntity.class))).thenReturn(entity);
         when(landMapper.toResponse(entity)).thenReturn(response);
 
@@ -81,6 +88,7 @@ class LandServiceImplTest {
         when(landRepository.save(entity)).thenReturn(entity);
         LandResponse response = new LandResponse();
         response.setName(request.getName());
+        response.setId(landId);
         when(landMapper.toResponse(entity)).thenReturn(response);
 
         LandResponse result = landService.updateLand(landId, request);
@@ -107,7 +115,9 @@ class LandServiceImplTest {
         LandEntity entity = new LandEntity();
         when(landRepository.findById(landId)).thenReturn(Optional.of(entity));
         LandResponse response = new LandResponse();
+        response.setId(landId);
         when(landMapper.toResponse(entity)).thenReturn(response);
+        when(coordinateRepository.findByLandId(landId)).thenReturn(List.of());
 
         LandResponse result = landService.getLandById(landId);
 
@@ -134,8 +144,11 @@ class LandServiceImplTest {
 
         when(landRepository.findAll()).thenReturn(entities);
         List<LandResponse> responseList = List.of(new LandResponse(), new LandResponse());
+        responseList.get(0).setId(1L);
+        responseList.get(1).setId(2L);
         when(landMapper.toResponseList(entities)).thenReturn(responseList);
-
+        when(coordinateRepository.findByLandId(anyLong())).thenReturn(List.of());
+ 
         List<LandResponse> result = landService.getAllLands();
 
         assertEquals(2, result.size());

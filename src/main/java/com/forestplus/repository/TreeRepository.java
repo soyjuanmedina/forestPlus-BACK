@@ -104,4 +104,6 @@ public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
     	        @Param("companyIds") List<Long> companyIds
     	);
 
+    @Query("SELECT COALESCE(SUM(t.co2AbsorptionAt20), 0) FROM TreeEntity t")
+    BigDecimal sumGlobalAnnualCo2At20();
 }

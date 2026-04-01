@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class LandController {
         summary = "Obtener una parcela por su ID"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<LandResponse> getLandById(@PathVariable Long id) {
+    public ResponseEntity<LandResponse> getLandById(@PathVariable("id") Long id) {
         try {
             LandResponse land = landService.getLandById(id);
             return ResponseEntity.ok(land);
@@ -81,7 +82,7 @@ public class LandController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<LandResponse> updateLand(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody LandUpdateRequest request,
             @RequestHeader(name = "Authorization", required = false) String authHeader
     ) {
@@ -107,12 +108,51 @@ public class LandController {
     )
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
-    public ResponseEntity<Void> deleteLand(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLand(@PathVariable("id") Long id) {
         try {
             landService.deleteLand(id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ============================
+    // Subir o actualizar imagen de la parcela (JSON - v2)
+    // ============================
+    @PutMapping(value = "/{id}/picture", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+    @Operation(summary = "Actualizar imagen de la parcela (v2 - JSON Base64)")
+    public ResponseEntity<LandResponse> updateLandPicture(
+            @PathVariable("id") Long id,
+            @RequestBody java.util.Map<String, String> body
+    ) {
+        try {
+            String picture = body.get("picture");
+            LandResponse response = landService.updateLandPicture(id, picture);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ============================
+    // Subir o actualizar imagen de la parcela (Multipart - v1)
+    // ============================
+    @PutMapping(value = "/{id}/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
+    @Operation(summary = "Actualizar imagen de la parcela (v1 - Multipart)")
+    public ResponseEntity<LandResponse> updateLandPictureMultipart(
+            @PathVariable("id") Long id,
+            @RequestParam("file") MultipartFile file
+    ) {
+        try {
+            String base64 = "data:" + file.getContentType() + ";base64," + 
+                            java.util.Base64.getEncoder().encodeToString(file.getBytes());
+            LandResponse response = landService.updateLandPicture(id, base64);
+            return ResponseEntity.ok(response);
+        } catch (java.io.IOException e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

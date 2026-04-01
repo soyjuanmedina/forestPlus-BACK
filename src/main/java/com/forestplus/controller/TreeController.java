@@ -6,7 +6,6 @@ import com.forestplus.dto.request.TreeUpdateRequest;
 import com.forestplus.dto.response.LandTreeSummaryResponse;
 import com.forestplus.dto.response.TreeResponse;
 import com.forestplus.security.CurrentUserService;
-import com.forestplus.service.AuthService;
 import com.forestplus.service.TreeService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ import java.util.List;
 public class TreeController {
 
     private final TreeService treeService;
-    private final AuthService authService;
     private final CurrentUserService currentUserService;
 
     @GetMapping
@@ -35,7 +33,7 @@ public class TreeController {
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<TreeResponse> getTreeById(@PathVariable Long id) {
+    public ResponseEntity<TreeResponse> getTreeById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(treeService.getTreeById(id));
     }
 
@@ -48,7 +46,7 @@ public class TreeController {
     @PutMapping("/{id}")
     @PreAuthorize("@treeSecurity.canEdit(#id)")
     public ResponseEntity<TreeResponse> updateTree(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody TreeUpdateRequest request
     ) {
         return ResponseEntity.ok(treeService.updateTree(id, request));
@@ -56,7 +54,7 @@ public class TreeController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteTree(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTree(@PathVariable("id") Long id) {
         treeService.deleteTree(id);
         return ResponseEntity.noContent().build();
     }
@@ -64,7 +62,7 @@ public class TreeController {
     
     @GetMapping("/land/{landId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
-    public ResponseEntity<List<LandTreeSummaryResponse>> getTreesByLand(@PathVariable Long landId) {
+    public ResponseEntity<List<LandTreeSummaryResponse>> getTreesByLand(@PathVariable("landId") Long landId) {
         List<LandTreeSummaryResponse> summary = treeService.getTreesByLand(landId);
         return ResponseEntity.ok(summary);
     }
@@ -72,8 +70,8 @@ public class TreeController {
     @GetMapping("/owner")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<LandTreeSummaryResponse>> getTreesByOwner(
-            @RequestParam(required = false) Long ownerUserId,
-            @RequestParam(required = false) Long ownerCompanyId
+            @RequestParam(name = "ownerUserId", required = false) Long ownerUserId,
+            @RequestParam(name = "ownerCompanyId", required = false) Long ownerCompanyId
     ) {
         Long currentUserId = currentUserService.getCurrentUserId();
         Long currentCompanyId = currentUserService.getCurrentUserCompanyId(); 
@@ -118,9 +116,9 @@ public class TreeController {
     @GetMapping("/owner/trees")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<TreeResponse>> getTreesByOwnerAndType(
-            @RequestParam(required = false) Long ownerUserId,
-            @RequestParam(required = false) Long ownerCompanyId,
-            @RequestParam Long treeTypeId
+            @RequestParam(name = "ownerUserId", required = false) Long ownerUserId,
+            @RequestParam(name = "ownerCompanyId", required = false) Long ownerCompanyId,
+            @RequestParam(name = "treeTypeId") Long treeTypeId
     ) {
         Long currentUserId = currentUserService.getCurrentUserId();
         String currentRole = currentUserService.getCurrentUserRole();
@@ -147,35 +145,35 @@ public class TreeController {
     
     @GetMapping("/unassigned")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<TreeResponse>> getUnassignedTreesByLand(@RequestParam Long landId) {
+    public ResponseEntity<List<TreeResponse>> getUnassignedTreesByLand(@RequestParam(name = "landId") Long landId) {
         return ResponseEntity.ok(treeService.getUnassignedTreesByLand(landId));
     }
     
     @PostMapping("/assign")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
-    public ResponseEntity<TreeResponse> assignTreeToUser(@RequestParam Long treeId, @RequestParam Long userId) {
+    public ResponseEntity<TreeResponse> assignTreeToUser(@RequestParam(name = "treeId") Long treeId, @RequestParam(name = "userId") Long userId) {
         return ResponseEntity.ok(treeService.assignTreeToUser(treeId, userId));
     }
     
     @PostMapping("/unassign")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TreeResponse> unassignTreeFromUser(
-            @RequestParam Long treeId
+            @RequestParam(name = "treeId") Long treeId
     ) {
         return ResponseEntity.ok(treeService.unassignTreeFromUser(treeId));
     }
     
     @PostMapping("/unassign-company")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<TreeResponse> unassignTreeFromCompany(@RequestParam Long treeId) {
+    public ResponseEntity<TreeResponse> unassignTreeFromCompany(@RequestParam(name = "treeId") Long treeId) {
         return ResponseEntity.ok(treeService.unassignTreeFromCompany(treeId));
     }
     
     @GetMapping("/land/{landId}/type/{treeTypeId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TreeResponse>> getTreesByLandAndType(
-            @PathVariable Long landId,
-            @PathVariable Long treeTypeId
+            @PathVariable("landId") Long landId,
+            @PathVariable("treeTypeId") Long treeTypeId
     ) {
         return ResponseEntity.ok(treeService.getTreesByLandAndType(landId, treeTypeId));
     }
@@ -183,8 +181,8 @@ public class TreeController {
     @PostMapping("/assign-company")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<TreeResponse> assignTreeToCompany(
-            @RequestParam Long treeId,
-            @RequestParam Long companyId
+            @RequestParam(name = "treeId") Long treeId,
+            @RequestParam(name = "companyId") Long companyId
     ) {
         return ResponseEntity.ok(treeService.assignTreeToCompany(treeId, companyId));
     }
@@ -192,8 +190,8 @@ public class TreeController {
     @GetMapping("/owner/all")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<TreeResponse>> getAllTreesByOwner(
-            @RequestParam(required = false) Long ownerUserId,
-            @RequestParam(required = false) Long ownerCompanyId
+            @RequestParam(name = "ownerUserId", required = false) Long ownerUserId,
+            @RequestParam(name = "ownerCompanyId", required = false) Long ownerCompanyId
     ) {
         return ResponseEntity.ok(treeService.getAllTreesByOwner(ownerUserId, ownerCompanyId));
     }

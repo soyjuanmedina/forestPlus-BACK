@@ -50,7 +50,7 @@ public class TreeTypeEntity {
     @Column(name = "lifespan_years")
     private Integer lifespanYears;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "LONGTEXT")
     private String picture;
 
     @Column(name = "created_at")

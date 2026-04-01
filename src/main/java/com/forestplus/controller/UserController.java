@@ -41,11 +41,12 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     @Operation(summary = "Obtener usuarios con filtros, paginación y orden")
     public ResponseEntity<Page<UserResponse>> getUsers(
-            @RequestParam(required = false) String role,
-            @RequestParam(required = false) Long companyId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id,asc") String sort // un solo string "campo,direccion"
+            @RequestParam(name = "role", required = false) String role,
+            @RequestParam(name = "companyId", required = false) Long companyId,
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "id,asc") String sort // un solo string "campo,direccion"
     ) {
         String[] parts = sort.split(",");
         String property = parts[0];
@@ -55,7 +56,7 @@ public class UserController {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(direction, property)));
 
-        Page<UserResponse> users = userService.getUsers(pageable, role, companyId);
+        Page<UserResponse> users = userService.getUsers(pageable, role, companyId, search);
         return ResponseEntity.ok(users);
     }
 
@@ -74,7 +75,7 @@ public class UserController {
         )
     )
     @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> getUserById(@PathVariable("id") Long id) {
         UserResponse user = userService.getUserById(id);
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -117,7 +118,7 @@ public class UserController {
     )
     @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     public ResponseEntity<UserResponse> updateUserByAdmin(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody RegisterUserByAdminRequest request) {
         try {
             UserResponse response = userService.updateUserByAdmin(id, request);
@@ -143,7 +144,7 @@ public class UserController {
     )
     @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     public ResponseEntity<UserResponse> updateUser(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody RegisterUserRequest request) {
         try {
             UserResponse response = userService.updateUser(id, request);
@@ -161,26 +162,16 @@ public class UserController {
     @Operation(summary = "Eliminar un usuario")
     @ApiResponse(responseCode = "204", description = "Usuario eliminado")
     @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
     
-	 // =====================================
-	 // Actualizar imagen de perfil del usuario
-	 // =====================================
 	 @PutMapping("/{id}/picture")
 	 @PreAuthorize("isAuthenticated()")
 	 @Operation(
 	     summary = "Actualizar la imagen de perfil del usuario",
-	     requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-	         description = "Archivo de imagen a subir",
-	         required = true,
-	         content = @Content(
-	             mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-	             schema = @Schema(type = "string", format = "binary")
-	         )
-	     )
+	     description = "Recibe un JSON con el campo 'picture' conteniendo la imagen en formato Base64"
 	 )
 	 @ApiResponse(
 	     responseCode = "200",
@@ -191,14 +182,32 @@ public class UserController {
 	     )
 	 )
 	 public ResponseEntity<UserResponse> updateUserPicture(
-	         @PathVariable Long id,
-	         @RequestPart("file") MultipartFile file // <-- Cambiado de @RequestParam a @RequestPart
+	         @PathVariable("id") Long id,
+	         @RequestBody java.util.Map<String, String> body
 	 ) {
 	     try {
-	         UserResponse response = userService.updateUserPicture(id, file);
+	         String picture = body.get("picture");
+	         UserResponse response = userService.updateUserPicture(id, picture);
 	         return ResponseEntity.ok(response);
 	     } catch (RuntimeException e) {
 	         return ResponseEntity.notFound().build();
+	     }
+	 }
+
+	 @PutMapping(value = "/{id}/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	 @PreAuthorize("isAuthenticated()")
+	 @Operation(summary = "Actualizar imagen de perfil (Compatible con v1 - Multipart)")
+	 public ResponseEntity<UserResponse> updateUserPictureMultipart(
+	         @PathVariable("id") Long id,
+	         @RequestParam("file") MultipartFile file
+	 ) {
+	     try {
+	         String base64 = "data:" + file.getContentType() + ";base64," + 
+	                         java.util.Base64.getEncoder().encodeToString(file.getBytes());
+	         UserResponse response = userService.updateUserPicture(id, base64);
+	         return ResponseEntity.ok(response);
+	     } catch (java.io.IOException e) {
+	         return ResponseEntity.internalServerError().build();
 	     }
 	 }
 

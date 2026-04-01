@@ -32,6 +32,7 @@ public class LandEntity {
 
     private BigDecimal area;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String picture;
 
     @OneToMany(mappedBy = "land", cascade = CascadeType.ALL, orphanRemoval = true)

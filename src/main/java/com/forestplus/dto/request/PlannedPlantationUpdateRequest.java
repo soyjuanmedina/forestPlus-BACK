@@ -14,6 +14,9 @@ public class PlannedPlantationUpdateRequest {
     @Schema(description = "ID del terreno asociado (opcional)")
     private Long landId;
 
+    @Schema(description = "ID del tipo de árbol a plantar")
+    private Long treeTypeId;
+
     @Schema(description = "Fecha prevista de la plantación")
     private LocalDate plannedDate;
 

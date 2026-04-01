@@ -22,6 +22,9 @@ public class HomeDashboardKpiResponse {
     
     private BigDecimal annualCo2Compensated;
     
+    private long globalPlantedTrees;
+    private BigDecimal globalAnnualCo2Compensated;
+    
     private List<PlannedPlantationKpiResponse> plannedPlantations;
 
 }

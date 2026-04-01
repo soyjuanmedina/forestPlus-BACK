@@ -35,6 +35,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final EmailService emailService;
     private final CurrentUserService currentUserService;
     private final LoopsService loopsService;
+    private final com.forestplus.repository.PlannedPlantationRepository plannedPlantationRepository;
 
     @Transactional
     @Override
@@ -43,6 +44,14 @@ public class PurchaseServiceImpl implements PurchaseService {
         // 1️⃣ Obtener terreno
         LandEntity land = landRepository.findById(request.getLandId())
                 .orElseThrow(() -> new RuntimeException("Terreno no encontrado"));
+        
+        // OPCIONAL: Información de la plantación
+        String plantationInfo = "No especificada";
+        if (request.getPlannedPlantationId() != null) {
+            plantationInfo = plannedPlantationRepository.findById(request.getPlannedPlantationId())
+                .map(p -> p.getPlannedDate() != null ? "Vuelo: " + p.getPlannedDate() : "ID: " + p.getId())
+                .orElse("No encontrada (" + request.getPlannedPlantationId() + ")");
+        }
 
         // 2️⃣ Obtener tipo de árbol
         TreeTypeEntity treeType = treeTypeRepository.findById(request.getTreeTypeId())
@@ -72,6 +81,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         buyerEventProperties.put("totalPrice", totalPrice);
         buyerEventProperties.put("treeType", treeType.getName());
         buyerEventProperties.put("link", link);
+        buyerEventProperties.put("plantation", plantationInfo);
         
         LoopsEventRequest buyerLoopsEvent = new LoopsEventRequest(
         	buyer.getEmail(),
@@ -91,6 +101,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         eventProperties.put("quantity", request.getQuantity());
         eventProperties.put("totalPrice", totalPrice);
         eventProperties.put("treeType", treeType.getName());
+        eventProperties.put("plantation", plantationInfo);
         
         LoopsEventRequest loopsEvent = new LoopsEventRequest(
         	sellerEmail,

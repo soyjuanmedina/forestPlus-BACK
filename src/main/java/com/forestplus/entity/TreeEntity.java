@@ -44,9 +44,6 @@ public class TreeEntity {
     @Column(name = "planted_at")
     private LocalDate plantedAt;
 
-    @Column(name = "scientific_name")
-    private String scientificName;
-
     @Column(name = "custom_name")
     private String customName;
 

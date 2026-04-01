@@ -33,7 +33,7 @@ public class CompanyCO2YearlyController {
         summary = "Obtener la lista de registros CO2 anuales de una empresa"
     )
     @GetMapping
-    public List<CompanyCO2YearlyResponse> getAll(@PathVariable Long companyId) {
+    public List<CompanyCO2YearlyResponse> getAll(@PathVariable("companyId") Long companyId) {
         return co2Service.getAllForCompany(companyId);
     }
 
@@ -47,7 +47,7 @@ public class CompanyCO2YearlyController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public CompanyCO2YearlyResponse createOrUpdate(
-            @PathVariable Long companyId,
+            @PathVariable("companyId") Long companyId,
             @RequestBody CompanyCO2YearlyRequest request
     ) {
         return co2Service.createOrUpdate(
@@ -68,8 +68,8 @@ public class CompanyCO2YearlyController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public void delete(
-        @PathVariable Long companyId,
-        @PathVariable Long id
+        @PathVariable("companyId") Long companyId,
+        @PathVariable("id") Long id
     ) {
         co2Service.delete(id);
     }

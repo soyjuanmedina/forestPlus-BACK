@@ -22,4 +22,6 @@ public class LandRequest {
 
     // Nuevo: máximo de árboles permitidos
     private Integer maxTrees;
+
+    private List<CoordinateRequest> coordinates;
 }

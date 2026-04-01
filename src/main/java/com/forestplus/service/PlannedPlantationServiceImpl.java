@@ -23,20 +23,27 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
 
     private final PlannedPlantationRepository plannedPlantationRepository;
     private final LandRepository landRepository;
+    private final com.forestplus.repository.TreeTypeRepository treeTypeRepository;
     private final PlannedPlantationMapper mapper;
+
+    private PlannedPlantationResponse mapToResponse(PlannedPlantationEntity entity) {
+        PlannedPlantationResponse resp = mapper.toResponse(entity);
+        resp.setPurchasedTrees((int) plannedPlantationRepository.countTreesByPlantationId(entity.getId()));
+        return resp;
+    }
 
     @Override
     public List<PlannedPlantationResponse> getAllPlannedPlantations() {
         return plannedPlantationRepository.findAll()
                 .stream()
-                .map(mapper::toResponse)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public PlannedPlantationResponse getPlannedPlantationById(Long id) {
         return plannedPlantationRepository.findById(id)
-                .map(mapper::toResponse)
+                .map(this::mapToResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Planned Plantation not found with id " + id));
     }
 
@@ -51,7 +58,13 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
             entity.setLand(land);
         }
 
-        return mapper.toResponse(plannedPlantationRepository.save(entity));
+        if (request.getTreeTypeId() != null) {
+            com.forestplus.entity.TreeTypeEntity treeType = treeTypeRepository.findById(request.getTreeTypeId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Tree Type not found with id " + request.getTreeTypeId()));
+            entity.setTreeType(treeType);
+        }
+
+        return mapToResponse(plannedPlantationRepository.save(entity));
     }
 
     @Override
@@ -72,7 +85,17 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
             entity.setLand(land);
         }
 
-        return mapper.toResponse(plannedPlantationRepository.save(entity));
+        if (request.getTreeTypeId() == null) {
+            entity.setTreeType(null);
+        } else {
+            com.forestplus.entity.TreeTypeEntity treeType = treeTypeRepository.findById(request.getTreeTypeId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Tree Type not found with id " + request.getTreeTypeId()
+                ));
+            entity.setTreeType(treeType);
+        }
+
+        return mapToResponse(plannedPlantationRepository.save(entity));
     }
 
     @Override
@@ -84,7 +107,7 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
     public List<PlannedPlantationResponse> getPlannedPlantationsByLand(Long landId) {
         return plannedPlantationRepository.findByLandId(landId)
                 .stream()
-                .map(mapper::toResponse)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -92,7 +115,7 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
     public List<PlannedPlantationResponse> getPlannedPlantationsWithoutLand() {
         return plannedPlantationRepository.findByLandIsNull()
                 .stream()
-                .map(mapper::toResponse)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -100,7 +123,7 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
     public List<PlannedPlantationResponse> getPlannedPlantationsBetweenDates(LocalDate start, LocalDate end) {
         return plannedPlantationRepository.findByPlannedDateBetween(start, end)
                 .stream()
-                .map(mapper::toResponse)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -108,7 +131,7 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
     public List<PlannedPlantationResponse> getExecutedPlannedPlantations() {
         return plannedPlantationRepository.findByEffectiveDateIsNotNull()
                 .stream()
-                .map(mapper::toResponse)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -116,7 +139,7 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
     public List<PlannedPlantationResponse> getPendingPlannedPlantations() {
         return plannedPlantationRepository.findByEffectiveDateIsNull()
                 .stream()
-                .map(mapper::toResponse)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 }

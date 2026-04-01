@@ -42,7 +42,7 @@ public class CoordinateController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtener coordenada por ID")
     public ResponseEntity<CoordinateResponse> getCoordinateById(
-            @Parameter(description = "ID de la coordenada") @PathVariable Long id) {
+            @Parameter(description = "ID de la coordenada") @PathVariable("id") Long id) {
         return ResponseEntity.ok(coordinateService.getCoordinateById(id));
     }
 
@@ -64,7 +64,7 @@ public class CoordinateController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar coordenada existente")
     public ResponseEntity<CoordinateResponse> updateCoordinate(
-            @Parameter(description = "ID de la coordenada") @PathVariable Long id,
+            @Parameter(description = "ID de la coordenada") @PathVariable("id") Long id,
             @RequestBody CoordinateUpdateRequest request) {
         return ResponseEntity.ok(coordinateService.updateCoordinate(id, request));
     }
@@ -76,7 +76,7 @@ public class CoordinateController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar coordenada por ID")
     public ResponseEntity<Void> deleteCoordinate(
-            @Parameter(description = "ID de la coordenada") @PathVariable Long id) {
+            @Parameter(description = "ID de la coordenada") @PathVariable("id") Long id) {
         coordinateService.deleteCoordinate(id);
         return ResponseEntity.noContent().build();
     }
@@ -88,7 +88,7 @@ public class CoordinateController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtener coordenadas de una parcela por ID de land")
     public ResponseEntity<List<CoordinateResponse>> getCoordinatesByLand(
-            @Parameter(description = "ID de la parcela") @PathVariable Long landId) {
+            @Parameter(description = "ID de la parcela") @PathVariable("landId") Long landId) {
         return ResponseEntity.ok(coordinateService.getCoordinatesByLand(landId));
     }
 
@@ -99,7 +99,7 @@ public class CoordinateController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     @Operation(summary = "Eliminar todas las coordenadas de una parcela")
     public ResponseEntity<Void> deleteCoordinatesByLand(
-            @Parameter(description = "ID de la parcela") @PathVariable Long landId) {
+            @Parameter(description = "ID de la parcela") @PathVariable("landId") Long landId) {
         coordinateService.deleteCoordinatesByLand(landId);
         return ResponseEntity.noContent().build();
     }

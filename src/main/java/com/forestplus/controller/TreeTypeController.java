@@ -39,7 +39,7 @@ public class TreeTypeController {
     // Obtener un tipo de árbol por ID
     // ============================
     @GetMapping("/{id}")
-    public ResponseEntity<TreeTypeResponse> getTreeTypeById(@PathVariable Long id) {
+    public ResponseEntity<TreeTypeResponse> getTreeTypeById(@PathVariable("id") Long id) {
         try {
             TreeTypeResponse treeType = treeTypeService.getTreeTypeById(id);
             return ResponseEntity.ok(treeType);
@@ -64,7 +64,7 @@ public class TreeTypeController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TreeTypeResponse> updateTreeType(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody TreeTypeUpdateRequest request
     ) {
         TreeTypeResponse updated = treeTypeService.updateTreeType(id, request);
@@ -76,7 +76,7 @@ public class TreeTypeController {
     // ============================
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteTreeType(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTreeType(@PathVariable("id") Long id) {
         treeTypeService.deleteTreeType(id);
         return ResponseEntity.noContent().build(); // 204 si todo va bien
     }
@@ -84,18 +84,11 @@ public class TreeTypeController {
     // ============================
     // Subir o actualizar imagen del tipo de árbol
     // ============================
-    @PutMapping(value = "/{id}/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}/picture")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Actualizar la imagen del tipo de árbol",
-        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Archivo de imagen a subir",
-            required = true,
-            content = @Content(
-                mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                schema = @Schema(type = "string", format = "binary")
-            )
-        )
+        description = "Recibe un JSON con el campo 'picture' conteniendo la imagen en formato Base64"
     )
     @ApiResponse(
         responseCode = "200",
@@ -106,14 +99,32 @@ public class TreeTypeController {
         )
     )
     public ResponseEntity<TreeTypeResponse> updateTreeTypePicture(
-            @PathVariable Long id,
-            @RequestPart("file") MultipartFile file
+            @PathVariable("id") Long id,
+            @RequestBody java.util.Map<String, String> body
     ) {
         try {
-            TreeTypeResponse response = treeTypeService.updateTreeTypePicture(id, file);
+            String picture = body.get("picture");
+            TreeTypeResponse response = treeTypeService.updateTreeTypePicture(id, picture);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping(value = "/{id}/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Actualizar imagen del tipo de árbol (Compatible con v1 - Multipart)")
+    public ResponseEntity<TreeTypeResponse> updateTreeTypePictureMultipart(
+            @PathVariable("id") Long id,
+            @RequestParam("file") MultipartFile file
+    ) {
+        try {
+            String base64 = "data:" + file.getContentType() + ";base64," + 
+                            java.util.Base64.getEncoder().encodeToString(file.getBytes());
+            TreeTypeResponse response = treeTypeService.updateTreeTypePicture(id, base64);
+            return ResponseEntity.ok(response);
+        } catch (java.io.IOException e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

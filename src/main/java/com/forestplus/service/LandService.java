@@ -17,4 +17,6 @@ public interface LandService {
     List<LandResponse> getAllLands();
 
     void deleteLand(Long id);
+    
+    LandResponse updateLandPicture(Long id, String picture);
 }
