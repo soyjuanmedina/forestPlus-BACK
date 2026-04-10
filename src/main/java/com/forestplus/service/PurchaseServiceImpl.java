@@ -52,7 +52,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         // OPCIONAL: Información de la plantación
         String plantationInfo = "No especificada";
         if (request.getPlannedPlantationId() != null) {
-             plantationInfo = plannedPlantationRepository.findById(request.getPlannedPlantationId())
+            plantationInfo = plannedPlantationRepository.findById(request.getPlannedPlantationId())
                 .map(p -> p.getPlannedDate() != null ? "Vuelo: " + p.getPlannedDate() : "ID: " + p.getId())
                 .orElse("No encontrada (" + request.getPlannedPlantationId() + ")");
         }
