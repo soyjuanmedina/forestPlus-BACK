@@ -18,3 +18,4 @@ public class PurchaseRequest {
     @Min(value = 1, message = "La cantidad mínima debe ser 1")
     private Integer quantity;
 }
+

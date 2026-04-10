@@ -37,3 +37,4 @@ public class GlobalExceptionHandler {
 
     public static record ErrorResponse(String message, int status) {}
 }
+ 
