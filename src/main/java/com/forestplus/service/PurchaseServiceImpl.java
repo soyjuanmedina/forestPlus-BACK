@@ -40,27 +40,31 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Transactional
     @Override
     public PurchaseResponse processPurchase(PurchaseRequest request) {
+        // Validadación de seguridad adicional
+        if (request.getQuantity() == null || request.getQuantity() < 1) {
+            throw new com.forestplus.exception.ForestPlusException(org.springframework.http.HttpStatus.BAD_REQUEST, "La cantidad mínima de árboles debe ser 1");
+        }
 
         // 1️⃣ Obtener terreno
         LandEntity land = landRepository.findById(request.getLandId())
-                .orElseThrow(() -> new RuntimeException("Terreno no encontrado"));
+                .orElseThrow(() -> new com.forestplus.exception.ForestPlusException(org.springframework.http.HttpStatus.NOT_FOUND, "Terreno no encontrado"));
         
         // OPCIONAL: Información de la plantación
         String plantationInfo = "No especificada";
         if (request.getPlannedPlantationId() != null) {
-            plantationInfo = plannedPlantationRepository.findById(request.getPlannedPlantationId())
+             plantationInfo = plannedPlantationRepository.findById(request.getPlannedPlantationId())
                 .map(p -> p.getPlannedDate() != null ? "Vuelo: " + p.getPlannedDate() : "ID: " + p.getId())
                 .orElse("No encontrada (" + request.getPlannedPlantationId() + ")");
         }
 
         // 2️⃣ Obtener tipo de árbol
         TreeTypeEntity treeType = treeTypeRepository.findById(request.getTreeTypeId())
-                .orElseThrow(() -> new RuntimeException("Tipo de árbol no encontrado"));
+                .orElseThrow(() -> new com.forestplus.exception.ForestPlusException(org.springframework.http.HttpStatus.NOT_FOUND, "Tipo de árbol no encontrado"));
 
         // 3️⃣ Obtener comprador
         UserEntity buyer = currentUserService.getCurrentUser();
         if (buyer == null) {
-            throw new RuntimeException("Usuario no autenticado");
+            throw new com.forestplus.exception.ForestPlusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Usuario no autenticado");
         }
 
         // 4️⃣ Actualizar árboles pendientes

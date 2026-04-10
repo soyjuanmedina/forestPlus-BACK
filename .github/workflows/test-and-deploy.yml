@@ -32,7 +32,7 @@ jobs:
       # ---------- Clone Angular Frontend ----------
       - name: Clone Angular Frontend
         run: |
-          git clone --branch $FRONT_BRANCH https://github.com/soyjuanmedina/forestPlus-FRONT frontend
+          git clone --branch $FRONT_BRANCH https://github.com/soyjuanmedina/forestPlus-FRONT-v2 frontend
 
       # ---------- Node ----------
       - name: Set up Node.js
@@ -59,7 +59,7 @@ jobs:
       - name: Copy Angular build to Spring Boot static
         run: |
           rm -rf src/main/resources/static/*
-          cp -r frontend/dist/forest-plus/browser/* src/main/resources/static/
+          cp -r frontend/dist/forest-frontend/browser/* src/main/resources/static/
 
       # ---------- Set Spring profile for development ----------
       - name: Set Spring profile to dev for development branch

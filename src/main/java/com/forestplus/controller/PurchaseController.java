@@ -11,6 +11,7 @@ import com.forestplus.dto.request.PurchaseRequest;
 import com.forestplus.dto.response.PurchaseResponse;
 import com.forestplus.service.PurchaseService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,7 +23,7 @@ public class PurchaseController {
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<PurchaseResponse> purchaseTrees(@RequestBody PurchaseRequest request) {
+    public ResponseEntity<PurchaseResponse> purchaseTrees(@Valid @RequestBody PurchaseRequest request) {
         return ResponseEntity.ok(purchaseService.processPurchase(request));
     }
 }
