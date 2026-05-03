@@ -149,7 +149,7 @@ class LandServiceImplTest {
         when(landMapper.toResponseList(entities)).thenReturn(responseList);
         when(coordinateRepository.findByLandId(anyLong())).thenReturn(List.of());
  
-        List<LandResponse> result = landService.getAllLands();
+        List<LandResponse> result = landService.getAllLands(null);
 
         assertEquals(2, result.size());
         verify(landRepository).findAll();

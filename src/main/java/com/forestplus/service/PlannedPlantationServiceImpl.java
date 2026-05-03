@@ -9,6 +9,8 @@ import com.forestplus.exception.ResourceNotFoundException;
 import com.forestplus.mapper.PlannedPlantationMapper;
 import com.forestplus.repository.LandRepository;
 import com.forestplus.repository.PlannedPlantationRepository;
+import com.forestplus.security.CurrentUserService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
     private final LandRepository landRepository;
     private final com.forestplus.repository.TreeTypeRepository treeTypeRepository;
     private final PlannedPlantationMapper mapper;
+    private final CurrentUserService currentUserService;
 
     private PlannedPlantationResponse mapToResponse(PlannedPlantationEntity entity) {
         PlannedPlantationResponse resp = mapper.toResponse(entity);
@@ -34,8 +37,23 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
 
     @Override
     public List<PlannedPlantationResponse> getAllPlannedPlantations() {
-        return plannedPlantationRepository.findAll()
-                .stream()
+        String currentRole = currentUserService.getCurrentUserRole();
+        Long companyId = currentUserService.getCurrentUserCompanyId();
+
+        List<PlannedPlantationEntity> entities;
+
+        if ("ADMIN".equals(currentRole)) {
+            // El Super Admin ve todas las plantaciones de todos
+            entities = plannedPlantationRepository.findAll();
+        } else if (companyId != null) {
+            // El COMPANY_ADMIN o COMPANY_USER solo ve las de su empresa
+            entities = plannedPlantationRepository.findByLand_Companies_Id(companyId);
+        } else {
+            // Si no tiene compañía y no es ADMIN, devolvemos lista vacía
+            return java.util.Collections.emptyList();
+        }
+
+        return entities.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

@@ -26,6 +26,8 @@ public class CompanyEntity {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserEntity> users;
     
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String picture; 
     
     // Relación muchos a muchos con terrenos

@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class CompanyUpdateRequest  {
     private String name;
     private String address;
+    private String picture;
 }

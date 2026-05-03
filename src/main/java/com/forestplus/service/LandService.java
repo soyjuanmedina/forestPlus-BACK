@@ -14,7 +14,7 @@ public interface LandService {
 
     LandResponse getLandById(Long id);
 
-    List<LandResponse> getAllLands();
+    List<LandResponse> getAllLands(Long companyId);
 
     void deleteLand(Long id);
     

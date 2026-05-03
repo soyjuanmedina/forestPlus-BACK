@@ -283,20 +283,23 @@ public class TreeServiceImpl implements TreeService {
     // ==============================
     // Mandar mail al usuario
     // ==============================
-    String link = frontendUrl;
-    
-    Map<String, Object> buyerEventProperties = new HashMap<>();
-    buyerEventProperties.put("landName", land.getName());
-    buyerEventProperties.put("quantity", request.getQuantity());
-    buyerEventProperties.put("link", link);
-    
-    LoopsEventRequest buyerLoopsEvent = new LoopsEventRequest(
-    	ownerUser.getEmail(),
-        "assigned_tree",
-        buyerEventProperties
-    );
+    if (ownerUser != null) {
 
-    loopsService.sendEvent(buyerLoopsEvent);
+        String link = frontendUrl;
+        
+        Map<String, Object> buyerEventProperties = new HashMap<>();
+        buyerEventProperties.put("landName", land.getName());
+        buyerEventProperties.put("quantity", request.getQuantity());
+        buyerEventProperties.put("link", link);
+        
+        LoopsEventRequest buyerLoopsEvent = new LoopsEventRequest(
+        	ownerUser.getEmail(),
+            "assigned_tree",
+            buyerEventProperties
+        );
+
+        loopsService.sendEvent(buyerLoopsEvent);
+    }
 
     // ==============================
     // 🔹 Marcar terreno lleno si corresponde

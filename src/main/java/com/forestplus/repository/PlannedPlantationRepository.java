@@ -70,4 +70,7 @@ public interface PlannedPlantationRepository
     long countTreesByPlantationId(@Param("plantationId") Long plantationId);
 
     List<PlannedPlantationEntity> findAllByIsActiveTrue();
+    
+ // Navega: land -> companies -> id
+    List<PlannedPlantationEntity> findByLand_Companies_Id(Long companyId);
 }

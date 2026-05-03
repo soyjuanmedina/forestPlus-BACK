@@ -67,6 +67,11 @@ public class CompanyServiceImpl implements CompanyService {
 
                 company.setName(request.getName());
                 company.setAddress(request.getAddress());
+                company.setPicture(request.getPicture());
+                
+                System.out.println("Llegó al Controller: " + request.getPicture().length());
+                
+                System.out.println("Llegó de la company: " + company.getPicture().length());
 
                 return companyRepository.save(company);
             })

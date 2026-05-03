@@ -10,6 +10,7 @@ import com.forestplus.mapper.LandMapper;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.LandRepository;
 import com.forestplus.repository.UserRepository;
+import com.forestplus.security.CurrentUserService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,31 +27,65 @@ public class LandServiceImpl implements LandService {
     private final LandMapper landMapper;
     private final com.forestplus.mapper.CoordinateMapper coordinateMapper;
     private final com.forestplus.repository.CoordinateRepository coordinateRepository;
+    private final CurrentUserService currentUserService;
+
 
     @Override
     @org.springframework.transaction.annotation.Transactional
     public LandResponse createLand(LandRequest request) {
+        // 1. Convertir el DTO de entrada a la Entidad base
         LandEntity land = landMapper.toEntity(request);
         if (land == null) {
             throw new RuntimeException("Error mapping land request");
         }
-        
+
+        // 2. Obtener información del contexto de seguridad
+        Long currentUserId = currentUserService.getCurrentUserId();
+        String currentRole = currentUserService.getCurrentUserRole();
+
+        // 3. Lógica de vinculación con la Compañía (Solo para COMPANY_ADMIN)
+        if ("COMPANY_ADMIN".equals(currentRole)) {
+            UserEntity creator = userRepository.findById(currentUserId)
+                    .orElseThrow(() -> new RuntimeException("Usuario creador no encontrado"));
+
+            if (creator.getCompany() != null) {
+                CompanyEntity company = creator.getCompany();
+                
+                // Inicializar las listas si vienen nulas para evitar NullPointerException
+                if (land.getCompanies() == null) land.setCompanies(new java.util.ArrayList<>());
+                if (company.getLands() == null) company.setLands(new java.util.ArrayList<>());
+
+                // Establecer vínculo bidireccional
+                // Importante: Al añadir el terreno a la lista de la compañía (lado dueño),
+                // JPA se encarga de insertar en la tabla 'company_lands'.
+                land.getCompanies().add(company);
+                company.getLands().add(land);
+            }
+        }
+
+        // 4. Vincular las coordenadas con el terreno (Relación OneToMany)
         if (land.getCoordinates() != null) {
             for (com.forestplus.entity.CoordinateEntity coord : land.getCoordinates()) {
                 coord.setLand(land);
             }
         }
-        
+
+        // 5. Guardar la entidad (Esto persiste Land, Coordinates y la relación con Company)
         land = landRepository.save(land);
+
+        // 6. Mapear a respuesta y refuerzo de datos para el Front-end
         LandResponse response = landMapper.toResponse(land);
         
-        // Refuerzo manual
+        // Si el mapper no cargó las coordenadas automáticamente, las forzamos
         if (response.getCoordinates() == null || response.getCoordinates().isEmpty()) {
-            List<com.forestplus.entity.CoordinateEntity> coords = coordinateRepository.findByLandId(response.getId());
+            List<com.forestplus.entity.CoordinateEntity> coords = coordinateRepository.findByLandId(land.getId());
             if (coords != null && !coords.isEmpty()) {
-                response.setCoordinates(coords.stream().map(coordinateMapper::toResponse).toList());
+                response.setCoordinates(coords.stream()
+                    .map(coordinateMapper::toResponse)
+                    .toList());
             }
         }
+
         return response;
     }
 
@@ -115,8 +150,17 @@ public class LandServiceImpl implements LandService {
 
     @Override
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<LandResponse> getAllLands() {
-        List<LandEntity> lands = landRepository.findAll();
+    public List<LandResponse> getAllLands(Long companyId) {
+        List<LandEntity> lands;
+    	if (companyId != null) {
+            // Buscamos solo las de la compañía
+            lands = landRepository.findByCompanies_Id(companyId);
+        } else {
+            // Buscamos todas (para el ADMIN)
+            lands = landRepository.findAll();
+        }
+    	
+
         List<LandResponse> responses = landMapper.toResponseList(lands);
         
         // Refuerzo para todos los terrenos

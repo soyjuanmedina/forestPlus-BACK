@@ -25,7 +25,7 @@ public class PlannedPlantationController {
     private final CurrentUserService currentUserService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<List<PlannedPlantationResponse>> getAll() {
         return ResponseEntity.ok(plannedPlantationService.getAllPlannedPlantations());
     }
@@ -37,13 +37,13 @@ public class PlannedPlantationController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<PlannedPlantationResponse> create(@RequestBody PlannedPlantationRequest request) {
         return ResponseEntity.ok(plannedPlantationService.createPlannedPlantation(request));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<PlannedPlantationResponse> update(
             @PathVariable("id") Long id,
             @RequestBody PlannedPlantationUpdateRequest request
@@ -52,7 +52,7 @@ public class PlannedPlantationController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         plannedPlantationService.deletePlannedPlantation(id);
         return ResponseEntity.noContent().build();

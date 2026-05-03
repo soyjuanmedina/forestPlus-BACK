@@ -5,6 +5,7 @@ import com.forestplus.dto.request.LandUpdateRequest;
 import com.forestplus.dto.response.LandResponse;
 import com.forestplus.entity.UserEntity;
 import com.forestplus.repository.UserRepository;
+import com.forestplus.security.CurrentUserService;
 import com.forestplus.service.LandService;
 import com.forestplus.service.JwtService;
 
@@ -18,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -28,18 +30,34 @@ public class LandController {
     private final LandService landService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final CurrentUserService currentUserService;
 
     // ============================
     // Obtener todas las parcelas
     // ============================
     @Operation(
-        operationId = "getAllLands",
-        summary = "Obtener todas las parcelas"
-    )
-    @GetMapping
-    public ResponseEntity<List<LandResponse>> getAllLands() {
-        return ResponseEntity.ok(landService.getAllLands());
-    }
+            operationId = "getAllLands",
+            summary = "Obtener todas las parcelas"
+        )
+        @GetMapping
+        @PreAuthorize("isAuthenticated()") // Aseguramos que esté logueado
+        public ResponseEntity<List<LandResponse>> getAllLands() {
+            Long currentCompanyId = currentUserService.getCurrentUserCompanyId(); 
+            String currentRole = currentUserService.getCurrentUserRole();
+
+            // Si es ADMIN, devolvemos todo (null significa sin filtro de compañía)
+            if ("ADMIN".equals(currentRole)) {
+                return ResponseEntity.ok(landService.getAllLands(null));
+            }
+
+            // Si es COMPANY_ADMIN o COMPANY_USER, filtramos por su compañía
+            if ("COMPANY_ADMIN".equals(currentRole) || "COMPANY_USER".equals(currentRole)) {
+                return ResponseEntity.ok(landService.getAllLands(currentCompanyId));
+            }
+
+            // Para cualquier otro rol no contemplado, podrías devolver una lista vacía o 403
+            return ResponseEntity.ok(Collections.emptyList());
+        }
 
     // ============================
     // Obtener parcela por ID

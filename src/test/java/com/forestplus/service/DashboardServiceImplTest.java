@@ -16,6 +16,7 @@ import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.PlannedPlantationRepository;
 import com.forestplus.repository.TreeRepository;
 import com.forestplus.repository.UserRepository;
+import com.forestplus.security.CurrentUserService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,9 @@ class DashboardServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+    
+    @Mock
+    private CurrentUserService currentUserService;
 
     @Mock
     private PlannedPlantationRepository plannedPlantationRepository;
