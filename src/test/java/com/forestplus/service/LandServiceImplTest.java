@@ -8,6 +8,7 @@ import com.forestplus.mapper.LandMapper;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.LandRepository;
 import com.forestplus.repository.UserRepository;
+import com.forestplus.security.CurrentUserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,6 +43,9 @@ class LandServiceImplTest {
     @Mock
     private com.forestplus.mapper.CoordinateMapper coordinateMapper;
  
+    @Mock
+    private CurrentUserService currentUserService;
+
     @InjectMocks
     private LandServiceImpl landService;
 

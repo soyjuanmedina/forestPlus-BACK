@@ -62,12 +62,20 @@ class DashboardServiceImplTest {
         when(companyRepository.findCompanyIdsByUserId(USER_ID))
                 .thenReturn(List.of(10L, 20L));
 
+        // Security Context
+        when(currentUserService.getCurrentUserRole()).thenReturn("USER");
+        when(currentUserService.getCurrentUserCompanyId()).thenReturn(null);
+
         // Trees
-        when(treeRepository.countOwnedTrees(USER_ID, List.of(10L, 20L)))
+        when(treeRepository.countOwnedTrees(USER_ID, null))
                 .thenReturn(5L);
 
-        when(treeRepository.sumAnnualCo2At20(USER_ID, List.of(10L, 20L)))
+        when(treeRepository.sumAnnualCo2At20(USER_ID, null))
                 .thenReturn(BigDecimal.TEN);
+
+        // Global Stats (for non-company user)
+        when(treeRepository.count()).thenReturn(100L);
+        when(treeRepository.sumGlobalAnnualCo2At20()).thenReturn(new BigDecimal("200.0"));
 
         // User
         UserEntity user = new UserEntity();
@@ -113,11 +121,17 @@ class DashboardServiceImplTest {
         when(companyRepository.findCompanyIdsByUserId(USER_ID))
                 .thenReturn(List.of());
 
+        when(currentUserService.getCurrentUserRole()).thenReturn("USER");
+        when(currentUserService.getCurrentUserCompanyId()).thenReturn(null);
+
         when(treeRepository.countOwnedTrees(USER_ID, null))
                 .thenReturn(0L);
 
         when(treeRepository.sumAnnualCo2At20(USER_ID, null))
                 .thenReturn(BigDecimal.ZERO);
+
+        when(treeRepository.count()).thenReturn(0L);
+        when(treeRepository.sumGlobalAnnualCo2At20()).thenReturn(BigDecimal.ZERO);
 
         when(userRepository.findById(USER_ID))
                 .thenReturn(Optional.empty());
@@ -143,11 +157,17 @@ class DashboardServiceImplTest {
         when(companyRepository.findCompanyIdsByUserId(USER_ID))
                 .thenReturn(List.of());
 
+        when(currentUserService.getCurrentUserRole()).thenReturn("USER");
+        when(currentUserService.getCurrentUserCompanyId()).thenReturn(null);
+
         when(treeRepository.countOwnedTrees(USER_ID, null))
                 .thenReturn(0L);
 
         when(treeRepository.sumAnnualCo2At20(USER_ID, null))
                 .thenReturn(BigDecimal.ZERO);
+
+        when(treeRepository.count()).thenReturn(0L);
+        when(treeRepository.sumGlobalAnnualCo2At20()).thenReturn(BigDecimal.ZERO);
 
         when(userRepository.findById(USER_ID))
                 .thenReturn(Optional.empty());

@@ -9,6 +9,7 @@ import com.forestplus.exception.ResourceNotFoundException;
 import com.forestplus.mapper.PlannedPlantationMapper;
 import com.forestplus.repository.LandRepository;
 import com.forestplus.repository.PlannedPlantationRepository;
+import com.forestplus.security.CurrentUserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,6 +35,9 @@ class PlannedPlantationServiceImplTest {
     @Mock
     private PlannedPlantationMapper mapper;
 
+    @Mock
+    private CurrentUserService currentUserService;
+
     @InjectMocks
     private PlannedPlantationServiceImpl service;
 
@@ -41,6 +45,7 @@ class PlannedPlantationServiceImplTest {
     void shouldGetAllPlannedPlantations() {
         PlannedPlantationEntity entity = new PlannedPlantationEntity();
         PlannedPlantationResponse response = new PlannedPlantationResponse();
+        when(currentUserService.getCurrentUserRole()).thenReturn("ADMIN");
         when(plannedPlantationRepository.findAll()).thenReturn(List.of(entity));
         when(mapper.toResponse(entity)).thenReturn(response);
 
