@@ -17,6 +17,9 @@ public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
     List<TreeEntity> findByOwnerCompanyId(Long companyId);
     List<TreeEntity> findByLandId(Long landId);
     
+    @Query("SELECT t FROM TreeEntity t LEFT JOIN FETCH t.ownerUser u LEFT JOIN FETCH u.company LEFT JOIN FETCH t.ownerCompany WHERE t.id = :id")
+    java.util.Optional<TreeEntity> findByIdWithOwners(@Param("id") Long id);
+    
     long countByLandId(Long landId);
 
     @Query("""
@@ -40,9 +43,11 @@ public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
 	        COUNT(t)
 	    )
 	    FROM TreeEntity t
+	    LEFT JOIN t.ownerUser u
+	    LEFT JOIN t.ownerCompany c
 	    WHERE 
-	        (:ownerUserId IS NULL OR t.ownerUser.id = :ownerUserId)
-	        AND (:ownerCompanyId IS NULL OR t.ownerCompany.id = :ownerCompanyId)
+	        (:ownerUserId IS NULL OR u.id = :ownerUserId)
+	        AND (:ownerCompanyId IS NULL OR c.id = :ownerCompanyId OR (u IS NOT NULL AND u.company.id = :ownerCompanyId))
 	    GROUP BY t.treeType.id, t.treeType.name, t.treeType.picture
 		""")
 	List<LandTreeSummaryResponse> getTreesByOwner(
@@ -55,8 +60,10 @@ public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
     
     @Query("""
     	    SELECT t FROM TreeEntity t
-    	    WHERE (:ownerUserId IS NULL OR t.ownerUser.id = :ownerUserId)
-    	      AND (:ownerCompanyId IS NULL OR t.ownerCompany.id = :ownerCompanyId)
+    	    LEFT JOIN t.ownerUser u
+    	    LEFT JOIN t.ownerCompany c
+    	    WHERE ((:ownerUserId IS NULL OR u.id = :ownerUserId)
+    	      AND (:ownerCompanyId IS NULL OR c.id = :ownerCompanyId OR (u IS NOT NULL AND u.company.id = :ownerCompanyId)))
     	      AND t.treeType.id = :treeTypeId
     	""")
     	List<TreeEntity> findByOwnerAndType(
@@ -68,10 +75,11 @@ public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
     @Query("""
     	    SELECT t
     	    FROM TreeEntity t
+    	    LEFT JOIN t.ownerUser u
     	    WHERE 
-    	        (:ownerUserId IS NOT NULL AND t.ownerUser.id = :ownerUserId)
+    	        (:ownerUserId IS NOT NULL AND u.id = :ownerUserId)
     	        OR
-    	        (:ownerCompanyId IS NOT NULL AND t.ownerCompany.id = :ownerCompanyId)
+    	        (:ownerCompanyId IS NOT NULL AND (t.ownerCompany.id = :ownerCompanyId OR (u.id IS NOT NULL AND u.company.id = :ownerCompanyId)))
     	    """)
     	List<TreeEntity> findOwnerTrees(
     	        @Param("ownerUserId") Long ownerUserId,
@@ -79,12 +87,24 @@ public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
     	);
     
     @Query("""
+    	    SELECT t
+    	    FROM TreeEntity t
+    	    LEFT JOIN t.ownerUser u
+    	    WHERE 
+    	        t.ownerCompany.id = :companyId
+    	        OR
+    	        (u.id IS NOT NULL AND u.company.id = :companyId)
+    	    """)
+    	List<TreeEntity> findAllByCompany(@Param("companyId") Long companyId);
+    
+    @Query("""
     	    SELECT COUNT(t)
     	    FROM TreeEntity t
+    	    LEFT JOIN t.ownerUser u
     	    WHERE 
-    	        (:userId IS NOT NULL AND t.ownerUser.id = :userId)
+    	        (:userId IS NOT NULL AND u.id = :userId)
     	        OR
-    	        (:companyIds IS NOT NULL AND t.ownerCompany.id IN :companyIds)
+    	        (:companyIds IS NOT NULL AND (t.ownerCompany.id IN :companyIds OR (u.id IS NOT NULL AND u.company.id IN :companyIds)))
     	""")
     	long countOwnedTrees(
     	    @Param("userId") Long userId,
@@ -94,10 +114,11 @@ public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
     @Query("""
     	    SELECT COALESCE(SUM(t.co2AbsorptionAt20), 0)
     	    FROM TreeEntity t
+    	    LEFT JOIN t.ownerUser u
     	    WHERE 
-    	        (:userId IS NOT NULL AND t.ownerUser.id = :userId)
+    	        (:userId IS NOT NULL AND u.id = :userId)
     	        OR
-    	        (:companyIds IS NOT NULL AND t.ownerCompany.id IN :companyIds)
+    	        (:companyIds IS NOT NULL AND (t.ownerCompany.id IN :companyIds OR (u.id IS NOT NULL AND u.company.id IN :companyIds)))
     	""")
     	BigDecimal sumAnnualCo2At20(
     	        @Param("userId") Long userId,

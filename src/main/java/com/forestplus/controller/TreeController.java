@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,9 +27,17 @@ public class TreeController {
     private final CurrentUserService currentUserService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<List<TreeResponse>> getAllTrees() {
-        return ResponseEntity.ok(treeService.getAllTrees());
+        String role = currentUserService.getCurrentUserRole();
+        Long companyId = currentUserService.getCurrentUserCompanyId();
+
+        if ("ADMIN".equals(role)) {
+            return ResponseEntity.ok(treeService.getAllTrees());
+        }
+
+        // Si es COMPANY_ADMIN, filtramos por su compañía (incluyendo empleados)
+        return ResponseEntity.ok(treeService.getAllTreesByCompany(companyId));
     }
 
     @GetMapping("/{id}")
@@ -46,15 +55,15 @@ public class TreeController {
     @PutMapping("/{id}")
     @PreAuthorize("@treeSecurity.canEdit(#id)")
     public ResponseEntity<TreeResponse> updateTree(
-            @PathVariable("id") Long id,
+            @P("id") @PathVariable("id") Long id,
             @RequestBody TreeUpdateRequest request
     ) {
         return ResponseEntity.ok(treeService.updateTree(id, request));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteTree(@PathVariable("id") Long id) {
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('COMPANY_ADMIN') and @treeSecurity.canDelete(#id))")
+    public ResponseEntity<Void> deleteTree(@P("id") @PathVariable("id") Long id) {
         treeService.deleteTree(id);
         return ResponseEntity.noContent().build();
     }

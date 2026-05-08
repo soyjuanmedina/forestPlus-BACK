@@ -6,6 +6,8 @@ import com.forestplus.dto.response.PlannedPlantationResponse;
 import com.forestplus.entity.LandEntity;
 import com.forestplus.entity.PlannedPlantationEntity;
 import com.forestplus.exception.ResourceNotFoundException;
+import com.forestplus.exception.ForestPlusException;
+import org.springframework.http.HttpStatus;
 import com.forestplus.mapper.PlannedPlantationMapper;
 import com.forestplus.repository.LandRepository;
 import com.forestplus.repository.PlannedPlantationRepository;
@@ -62,7 +64,7 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
     public PlannedPlantationResponse getPlannedPlantationById(Long id) {
         return plannedPlantationRepository.findById(id)
                 .map(this::mapToResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Planned Plantation not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("ERRORS.PLANTATION.NOT_FOUND"));
     }
 
     @Override
@@ -72,13 +74,13 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
 
         if (request.getLandId() != null) {
             LandEntity land = landRepository.findById(request.getLandId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Land not found with id " + request.getLandId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("ERRORS.LAND.NOT_FOUND"));
             entity.setLand(land);
         }
 
         if (request.getTreeTypeId() != null) {
             com.forestplus.entity.TreeTypeEntity treeType = treeTypeRepository.findById(request.getTreeTypeId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Tree Type not found with id " + request.getTreeTypeId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("ERRORS.TREE_TYPE.NOT_FOUND"));
             entity.setTreeType(treeType);
         }
 
@@ -89,7 +91,7 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
     @Transactional
     public PlannedPlantationResponse updatePlannedPlantation(Long id, PlannedPlantationUpdateRequest request) {
         PlannedPlantationEntity entity = plannedPlantationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Planned Plantation not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("ERRORS.PLANTATION.NOT_FOUND"));
 
         mapper.updateEntityFromDto(request, entity);
 
@@ -117,7 +119,20 @@ public class PlannedPlantationServiceImpl implements PlannedPlantationService {
     }
 
     @Override
+    @Transactional
     public void deletePlannedPlantation(Long id) {
+        if (!plannedPlantationRepository.existsById(id)) {
+            throw new ResourceNotFoundException("ERRORS.PLANTATION.NOT_FOUND");
+        }
+        
+        long treeCount = plannedPlantationRepository.countTreesByPlantationId(id);
+        if (treeCount > 0) {
+            throw new ForestPlusException(
+                HttpStatus.BAD_REQUEST, 
+                "ERRORS.PLANTATION.HAS_TREES"
+            );
+        }
+        
         plannedPlantationRepository.deleteById(id);
     }
 

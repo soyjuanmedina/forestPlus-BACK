@@ -19,6 +19,8 @@ public interface PlannedPlantationRepository
      */
     List<PlannedPlantationEntity> findByLandId(Long landId);
 
+    long countByLandId(Long landId);
+
     /**
      * Plantaciones sin terreno asignado
      */

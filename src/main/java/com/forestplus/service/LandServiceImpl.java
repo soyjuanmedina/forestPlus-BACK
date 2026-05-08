@@ -6,10 +6,15 @@ import com.forestplus.dto.response.LandResponse;
 import com.forestplus.entity.CompanyEntity;
 import com.forestplus.entity.LandEntity;
 import com.forestplus.entity.UserEntity;
+import com.forestplus.exception.ResourceNotFoundException;
+import com.forestplus.exception.ForestPlusException;
+import org.springframework.http.HttpStatus;
 import com.forestplus.mapper.LandMapper;
 import com.forestplus.repository.CompanyRepository;
 import com.forestplus.repository.LandRepository;
 import com.forestplus.repository.UserRepository;
+import com.forestplus.repository.TreeRepository;
+import com.forestplus.repository.PlannedPlantationRepository;
 import com.forestplus.security.CurrentUserService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +32,8 @@ public class LandServiceImpl implements LandService {
     private final LandMapper landMapper;
     private final com.forestplus.mapper.CoordinateMapper coordinateMapper;
     private final com.forestplus.repository.CoordinateRepository coordinateRepository;
+    private final TreeRepository treeRepository;
+    private final PlannedPlantationRepository plannedPlantationRepository;
     private final CurrentUserService currentUserService;
 
 
@@ -46,7 +53,7 @@ public class LandServiceImpl implements LandService {
         // 3. Lógica de vinculación con la Compañía (Solo para COMPANY_ADMIN)
         if ("COMPANY_ADMIN".equals(currentRole)) {
             UserEntity creator = userRepository.findById(currentUserId)
-                    .orElseThrow(() -> new RuntimeException("Usuario creador no encontrado"));
+                    .orElseThrow(() -> new ResourceNotFoundException("ERRORS.USER.NOT_FOUND"));
 
             if (creator.getCompany() != null) {
                 CompanyEntity company = creator.getCompany();
@@ -93,7 +100,7 @@ public class LandServiceImpl implements LandService {
     @org.springframework.transaction.annotation.Transactional
     public LandResponse updateLand(Long id, LandUpdateRequest request) {
         LandEntity land = landRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Land not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("ERRORS.LAND.NOT_FOUND"));
 
         land.setName(request.getName());
         land.setDescription(request.getDescription());
@@ -135,7 +142,7 @@ public class LandServiceImpl implements LandService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public LandResponse getLandById(Long id) {
         LandEntity land = landRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Land not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("ERRORS.LAND.NOT_FOUND"));
         LandResponse response = landMapper.toResponse(land);
         
         // Refuerzo manual por si el mapper tiene problemas con la carga diferida
@@ -176,14 +183,39 @@ public class LandServiceImpl implements LandService {
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public void deleteLand(Long id) {
-        landRepository.deleteById(id);
+        LandEntity land = landRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("ERRORS.LAND.NOT_FOUND"));
+
+        if (treeRepository.countByLandId(id) > 0) {
+            throw new ForestPlusException(HttpStatus.BAD_REQUEST, "ERRORS.LAND.HAS_TREES");
+        }
+
+        if (plannedPlantationRepository.countByLandId(id) > 0) {
+            throw new ForestPlusException(HttpStatus.BAD_REQUEST, "ERRORS.LAND.HAS_PLANTATIONS");
+        }
+
+        // Desvincular de compañías (lado dueño de la relación ManyToMany)
+        if (land.getCompanies() != null) {
+            for (CompanyEntity company : new java.util.ArrayList<>(land.getCompanies())) {
+                company.getLands().remove(land);
+            }
+            land.getCompanies().clear();
+        }
+        
+        // Desvincular de usuarios
+        if (land.getUsers() != null) {
+            land.getUsers().clear();
+        }
+
+        landRepository.delete(land);
     }
 
     @Override
     public LandResponse updateLandPicture(Long id, String picture) {
         LandEntity land = landRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Land not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("ERRORS.LAND.NOT_FOUND"));
         land.setPicture(picture);
         land = landRepository.save(land);
         LandResponse response = landMapper.toResponse(land);

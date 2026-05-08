@@ -401,43 +401,22 @@ public class TreeServiceImpl implements TreeService {
         Long currentCompanyId = currentUserService.getCurrentUserCompanyId();
         String currentRole = currentUserService.getCurrentUserRole();
 
-        // --- ADMIN & COMPANY_ADMIN ---
-        if ("ADMIN".equals(currentRole) || "COMPANY_ADMIN".equals(currentRole)) {
+        // --- ADMIN & COMPANY_ADMIN & COMPANY_USER ---
+        if ("ADMIN".equals(currentRole) || "COMPANY_ADMIN".equals(currentRole) || "COMPANY_USER".equals(currentRole)) {
+            // Si no vienen parámetros y el usuario pertenece a una empresa
+            if (ownerUserId == null && ownerCompanyId == null && currentCompanyId != null) {
+                // Si es ADMIN de la empresa, ve todo el bosque de la empresa
+                if ("COMPANY_ADMIN".equals(currentRole)) {
+                    return this.getAllTreesByCompany(currentCompanyId);
+                }
+                // Si es usuario normal, ve los suyos y los de la empresa
+                return treeMapper.toResponseList(
+                        treeRepository.findOwnerTrees(currentUserId, currentCompanyId)
+                );
+            }
+            
             return treeMapper.toResponseList(
                     treeRepository.findOwnerTrees(ownerUserId, ownerCompanyId)
-            );
-        }
-
-        // --- COMPANY_USER ---
-        if ("COMPANY_USER".equals(currentRole)) {
-
-            // Pide usuario concreto
-            if (ownerUserId != null) {
-                if (!ownerUserId.equals(currentUserId)) {
-                    throw new ForestPlusException("No puedes ver los árboles de otro usuario.", 
-                            HttpStatus.FORBIDDEN.value()) {};
-                }
-
-                return treeMapper.toResponseList(
-                        treeRepository.findOwnerTrees(ownerUserId, null)
-                );
-            }
-
-            // Pide compañía
-            if (ownerCompanyId != null) {
-                if (!ownerCompanyId.equals(currentCompanyId)) {
-                    throw new ForestPlusException("No puedes ver los árboles de otra compañía.", 
-                            HttpStatus.FORBIDDEN.value()) {};
-                }
-
-                return treeMapper.toResponseList(
-                        treeRepository.findOwnerTrees(null, ownerCompanyId)
-                );
-            }
-
-            // Sin parámetros → sus árboles
-            return treeMapper.toResponseList(
-                    treeRepository.findOwnerTrees(currentUserId, null)
             );
         }
 
@@ -452,5 +431,9 @@ public class TreeServiceImpl implements TreeService {
         );
     }
     
+    @Override
+    public List<TreeResponse> getAllTreesByCompany(Long companyId) {
+        return treeMapper.toResponseList(treeRepository.findAllByCompany(companyId));
+    }
 }
 

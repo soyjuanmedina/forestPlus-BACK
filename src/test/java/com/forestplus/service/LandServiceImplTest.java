@@ -44,6 +44,12 @@ class LandServiceImplTest {
     private com.forestplus.mapper.CoordinateMapper coordinateMapper;
  
     @Mock
+    private com.forestplus.repository.TreeRepository treeRepository;
+
+    @Mock
+    private com.forestplus.repository.PlannedPlantationRepository plannedPlantationRepository;
+
+    @Mock
     private CurrentUserService currentUserService;
 
     @InjectMocks
@@ -110,7 +116,7 @@ class LandServiceImplTest {
         RuntimeException ex = assertThrows(RuntimeException.class,
                 () -> landService.updateLand(landId, request));
 
-        assertEquals("Land not found", ex.getMessage());
+        assertEquals("ERRORS.LAND.NOT_FOUND", ex.getMessage());
     }
 
     @Test
@@ -137,7 +143,7 @@ class LandServiceImplTest {
         RuntimeException ex = assertThrows(RuntimeException.class,
                 () -> landService.getLandById(landId));
 
-        assertEquals("Land not found", ex.getMessage());
+        assertEquals("ERRORS.LAND.NOT_FOUND", ex.getMessage());
     }
 
     @Test
@@ -163,10 +169,13 @@ class LandServiceImplTest {
     @Test
     void shouldDeleteLand() {
         Long landId = 1L;
-        doNothing().when(landRepository).deleteById(landId);
-
+        LandEntity entity = new LandEntity();
+        when(landRepository.findById(landId)).thenReturn(Optional.of(entity));
+        // Mocking treeRepository and plannedPlantationRepository if they are mocked in the class
+        // Wait, I need to check if they are mocked.
+        
         landService.deleteLand(landId);
 
-        verify(landRepository).deleteById(landId);
+        verify(landRepository).delete(entity);
     }
 }

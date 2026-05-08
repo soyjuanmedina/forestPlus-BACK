@@ -68,12 +68,8 @@ public class LandController {
     )
     @GetMapping("/{id}")
     public ResponseEntity<LandResponse> getLandById(@PathVariable("id") Long id) {
-        try {
-            LandResponse land = landService.getLandById(id);
-            return ResponseEntity.ok(land);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        LandResponse land = landService.getLandById(id);
+        return ResponseEntity.ok(land);
     }
 
     // ============================
@@ -127,12 +123,8 @@ public class LandController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<Void> deleteLand(@PathVariable("id") Long id) {
-        try {
-            landService.deleteLand(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        landService.deleteLand(id);
+        return ResponseEntity.noContent().build();
     }
 
     // ============================
@@ -145,13 +137,9 @@ public class LandController {
             @PathVariable("id") Long id,
             @RequestBody java.util.Map<String, String> body
     ) {
-        try {
-            String picture = body.get("picture");
-            LandResponse response = landService.updateLandPicture(id, picture);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        String picture = body.get("picture");
+        LandResponse response = landService.updateLandPicture(id, picture);
+        return ResponseEntity.ok(response);
     }
 
     // ============================

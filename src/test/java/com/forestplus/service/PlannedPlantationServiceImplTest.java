@@ -145,7 +145,8 @@ class PlannedPlantationServiceImplTest {
 
     @Test
     void shouldDeletePlannedPlantation() {
-        doNothing().when(plannedPlantationRepository).deleteById(1L);
+        when(plannedPlantationRepository.existsById(1L)).thenReturn(true);
+        when(plannedPlantationRepository.countTreesByPlantationId(1L)).thenReturn(0L);
         service.deletePlannedPlantation(1L);
         verify(plannedPlantationRepository).deleteById(1L);
     }
