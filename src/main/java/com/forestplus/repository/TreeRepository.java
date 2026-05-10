@@ -21,6 +21,8 @@ public interface TreeRepository extends JpaRepository<TreeEntity, Long> {
     java.util.Optional<TreeEntity> findByIdWithOwners(@Param("id") Long id);
     
     long countByLandId(Long landId);
+    
+    long countByPlannedPlantationId(Long plannedPlantationId);
 
     @Query("""
 	    SELECT new com.forestplus.dto.response.LandTreeSummaryResponse(

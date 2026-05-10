@@ -79,14 +79,23 @@ public class TreeServiceImpl implements TreeService {
     }
 
     @Override
+    @Transactional
     public TreeResponse createTree(TreeRequest request) {
+        LandEntity land = landRepository.findById(request.getLandId())
+                .orElseThrow(() -> new RuntimeException("Land not found"));
+
+        // Validar capacidad del terreno
+        long currentLandTrees = treeRepository.countByLandId(land.getId());
+        if (land.getMaxTrees() != null && currentLandTrees >= land.getMaxTrees()) {
+            throw new ForestPlusException("El terreno ya ha alcanzado su capacidad máxima (" + land.getMaxTrees() + ")", HttpStatus.BAD_REQUEST.value()) {};
+        }
+
+        TreeTypeEntity treeType = treeTypeRepository.findById(request.getTreeTypeId())
+                .orElseThrow(() -> new RuntimeException("TreeType not found"));
+
         TreeEntity tree = treeMapper.toEntity(request);
-
-        tree.setLand(landRepository.findById(request.getLandId())
-                .orElseThrow(() -> new RuntimeException("Land not found")));
-
-        tree.setTreeType(treeTypeRepository.findById(request.getTreeTypeId())
-                .orElseThrow(() -> new RuntimeException("TreeType not found")));
+        tree.setLand(land);
+        tree.setTreeType(treeType);
 
         if (request.getOwnerUserId() != null) {
             tree.setOwnerUser(userRepository.findById(request.getOwnerUserId())
@@ -99,10 +108,17 @@ public class TreeServiceImpl implements TreeService {
         }
         
         if (request.getPlannedPlantationId() != null) {
-            tree.setPlannedPlantation(
-                plannedPlantationRepository.findById(request.getPlannedPlantationId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Planned plantation not found"))
-            );
+            PlannedPlantationEntity pp = plannedPlantationRepository.findById(request.getPlannedPlantationId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Planned plantation not found"));
+            
+            // Validar capacidad de la plantación
+            if (pp.getMaxTrees() != null) {
+                long currentPPTrees = treeRepository.countByPlannedPlantationId(pp.getId());
+                if (currentPPTrees >= pp.getMaxTrees()) {
+                    throw new ForestPlusException("La plantación prevista ya ha alcanzado su capacidad máxima (" + pp.getMaxTrees() + ")", HttpStatus.BAD_REQUEST.value()) {};
+                }
+            }
+            tree.setPlannedPlantation(pp);
         }
 
         return treeMapper.toResponse(treeRepository.save(tree));
@@ -215,11 +231,25 @@ public class TreeServiceImpl implements TreeService {
         // ==============================
         // 🔹 Lógica de máximo árboles
         // ==============================
-        long currentTrees = treeRepository.countByLandId(land.getId());
-        long available = land.getMaxTrees() == null ? Long.MAX_VALUE : land.getMaxTrees() - currentTrees;
+        long currentLandTrees = treeRepository.countByLandId(land.getId());
+        long landAvailable = land.getMaxTrees() == null ? Long.MAX_VALUE : land.getMaxTrees() - currentLandTrees;
 
-        if (available <= 0) {
+        if (landAvailable <= 0) {
             return new TreeBatchPlantResponse(0, request.getQuantity(), "Land is full");
+        }
+
+        long available = landAvailable;
+
+        // Validar también el límite de la plantación si existe
+        if (plannedPlantation != null && plannedPlantation.getMaxTrees() != null) {
+            long currentPPTrees = treeRepository.countByPlannedPlantationId(plannedPlantation.getId());
+            long ppAvailable = plannedPlantation.getMaxTrees() - currentPPTrees;
+            
+            if (ppAvailable <= 0) {
+                return new TreeBatchPlantResponse(0, request.getQuantity(), "Planned plantation is full");
+            }
+            
+            available = Math.min(available, ppAvailable);
         }
 
         // ==============================
@@ -227,7 +257,7 @@ public class TreeServiceImpl implements TreeService {
         // ==============================
         int toPlant = (int) Math.min(request.getQuantity(), available);
         if (toPlant <= 0) {
-            return new TreeBatchPlantResponse(0, request.getQuantity(), "Land is full");
+            return new TreeBatchPlantResponse(0, request.getQuantity(), "Capacity exceeded");
         }
 
         // ==============================
