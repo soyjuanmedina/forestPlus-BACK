@@ -11,7 +11,8 @@ import com.forestplus.entity.UserEntity;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
-	Optional<UserEntity> findByEmail(String email);
+	@org.springframework.data.jpa.repository.Query("SELECT u FROM UserEntity u LEFT JOIN FETCH u.company WHERE u.email = :email")
+	Optional<UserEntity> findByEmail(@org.springframework.data.repository.query.Param("email") String email);
 	Optional<UserEntity> findByUuid(String uuid);
 	Page<UserEntity> findByRole(String role, Pageable pageable);
 	Page<UserEntity> findByCompanyId(Long companyId, Pageable pageable);

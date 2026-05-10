@@ -93,6 +93,7 @@ public class LandServiceImpl implements LandService {
             }
         }
 
+        enrichWithTreeCount(response);
         return response;
     }
 
@@ -135,6 +136,7 @@ public class LandServiceImpl implements LandService {
                 }
             }
         }
+        enrichWithTreeCount(response);
         return response;
     }
 
@@ -152,6 +154,7 @@ public class LandServiceImpl implements LandService {
                 response.setCoordinates(coords.stream().map(coordinateMapper::toResponse).toList());
             }
         }
+        enrichWithTreeCount(response);
         return response;
     }
 
@@ -178,6 +181,7 @@ public class LandServiceImpl implements LandService {
                     response.setCoordinates(coords.stream().map(coordinateMapper::toResponse).toList());
                 }
             }
+            enrichWithTreeCount(response);
         }
         return responses;
     }
@@ -227,6 +231,13 @@ public class LandServiceImpl implements LandService {
                 response.setCoordinates(coords.stream().map(coordinateMapper::toResponse).toList());
             }
         }
+        enrichWithTreeCount(response);
         return response;
+    }
+
+    private void enrichWithTreeCount(LandResponse response) {
+        if (response != null && response.getId() != null) {
+            response.setPlantedTreesCount(treeRepository.countByLandId(response.getId()));
+        }
     }
 }

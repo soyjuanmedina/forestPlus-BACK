@@ -24,4 +24,5 @@ public class LandResponse {
     private List<Long> userIds;
     private List<Long> companyIds;
     private List<CoordinateResponse> coordinates;
+    private Long plantedTreesCount;
 }
