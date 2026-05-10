@@ -269,8 +269,8 @@ public class UserServiceImpl implements UserService {
         UserEntity userToDelete = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
                 
-        Long authenticatedUserId = securityUtils.getAuthenticatedUserId();
-        String authenticatedUserRole = securityUtils.getAuthenticatedUserRole();
+        Long authenticatedUserId = currentUserService.getCurrentUserId();
+        String authenticatedUserRole = currentUserService.getCurrentUserRole();
 
         // Bloqueamos auto-borrado solo para administradores
         if (id.equals(authenticatedUserId) && 

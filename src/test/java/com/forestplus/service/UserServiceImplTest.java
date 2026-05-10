@@ -169,6 +169,10 @@ class UserServiceImplTest {
         user.setEmail("test@example.com");
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
+        // Mockear currentUserService para simular que otro usuario borra a este
+        when(currentUserService.getCurrentUserId()).thenReturn(999L);
+        when(currentUserService.getCurrentUserRole()).thenReturn("ADMIN");
+
         // Mockear loopsService para que no haga nada
         doNothing().when(loopsService).deleteContact(user.getEmail());
 
@@ -194,6 +198,10 @@ class UserServiceImplTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
+        // Mockear currentUserService
+        when(currentUserService.getCurrentUserId()).thenReturn(999L);
+        when(currentUserService.getCurrentUserRole()).thenReturn("ADMIN");
+
         // Mockear deleteById para que lance la excepción
         doThrow(new org.springframework.dao.DataIntegrityViolationException("constraint"))
                 .when(userRepository).deleteById(1L);
@@ -203,6 +211,38 @@ class UserServiceImplTest {
 
         assertEquals(HttpStatus.CONFLICT.value(), ex.getStatus());
         assertTrue(ex.getMessage().contains("constraint"));
+    }
+
+    @Test
+    void testDeleteUser_selfDeletionAdmin_fails() {
+        UserEntity user = new UserEntity();
+        user.setId(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        // Simular que el ADMIN intenta borrarse a sí mismo
+        when(currentUserService.getCurrentUserId()).thenReturn(1L);
+        when(currentUserService.getCurrentUserRole()).thenReturn("ADMIN");
+
+        ForestPlusException ex = assertThrows(ForestPlusException.class,
+                () -> service.deleteUser(1L));
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), ex.getStatus());
+        assertTrue(ex.getMessage().contains("Como administrador, no puedes eliminar tu propia cuenta"));
+    }
+
+    @Test
+    void testDeleteUser_selfDeletionUser_success() {
+        UserEntity user = new UserEntity();
+        user.setId(1L);
+        user.setEmail("user@test.com");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        // Simular que un USER normal se borra a sí mismo
+        when(currentUserService.getCurrentUserId()).thenReturn(1L);
+        when(currentUserService.getCurrentUserRole()).thenReturn("USER");
+
+        assertDoesNotThrow(() -> service.deleteUser(1L));
+        verify(userRepository).deleteById(1L);
     }
 
     // ===================== UPDATE USER =====================
