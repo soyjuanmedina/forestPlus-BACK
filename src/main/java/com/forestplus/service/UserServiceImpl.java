@@ -266,6 +266,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
+        Long authenticatedUserId = securityUtils.getAuthenticatedUserId();
+        if (id.equals(authenticatedUserId)) {
+            throw new ForestPlusException(HttpStatus.BAD_REQUEST, "No puedes eliminarte a ti mismo");
+        }
+
         try {
             // 1️⃣ Buscar el usuario
             UserEntity user = userRepository.findById(id)
