@@ -249,6 +249,42 @@ public class AuthService {
         loopsService.sendEvent(loopsEvent);
     }
 
+    public void requestUnlock(String email, String ip) {
+        if (!rateLimitService.tryConsumeByIp(ip) || !rateLimitService.tryConsumeByEmail(email)) {
+            throw new RuntimeException("Too many requests, please try later.");
+        }
+
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
+
+        String uuid = UUID.randomUUID().toString();
+        user.setUuid(uuid);
+        userRepository.save(user);
+
+        // Enlace de desbloqueo (en v2 redirigirá al login con un parámetro)
+        String link = frontendUrl + "login?unlocked=true&uuid=" + uuid;
+        
+        Map<String, Object> eventProperties = new HashMap<>();
+        eventProperties.put("link", link);
+        
+        LoopsEventRequest loopsEvent = new LoopsEventRequest(
+            user.getEmail(),
+            "unlock_account",
+            eventProperties
+        );
+
+        loopsService.sendEvent(loopsEvent);
+    }
+
+    public void unlockAccount(String uuid) {
+        UserEntity user = userRepository.findByUuid(uuid)
+                .orElseThrow(() -> new UuidNotFoundException(uuid));
+        user.setAccountLocked(false);
+        user.setLoginErrorCount(0);
+        user.setUuid(null);
+        userRepository.save(user);
+    }
+
     public void resetPasswordWithUuid(String uuid, String newPassword) {
         UserEntity user = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new UserNotFoundException("UUID_INVALIDO"));

@@ -208,6 +208,24 @@ public class AuthController {
         authService.forgotPassword(request.getEmail(), ip);
         return ResponseEntity.ok(new MessageResponse("Email de recuperación enviado"));
     }
+
+    @PostMapping(value = "/unlock-account", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> requestUnlock(
+        @RequestBody ForgotPasswordRequest request,
+        HttpServletRequest servletRequest
+    ) {
+        String ip = extractClientIp(servletRequest);
+        authService.requestUnlock(request.getEmail(), ip);
+        return ResponseEntity.ok(new MessageResponse("Email de desbloqueo enviado"));
+    }
+
+    @GetMapping(value = "/unlock", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> unlockAccount(
+        @RequestParam("uuid") String uuid
+    ) {
+        authService.unlockAccount(uuid);
+        return ResponseEntity.ok(new MessageResponse("Cuenta desbloqueada correctamente"));
+    }
     
     /**
      * Obtiene la IP del cliente considerando posibles proxies.
