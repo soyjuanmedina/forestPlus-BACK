@@ -266,18 +266,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
+        UserEntity userToDelete = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                
         Long authenticatedUserId = securityUtils.getAuthenticatedUserId();
-        if (id.equals(authenticatedUserId)) {
-            throw new ForestPlusException(HttpStatus.BAD_REQUEST, "No puedes eliminarte a ti mismo");
+        String authenticatedUserRole = securityUtils.getAuthenticatedUserRole();
+
+        // Bloqueamos auto-borrado solo para administradores
+        if (id.equals(authenticatedUserId) && 
+           ("ADMIN".equals(authenticatedUserRole) || "COMPANY_ADMIN".equals(authenticatedUserRole))) {
+            throw new ForestPlusException(HttpStatus.BAD_REQUEST, "Como administrador, no puedes eliminar tu propia cuenta. Contacta con el administrador del sistema.");
         }
 
         try {
-            // 1️⃣ Buscar el usuario
-            UserEntity user = userRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        	
             // Eliminar en Loops primero
-            loopsService.deleteContact(user.getEmail());
+            loopsService.deleteContact(userToDelete.getEmail());
             
             userRepository.deleteById(id);
 
