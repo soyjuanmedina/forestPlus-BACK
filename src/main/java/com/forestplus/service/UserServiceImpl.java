@@ -321,7 +321,11 @@ public class UserServiceImpl implements UserService {
                 page = userRepository.findAll(pageable);
             }
         } else if ("COMPANY_ADMIN".equals(currentRole)) {
-            Long companyFilter = (companyId != null) ? companyId : currentCompanyId;
+            if (companyId != null && !companyId.equals(currentCompanyId)) {
+                throw new ForestPlusException(HttpStatus.FORBIDDEN,
+                    "No tienes permisos para ver usuarios de otra empresa");
+            }
+            Long companyFilter = currentCompanyId;
             if (search != null && !search.trim().isEmpty()) {
                 String searchTerm = "%" + search.trim().toLowerCase() + "%";
                 page = userRepository.searchUsersInCompany(searchTerm, companyFilter, pageable);
